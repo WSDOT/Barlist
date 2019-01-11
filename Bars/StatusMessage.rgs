@@ -1,0 +1,26 @@
+HKCR
+{
+	Bars.StatusMessage.1 = s 'StatusMessage Class'
+	{
+		CLSID = s '{0A69D046-1DB1-11D3-893F-006097C68A9C}'
+	}
+	Bars.StatusMessage = s 'StatusMessage Class'
+	{
+		CLSID = s '{0A69D046-1DB1-11D3-893F-006097C68A9C}'
+		CurVer = s 'Bars.StatusMessage.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0A69D046-1DB1-11D3-893F-006097C68A9C} = s 'StatusMessage Class'
+		{
+			ProgID = s 'Bars.StatusMessage.1'
+			VersionIndependentProgID = s 'Bars.StatusMessage'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{F1F5C05B-12AA-11D3-8932-006097C68A9C}'
+		}
+	}
+}

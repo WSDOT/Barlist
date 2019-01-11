@@ -1,0 +1,26 @@
+HKCR
+{
+	Bars.Type53.1 = s 'Type53 Class'
+	{
+		CLSID = s '{735049B2-1F88-11d3-8942-006097C68A9C}'
+	}
+	Bars.Type53 = s 'Type53 Class'
+	{
+		CLSID = s '{735049B2-1F88-11d3-8942-006097C68A9C}'
+		CurVer = s 'Bars.Type53.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {735049B2-1F88-11d3-8942-006097C68A9C} = s 'Type53 Class'
+		{
+			ProgID = s 'Bars.Type53.1'
+			VersionIndependentProgID = s 'Bars.Type53'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{F1F5C05B-12AA-11D3-8932-006097C68A9C}'
+		}
+	}
+}

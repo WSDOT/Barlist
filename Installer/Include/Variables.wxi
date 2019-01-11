@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Include>
+  <?include CustomizationVariables.wxi?>
+  
+   <?define BarlistReleaseVersion = 5.0.0?> <!-- This defines the version number of the product release (must only use x.y.z to get removal of previous versions) -->
+   <?define BarlistVersion   = 5.0.0.0?> <!-- This defines the version number of the executable application (probably won't change much)-->
+  <?define WBFLVersion         = 4.3.0.0?>
+
+  <?define BarlistDocumentationVersion=5.0?>
+
+  <?define ExeName=Barlist?>
+
+  <?define DocumentationSourceRoot=\ARP\Barlist\Docs?>
+  <?define BarlistDocumentationTarget=Barlist?>
+
+  <?define BarlistDocumentationSourceRoot=$(var.DocumentationSourceRoot)\$(var.BarlistDocumentationTarget)\$(var.BarlistDocumentationVersion)?>
+
+  <?if $(var.Platform) = "x64"?>
+      <?define ProgramFilesDirectory = ProgramFiles64Folder?>
+      <?define ProductID = {EABF062C-C2F8-4CEB-8CCF-E53B538F067F}?>
+      <?define UpgradeCode = {92B7294A-DB06-4B6F-A337-F7964DB57760}?>
+      <?define PlatformFolder=x64?>
+      <?define IsWin64=yes?>
+   <?else?>
+      <?define ProgramFilesDirectory = ProgramFilesFolder?>
+      <?define ProductID = {92B7294A-DB06-4B6F-A337-F7964DB57760}?>
+      <?define UpgradeCode = {79B415B0-3782-4E44-BDF1-C903ED2F83F2}?>
+      <?define PlatformFolder=Win32?>
+      <?define IsWin64=no?>
+   <?endif?>
+
+  <?ifndef StartMenuFolderName?>
+  <?define StartMenuFolderName=Engineering Applications?>
+  <?endif?>
+
+  <?define BarlistFeatureLevel=1?>
+
+  <?define BarlistAppPluginCATID={AFBC445E-98FB-43C1-AD02-6AF599903BD9}?>
+   <?define BarlistComponentInfoCATID={7047875C-F3A0-453F-9F04-DDA9238AB5CF}?>
+  <?define BarlistAddinCATID={88FF9D4E-1F47-11D3-8941-006097C68A9C}?>
+
+   <?define BarlistSourceRoot=\ARP_RELEASE\Barlist\$(var.BarlistVersion)\bin\?>
+   <?define WBFLSourceRoot=\ARP_RELEASE\WBFL\$(var.WBFLVersion)\bin\?>
+   
+
+   <?if $(var.Platform)="x64"?>
+      <?define XercesSourceRoot=\ARP\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\?>
+   <?else?>
+      <?define XercesSourceRoot=\ARP\WBFL\Apache\XERCESCPKG-31-X86-VC100\bin\?>
+   <?endif?>
+
+</Include>

@@ -1,0 +1,624 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9e2f1c00-4542-4d4d-a659-524ede677dce}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{d72a8313-8662-4624-bedf-f8dc5b0c2565}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{b6082587-7edd-40b3-be0b-3ae7d35db117}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="AddinMgr.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+    <Midl Include="..\SDK\Include\BarlistAddin.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+    <Midl Include="..\SDK\Include\Barlst.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+    <Midl Include="Bars.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AddinMgrImp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BarCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BarComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BarData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BarException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BarInfoMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Barlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BarRecord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BarRecordCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Bars.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BendComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BendData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FabricationConstraints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Group.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GroupCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HelixComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HookComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HookData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LineComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusMessageCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type50.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type51.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type52.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type53.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type54.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type55.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type56.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type57.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type58.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type59.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type60.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type61.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type62.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type63.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type66.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type67.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type68.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type69.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type70.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type71.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type72.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type73.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type74.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type75.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type76.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type77.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type78.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type79.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type80.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type81.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type82.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type83.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type84.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type89.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type90.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type91.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type92.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type93.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type94.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type95.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type96.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type97.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type98.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type99.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Bars.def">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="AddinMgr.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BarCollection.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BarData.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BarInfoMgr.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Barlist.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BarRecord.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BarRecordCollection.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="BendData.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Group.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GroupCollection.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="HookData.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="StatusMessage.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="StatusMessageCollection.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type50.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type51.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type52.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type53.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type54.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type55.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type56.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type57.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type58.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type59.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type60.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type61.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type62.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type63.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type66.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type67.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type68.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type69.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type70.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type71.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type72.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type73.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type74.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type75.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type76.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type77.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type78.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type79.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type80.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type81.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type82.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type83.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type84.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type89.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type90.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type91.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type92.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type93.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type94.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type95.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type96.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type97.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type98.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Type99.rgs">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Bars.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AddinMgrImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarInfoMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Barlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarRecord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarRecordCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BarsCP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BendComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BendData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BendImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FabricationConstraints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Group.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GroupCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HelixComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HookComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HookData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LineComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusMessageCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type50.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type51.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type52.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type53.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type54.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type55.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type56.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type57.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type58.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type59.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type60.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type61.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type62.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type63.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type66.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type67.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type68.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type69.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type70.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type71.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type72.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type73.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type74.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type75.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type76.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type77.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type78.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type79.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type80.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type81.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type82.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type83.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type84.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type89.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type90.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type91.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type92.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type93.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type94.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type95.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type96.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type97.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type98.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type99.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

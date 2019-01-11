@@ -1,0 +1,570 @@
+///////////////////////////////////////////////////////////////////////
+// Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
+// Copyright © 2009-2019, Washington State Department of Transportation
+//                     Bridge and Structures Office
+//
+// This software was developed as part of the Alternate Route Project
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the Alternate Route Open Source License as 
+// published by the Washington State Department of Transportation,
+// Bridge and Structures Office.
+//
+// This program is distributed in the hope that it will be useful,
+// but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// PURPOSE.  See the Alternate Route Open Source License for more details.
+//
+// You should have received a copy of the Alternate Open Source License
+// along with this program; if not, write to the Washington State
+// Department of Transportation, Bridge and Structures Office,
+// 4500 3rd Ave SE, P.O. Box 47340, Olympia, WA 98503, USA or e-mail
+// Bridge_Support@wsdot.wa.gov
+///////////////////////////////////////////////////////////////////////
+
+
+// Bars.idl : IDL source for Bars.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (Bars.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "Barlst.idl";
+import "AddinMgr.idl";
+
+[
+	uuid(F1F5C05B-12AA-11D3-8932-006097C68A9C),
+	version(1.0),
+	helpstring("Bars 1.0 Type Library")
+]
+library BARSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(F1F5C068-12AA-11D3-8932-006097C68A9C),
+		helpstring("BarInfoMgr Class")
+	]
+	coclass BarInfoMgr
+	{
+		[default] interface IBarInfoMgr;
+	};
+	[
+		uuid(F1F5C06A-12AA-11D3-8932-006097C68A9C),
+		helpstring("HookData Class")
+	]
+	coclass HookData
+	{
+		[default] interface IHookData;
+	};
+	[
+		uuid(1454C8E4-1380-11D3-8933-006097C68A9C),
+		helpstring("BendData Class")
+	]
+	coclass BendData
+	{
+		[default] interface IBendData;
+	};
+	[
+		uuid(1454C8E6-1380-11D3-8933-006097C68A9C),
+		helpstring("BarData Class")
+	]
+	coclass BarData
+	{
+		[default] interface IBarData;
+	};
+	[
+		uuid(1454C8EA-1380-11D3-8933-006097C68A9C),
+		helpstring("BarCollection Class")
+	]
+	coclass BarCollection
+	{
+		[default] interface IBarCollection;
+	};
+	[
+		uuid(BFC2D3A8-143B-11D3-8934-006097C68A9C),
+		helpstring("BarRecord Class")
+	]
+	coclass BarRecord
+	{
+		[default] interface IBarRecord;
+      [default,source] interface IBarRecordEvents;
+	};
+	[
+		uuid(BFC2D3AA-143B-11D3-8934-006097C68A9C),
+		helpstring("Barlist Class")
+	]
+	coclass Barlist
+	{
+		[default] interface IBarlist;
+      [default,source] interface IBarlistEvents;
+	};
+	[
+		uuid(BFC2D3AC-143B-11D3-8934-006097C68A9C),
+		helpstring("Group Class")
+	]
+	coclass Group
+	{
+		[default] interface IGroup;
+      [default,source] interface IGroupEvents;
+	};
+	[
+		uuid(BFC2D3AE-143B-11D3-8934-006097C68A9C),
+		helpstring("GroupCollection Class")
+	]
+	coclass GroupCollection
+	{
+		[default] interface IGroupCollection;
+      [default,source] interface IGroupCollectionEvents;
+	};
+	[
+		uuid(BFC2D3B0-143B-11D3-8934-006097C68A9C),
+		helpstring("BarRecordCollection Class")
+	]
+	coclass BarRecordCollection
+	{
+		[default] interface IBarRecordCollection;
+      [default,source] interface IBarRecordCollectionEvents;
+	};
+	[
+		uuid(9DE5701D-1919-11D3-893C-006097C68A9C),
+		helpstring("StatusMessageCollection Class")
+	]
+	coclass StatusMessageCollection
+	{
+		[default] interface IStatusMessageCollection;
+	};
+
+	[
+		uuid(0A69D046-1DB1-11D3-893F-006097C68A9C),
+		helpstring("StatusMessage Class")
+	]
+	coclass StatusMessage
+	{
+		[default] interface IStatusMessage;
+	};
+	[
+		uuid(12FCFC9B-1F41-11D3-8941-006097C68A9C),
+		helpstring("AddinMgr Class")
+	]
+	coclass AddinMgr
+	{
+		[default] interface IAddinMgr;
+	};
+
+	[
+		uuid(2597E762-150F-11d3-8937-006097C68A9C),
+		helpstring("Type50 Class")
+	]
+	coclass Type50
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+
+	[
+		uuid(0B21EEEE-1539-11d3-8937-006097C68A9C),
+		helpstring("Type51 Class")
+	]
+	coclass Type51
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(F02C1198-1F86-11d3-8942-006097C68A9C),
+		helpstring("Type52 Class")
+	]
+	coclass Type52
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(735049B2-1F88-11d3-8942-006097C68A9C),
+		helpstring("Type53 Class")
+	]
+	coclass Type53
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(E5303A00-1F89-11d3-8942-006097C68A9C),
+		helpstring("Type54 Class")
+	]
+	coclass Type54
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(3BB5B3A0-2007-11d3-8944-006097C68A9C),
+		helpstring("Type55 Class")
+	]
+	coclass Type55
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(994EC4D4-2007-11d3-8944-006097C68A9C),
+		helpstring("Type56 Class")
+	]
+	coclass Type56
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(0F985006-2008-11d3-8944-006097C68A9C),
+		helpstring("Type57 Class")
+	]
+	coclass Type57
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(ADCEDC5E-2008-11d3-8944-006097C68A9C),
+		helpstring("Type58 Class")
+	]
+	coclass Type58
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(C82A1B4A-2008-11d3-8944-006097C68A9C),
+		helpstring("Type59 Class")
+	]
+	coclass Type59
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(9ECEEF80-200A-11d3-8944-006097C68A9C),
+		helpstring("Type60 Class")
+	]
+	coclass Type60
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(56F9528C-200E-11d3-8944-006097C68A9C),
+		helpstring("Type61 Class")
+	]
+	coclass Type61
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(16599174-2013-11d3-8944-006097C68A9C),
+		helpstring("Type62 Class")
+	]
+	coclass Type62
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(05A27426-2014-11d3-8944-006097C68A9C),
+		helpstring("Type63 Class")
+	]
+	coclass Type63
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(11E8EBE8-2019-11d3-8944-006097C68A9C),
+		helpstring("Type66 Class")
+	]
+	coclass Type66
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(8920C5DC-2014-11d3-8944-006097C68A9C),
+		helpstring("Type67 Class")
+	]
+	coclass Type67
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(A6226848-2267-11d3-8945-006097C68A9C),
+		helpstring("Type68 Class")
+	]
+	coclass Type68
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(46B52712-226A-11d3-8945-006097C68A9C),
+		helpstring("Type69 Class")
+	]
+	coclass Type69
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(97275C84-226E-11d3-8945-006097C68A9C),
+		helpstring("Type70 Class")
+	]
+	coclass Type70
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(CB9B5150-2278-11d3-8945-006097C68A9C),
+		helpstring("Type71 Class")
+	]
+	coclass Type71
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(37C70690-2273-11d3-8945-006097C68A9C),
+		helpstring("Type72 Class")
+	]
+	coclass Type72
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(4264FF58-2273-11d3-8945-006097C68A9C),
+		helpstring("Type73 Class")
+	]
+	coclass Type73
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(66B70B7C-227C-11d3-8945-006097C68A9C),
+		helpstring("Type74 Class")
+	]
+	coclass Type74
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(0667F52E-2272-11d3-8945-006097C68A9C),
+		helpstring("Type75 Class")
+	]
+	coclass Type75
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(8832784E-2273-11d3-8945-006097C68A9C),
+		helpstring("Type76 Class")
+	]
+	coclass Type76
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(A2010C7C-2273-11d3-8945-006097C68A9C),
+		helpstring("Type77 Class")
+	]
+	coclass Type77
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(A2010C7D-2273-11d3-8945-006097C68A9C),
+		helpstring("Type78 Class")
+	]
+	coclass Type78
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(250EC1C4-2286-11d3-8945-006097C68A9C),
+		helpstring("Type79 Class")
+	]
+	coclass Type79
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(F8ED1936-2287-11d3-8945-006097C68A9C),
+		helpstring("Type80 Class")
+	]
+	coclass Type80
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(4D3D0582-2283-11d3-8945-006097C68A9C),
+		helpstring("Type81 Class")
+	]
+	coclass Type81
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(724228F8-2283-11d3-8945-006097C68A9C),
+		helpstring("Type82 Class")
+	]
+	coclass Type82
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(E7C3523C-227E-11d3-8945-006097C68A9C),
+		helpstring("Type83 Class")
+	]
+	coclass Type83
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(F2B8BB52-2286-11d3-8945-006097C68A9C),
+		helpstring("Type84 Class")
+	]
+	coclass Type84
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+
+
+	[
+		uuid(AD8A63C4-2280-11d3-8945-006097C68A9C),
+		helpstring("Type89 Class")
+	]
+	coclass Type89
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(007D2B14-228D-11d3-8945-006097C68A9C),
+		helpstring("Type90 Class")
+	]
+	coclass Type90
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(21647F26-228D-11d3-8945-006097C68A9C),
+		helpstring("Type91 Class")
+	]
+	coclass Type91
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(3ECDC162-228D-11d3-8945-006097C68A9C),
+		helpstring("Type92 Class")
+	]
+	coclass Type92
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(5D9A4200-228D-11d3-8945-006097C68A9C),
+		helpstring("Type93 Class")
+	]
+	coclass Type93
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(78848E04-228D-11d3-8945-006097C68A9C),
+		helpstring("Type94 Class")
+	]
+	coclass Type94
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(99AC4194-228D-11d3-8945-006097C68A9C),
+		helpstring("Type95 Class")
+	]
+	coclass Type95
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(B60CDECA-228D-11d3-8945-006097C68A9C),
+		helpstring("Type96 Class")
+	]
+	coclass Type96
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(CFFCD3E4-228D-11d3-8945-006097C68A9C),
+		helpstring("Type97 Class")
+	]
+	coclass Type97
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(ED9362CE-228D-11d3-8945-006097C68A9C),
+		helpstring("Type98 Class")
+	]
+	coclass Type98
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+	[
+		uuid(0A6670E4-228E-11d3-8945-006097C68A9C),
+		helpstring("Type99 Class")
+	]
+	coclass Type99
+	{
+		[default] interface IBend;
+      [default,source] interface IBendEvents;
+	};
+// To create a new bend type class
+// 1. Copy/paste this block and remove the commets
+// 2. Create a CLSID using GUIDGEN.EXE and copy it to uuid
+// 3. Replace XX with the bend type number
+//	[
+//		uuid(/*insert new GUID here*/),
+//		helpstring("TypeXX Class")
+//	]
+//	coclass TypeXX
+//	{
+//		[default] interface IBend;
+//      [default,source] interface IBendEvents;
+//	};
+};

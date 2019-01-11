@@ -1,0 +1,141 @@
+///////////////////////////////////////////////////////////////////////
+// Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
+// Copyright © 2009-2019, Washington State Department of Transportation
+//                     Bridge and Structures Office
+//
+// This software was developed as part of the Alternate Route Project
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the Alternate Route Open Source License as 
+// published by the Washington State Department of Transportation,
+// Bridge and Structures Office.
+//
+// This program is distributed in the hope that it will be useful,
+// but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// PURPOSE.  See the Alternate Route Open Source License for more details.
+//
+// You should have received a copy of the Alternate Open Source License
+// along with this program; if not, write to the Washington State
+// Department of Transportation, Bridge and Structures Office,
+// 4500 3rd Ave SE, P.O. Box 47340, Olympia, WA 98503, USA or e-mail
+// Bridge_Support@wsdot.wa.gov
+///////////////////////////////////////////////////////////////////////
+
+
+// Type75.cpp : Implementation of CType75
+#include "stdafx.h"
+#include "Bars.h"
+#include "Type75.h"
+#include "FabricationConstraints.h"
+#include "LineComponent.h"
+#include "BendComponent.h"
+#include "HookComponent.h"
+#include <MathEx.h>
+
+/////////////////////////////////////////////////////////////////////////////
+// CType75
+void CType75::BuildBend()
+{
+   CBendImpl<CType75,&CLSID_Type75>::BuildBend();
+
+   if ( GetStatusLevel() == stError )
+      return;
+
+   CComPtr<IBarData> pBarData;
+   pBarData.Attach( GetBarData() );
+
+   UseType use = GetUseType();
+
+   // Error check data
+
+   // Build the bend
+   double oRadius; // outside radius
+   double cRadius; // centerline radius
+   double hRadius; // radius of hook
+   double tail;
+   double deduct90_1;
+   double deduct90_2;
+   double deductHook_1;
+   double deductHook_2;
+   double u, w, x; // reduced dimensions (wx is the hypotenous)
+
+   oRadius = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
+   cRadius = CFabricationConstraints::GetCenterlineBendRadius( pBarData, use );
+
+   deduct90_1 = IsZero(GetW()) ? 0.00 : CFabricationConstraints::GetBendDeduction( oRadius, PI_OVER_2 );
+   deduct90_2 = IsZero(GetX()) ? 0.00 : CFabricationConstraints::GetBendDeduction( oRadius, PI_OVER_2 );
+
+   hRadius = CFabricationConstraints::GetHookRadius( pBarData, use );
+   tail = CFabricationConstraints::GetTailLength( pBarData, use, ht180 );
+   deductHook_1 = IsZero(GetW()) ? 0.00 : CFabricationConstraints::GetHookDeduction( pBarData, use, ht180 );
+   deductHook_2 = IsZero(GetX()) ? 0.00 : CFabricationConstraints::GetHookDeduction( pBarData, use, ht180 );
+
+   u = GetU() - deduct90_1 - deduct90_2;
+   w = IsZero(GetW()) ? 0.00 : GetW() - deduct90_1 - deductHook_1;
+   x = IsZero(GetX()) ? 0.00 : GetX() - deduct90_2 - deductHook_2;
+
+   // Some additional error checking
+   if ( u < 0 )
+   {
+      SetStatusLevel( stError );
+      CComBSTR msg;
+      msg.LoadString( ERR_MUSTBEGREATERTHAN );
+      AddStatusMsg( msg, CComVariant("U"), CComVariant(deduct90_1 + deduct90_2) );
+   }
+
+   if ( w < 0 )
+   {
+      SetStatusLevel( stError );
+      CComBSTR msg;
+      msg.LoadString( ERR_MUSTBEGREATERTHAN );
+      AddStatusMsg( msg, CComVariant("W"), CComVariant(deduct90_1+deductHook_1) );
+   }
+
+   if ( x < 0 )
+   {
+      SetStatusLevel( stError );
+      CComBSTR msg;
+      msg.LoadString( ERR_MUSTBEGREATERTHAN );
+      AddStatusMsg( msg, CComVariant("X"), CComVariant(deduct90_2+deductHook_2) );
+   }
+
+   if ( GetStatusLevel() == stError )
+      return;
+
+   // Assemble the bend components
+   AddBarComponent( new CLineComponent(u) );
+   AddBarComponent( new CLineComponent(w) );
+   AddBarComponent( new CLineComponent(x) );
+
+   if ( !IsZero(GetW()) )
+   {
+      AddBarComponent( new CBend90(cRadius) );
+      AddBarComponent( new CHook180(hRadius,tail) );
+   }
+
+   if ( !IsZero(GetX()) )
+   {
+      AddBarComponent( new CBend90(cRadius) );
+      AddBarComponent( new CHook180(hRadius,tail) );
+   }
+
+}
+
+void CType75::PreValidateBend()
+{
+   CBendImpl<CType75,&CLSID_Type75>::PreValidateBend();
+
+   bool bCase1 =  IsZero(GetW()) &&  IsZero(GetX());
+   bool bCase2 = !IsZero(GetW()) &&  IsZero(GetX());
+   bool bCase3 =  IsZero(GetW()) && !IsZero(GetX());
+   bool bCase4 = !IsZero(GetW()) && !IsZero(GetX());
+
+   if (!bCase1 && !bCase2 && !bCase3 && !bCase4)
+   {
+      SetStatusLevel( stError );
+      CComBSTR msg;
+      msg.LoadString( ERR_ILLFORMEDBEND );
+      AddStatusMsg( msg, CComVariant(), CComVariant() );
+   }
+}

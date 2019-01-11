@@ -1,0 +1,59 @@
+///////////////////////////////////////////////////////////////////////
+// Barlist
+// Copyright © 2009-2019  Washington State Department of Transportation
+//                        Bridge and Structures Office
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the Alternate Route Open Source License as 
+// published by the Washington State Department of Transportation, 
+// Bridge and Structures Office.
+//
+// This program is distributed in the hope that it will be useful, but 
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// the Alternate Route Open Source License for more details.
+//
+// You should have received a copy of the Alternate Route Open Source 
+// License along with this program; if not, write to the Washington 
+// State Department of Transportation, Bridge and Structures Office, 
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// Bridge_Support@wsdot.wa.gov
+///////////////////////////////////////////////////////////////////////
+
+// BarlistPlugin.idl : IDL source for BarlistPlugin.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (BarlistPlugin.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+	uuid(77FB7C53-6E92-4823-81F2-04073D827555),
+	version(1.0),
+	helpstring("BarlistPlugin 1.0 Type Library")
+]
+library BARLISTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(CFD04C61-6C91-42ED-8CAB-33DB07D08069),
+		helpstring("Plugin Class")
+	]
+	coclass Plugin
+	{
+		[default] interface IUnknown;
+	};
+
+   [
+      uuid(C357C429-FEB4-4CB9-87A9-A07DE7EE3D3F)
+   ]
+   coclass BarlistComponentInfo
+   {
+      interface IUnknown;
+   }
+};

@@ -1,0 +1,26 @@
+HKCR
+{
+	Addin.TestAddin.1 = s 'TestAddin Class'
+	{
+		CLSID = s '{12FCFC94-1F41-11D3-8941-006097C68A9C}'
+	}
+	Addin.TestAddin = s 'TestAddin Class'
+	{
+		CLSID = s '{12FCFC94-1F41-11D3-8941-006097C68A9C}'
+		CurVer = s 'Addin.TestAddin.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {12FCFC94-1F41-11D3-8941-006097C68A9C} = s 'TestAddin Class'
+		{
+			ProgID = s 'Addin.TestAddin.1'
+			VersionIndependentProgID = s 'Addin.TestAddin'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{12FCFC87-1F41-11D3-8941-006097C68A9C}'
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	Bars.BarRecord.1 = s 'BarRecord Class'
+	{
+		CLSID = s '{BFC2D3A8-143B-11D3-8934-006097C68A9C}'
+	}
+	Bars.BarRecord = s 'BarRecord Class'
+	{
+		CLSID = s '{BFC2D3A8-143B-11D3-8934-006097C68A9C}'
+		CurVer = s 'Bars.BarRecord.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {BFC2D3A8-143B-11D3-8934-006097C68A9C} = s 'BarRecord Class'
+		{
+			ProgID = s 'Bars.BarRecord.1'
+			VersionIndependentProgID = s 'Bars.BarRecord'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{F1F5C05B-12AA-11D3-8932-006097C68A9C}'
+		}
+	}
+}

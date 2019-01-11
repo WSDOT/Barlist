@@ -1,0 +1,267 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""Bars.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,3,0,0
+ PRODUCTVERSION 1,3,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "A member of the Alternate Route Project"
+            VALUE "CompanyName", "Washington State Department of Transportation"
+            VALUE "FileDescription", "Bars Module"
+            VALUE "FileVersion", "1.3.0.0"
+            VALUE "InternalName", "Bars"
+            VALUE "LegalCopyright", "Copyright © 2009-2019, Washington State Department of Transportation, All Rights Reserved"
+            VALUE "OriginalFilename", "Bars.DLL"
+            VALUE "ProductName", "Bars Module"
+            VALUE "ProductVersion", "1.3.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_BARINFOMGR          REGISTRY                "BarInfoMgr.rgs"
+
+IDR_HOOKDATA            REGISTRY                "HookData.rgs"
+
+IDR_BENDDATA            REGISTRY                "BendData.rgs"
+
+IDR_BARDATA             REGISTRY                "BarData.rgs"
+
+IDR_BARCOLLECTION       REGISTRY                "BarCollection.rgs"
+
+IDR_BARRECORD           REGISTRY                "BarRecord.rgs"
+
+IDR_BARLIST             REGISTRY                "Barlist.rgs"
+
+IDR_GROUP               REGISTRY                "Group.rgs"
+
+IDR_GROUPCOLLECTION     REGISTRY                "GroupCollection.rgs"
+
+IDR_BARRECORDCOLLECTION REGISTRY                "BarRecordCollection.rgs"
+
+IDR_STATUSMESSAGECOLLECTION REGISTRY                "StatusMessageCollection.rgs"
+
+IDR_STATUSMESSAGE       REGISTRY                "StatusMessage.rgs"
+
+IDR_ADDINMGR            REGISTRY                "AddinMgr.rgs"
+
+IDR_TYPE50              REGISTRY                "Type50.rgs"
+
+IDR_TYPE51              REGISTRY                "Type51.rgs"
+
+IDR_TYPE52              REGISTRY                "Type52.rgs"
+
+IDR_TYPE53              REGISTRY                "Type53.rgs"
+
+IDR_TYPE54              REGISTRY                "Type54.rgs"
+
+IDR_TYPE55              REGISTRY                "Type55.rgs"
+
+IDR_TYPE56              REGISTRY                "Type56.rgs"
+
+IDR_TYPE57              REGISTRY                "Type57.rgs"
+
+IDR_TYPE58              REGISTRY                "Type58.rgs"
+
+IDR_TYPE59              REGISTRY                "Type59.rgs"
+
+IDR_TYPE60              REGISTRY                "Type60.rgs"
+
+IDR_TYPE61              REGISTRY                "Type61.rgs"
+
+IDR_TYPE62              REGISTRY                "Type62.rgs"
+
+IDR_TYPE63              REGISTRY                "Type63.rgs"
+
+IDR_TYPE66              REGISTRY                "Type66.rgs"
+
+IDR_TYPE67              REGISTRY                "Type67.rgs"
+
+IDR_TYPE68              REGISTRY                "Type68.rgs"
+
+IDR_TYPE69              REGISTRY                "Type69.rgs"
+
+IDR_TYPE70              REGISTRY                "Type70.rgs"
+
+IDR_TYPE71              REGISTRY                "Type71.rgs"
+
+IDR_TYPE72              REGISTRY                "Type72.rgs"
+
+IDR_TYPE73              REGISTRY                "Type73.rgs"
+
+IDR_TYPE74              REGISTRY                "Type74.rgs"
+
+IDR_TYPE75              REGISTRY                "Type75.rgs"
+
+IDR_TYPE76              REGISTRY                "Type76.rgs"
+
+IDR_TYPE77              REGISTRY                "Type77.rgs"
+
+IDR_TYPE78              REGISTRY                "Type78.rgs"
+
+IDR_TYPE79              REGISTRY                "Type79.rgs"
+
+IDR_TYPE80              REGISTRY                "Type80.rgs"
+
+IDR_TYPE81              REGISTRY                "Type81.rgs"
+
+IDR_TYPE82              REGISTRY                "Type82.rgs"
+
+IDR_TYPE83              REGISTRY                "Type83.rgs"
+
+IDR_TYPE84              REGISTRY                "Type84.rgs"
+
+IDR_TYPE89              REGISTRY                "Type89.rgs"
+
+IDR_TYPE90              REGISTRY                "Type90.rgs"
+
+IDR_TYPE91              REGISTRY                "Type91.rgs"
+
+IDR_TYPE92              REGISTRY                "Type92.rgs"
+
+IDR_TYPE93              REGISTRY                "Type93.rgs"
+
+IDR_TYPE94              REGISTRY                "Type94.rgs"
+
+IDR_TYPE95              REGISTRY                "Type95.rgs"
+
+IDR_TYPE96              REGISTRY                "Type96.rgs"
+
+IDR_TYPE97              REGISTRY                "Type97.rgs"
+
+IDR_TYPE98              REGISTRY                "Type98.rgs"
+
+IDR_TYPE99              REGISTRY                "Type99.rgs"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_PROJNAME            "Bars"
+END
+
+STRINGTABLE
+BEGIN
+    WARN_EXCEEDSNORMAL      "WARNING : Exceeds normal bar length of %1"
+    WARN_MINRADIUS          "WARNING : %1 is less then the minimum bend radius of %2"
+    WARN_DIMLESSTHANHOOK    "WARNING : %1 is smaller than standard hook %2"
+    WARN_DUPMARKNUMBER      "WARNING : Mark Number %1 is currently in use"
+    WARN_SHOULDBEGREATERTHAN "WARNING: %1 should be greater than %2"
+END
+
+STRINGTABLE
+BEGIN
+    ERR_EXCEEDSMAX          "ERROR : Exceeds maximum bar length of %1"
+    ERR_NOTLONGITUDINAL     "ERROR : Bend must be designated as Transverse or Seismic"
+    ERR_NOTTRANSVERSE       "ERROR : Bend cannot be designated as Transverse"
+    ERR_NOTSEISMIC          "ERROR : Bend cannot be designated as Seismic"
+    ERR_ILLFORMEDBEND       "ERROR : Dimensions are inconsistant"
+    ERR_MUSTBEGREATERTHAN   "ERROR : %1 must be greater than %2"
+    ERR_MUSTBEEQUALTO       "ERROR : %1 must be equal to %2"
+    ERR_XLESSTHANW          "ERROR : X must be less than W"
+END
+
+STRINGTABLE
+BEGIN
+    ERR_MUSTBEZEROIFOTHERISZERO "ERROR : %1 must be zero if %2 is zero"
+    ERR_NOEACHNOTMULTIPLEOFNOREQD 
+                            "ERROR : # Each must be an even multiple of Num Reqd"
+    ERR_NUMREQDISZERO       "ERROR : Number Req'd cannot be zero"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_E_DUPGROUP          "DUPLICATE GROUP : Group already exists"
+    IDS_E_DUPMARK           "DUPLICATE MARK NUMBER : Mark Number already exists"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "Bars.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

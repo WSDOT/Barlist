@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
+
+<xs:complexType name ="BarlistType">
+   <xs:sequence>
+      <xs:element name="QNI" type="QNIType" minOccurs="1" maxOccurs="1" />
+      <xs:element name="Properties" type="PropertiesType" minOccurs="1" maxOccurs="1" />
+      <xs:element name="Group" type="GroupType" minOccurs="1" maxOccurs="unbounded" />
+   </xs:sequence>
+</xs:complexType>
+
+  <xs:element name="Barlist" type="BarlistType"/>
+
+  <xs:complexType name="QNIType">
+  <xs:sequence>
+  <xs:element name="Traffic" type="xs:decimal" />
+<xs:element name="Bridge" type="xs:decimal" />
+<xs:element name="Wall" type="xs:decimal" />
+  </xs:sequence>
+</xs:complexType>
+
+
+<xs:complexType name="PropertiesType">
+  <xs:sequence>
+<xs:element name="Project" type="xs:string" />
+<xs:element name="JobNumber" type="xs:string" />
+<xs:element name="Engineer" type="xs:string" />
+<xs:element name="Company" type="xs:string" />
+<xs:element name="Comments" type="xs:string" />
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="GroupType">
+  <xs:sequence>
+  <xs:element name="Name" type="xs:string" />
+<xs:element name="BarRecord" type="BarRecordType" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+</xs:complexType>
+
+  <xs:simpleType name="FlagType">
+    <xs:restriction base ="xs:string">
+      <xs:enumeration value="True"/>
+      <xs:enumeration value="False"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MarkType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0"/>
+      <xs:maxLength value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LocationType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="0"/>
+      <xs:maxLength value="28"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SizeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="#3"/>
+      <xs:enumeration value="#4"/>
+      <xs:enumeration value="#5"/>
+      <xs:enumeration value="#6"/>
+      <xs:enumeration value="#7"/>
+      <xs:enumeration value="#8"/>
+      <xs:enumeration value="#9"/>
+      <xs:enumeration value="#10"/>
+      <xs:enumeration value="#11"/>
+      <xs:enumeration value="#14"/>
+      <xs:enumeration value="#18"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NumRequiredType">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="9999"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NumEachType">
+    <xs:restriction base="xs:long">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="99"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BendType">
+    <xs:restriction base="xs:long">
+      <xs:enumeration value="50"/>
+      <xs:enumeration value="51"/>
+      <xs:enumeration value="52"/>
+      <xs:enumeration value="53"/>
+      <xs:enumeration value="54"/>
+      <xs:enumeration value="55"/>
+      <xs:enumeration value="56"/>
+      <xs:enumeration value="57"/>
+      <xs:enumeration value="58"/>
+      <xs:enumeration value="59"/>
+
+      <xs:enumeration value="60"/>
+      <xs:enumeration value="61"/>
+      <xs:enumeration value="62"/>
+      <xs:enumeration value="63"/>
+      <!--<xs:enumeration value="64"/>
+      <xs:enumeration value="65"/>-->
+      <xs:enumeration value="66"/>
+      <xs:enumeration value="67"/>
+      <xs:enumeration value="68"/>
+      <xs:enumeration value="69"/>
+
+      <xs:enumeration value="70"/>
+      <xs:enumeration value="71"/>
+      <xs:enumeration value="72"/>
+      <xs:enumeration value="73"/>
+      <xs:enumeration value="74"/>
+      <xs:enumeration value="75"/>
+      <xs:enumeration value="76"/>
+      <xs:enumeration value="77"/>
+      <xs:enumeration value="78"/>
+      <xs:enumeration value="79"/>
+
+      <xs:enumeration value="80"/>
+      <xs:enumeration value="81"/>
+      <xs:enumeration value="82"/>
+      <xs:enumeration value="83"/>
+      <xs:enumeration value="84"/>
+      <!--<xs:enumeration value="85"/>
+      <xs:enumeration value="86"/>
+      <xs:enumeration value="87"/>
+      <xs:enumeration value="88"/>-->
+      <xs:enumeration value="89"/>
+
+      <xs:enumeration value="90"/>
+      <xs:enumeration value="91"/>
+      <xs:enumeration value="92"/>
+      <xs:enumeration value="93"/>
+      <xs:enumeration value="94"/>
+      <xs:enumeration value="95"/>
+      <xs:enumeration value="96"/>
+      <xs:enumeration value="97"/>
+      <xs:enumeration value="98"/>
+      <xs:enumeration value="99"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="BarRecordType">
+  <xs:sequence>
+  <xs:element name="Mark" type="MarkType"/>
+<xs:element name="Location" type="LocationType" />
+<xs:element name="Size" type="SizeType" />
+<xs:element name="NoReqd" type="NumRequiredType" />
+<xs:element name="BendType" type="BendType" />
+<xs:element name="Use" type="xs:integer" />
+<xs:element name="LumpSum" type="FlagType" />
+<xs:element name="Substructure" type="FlagType" />
+<xs:element name="Epoxy" type="FlagType" />
+<xs:element name="Varies" type="FlagType" />
+<xs:element name="NoEach" type="NumEachType" />
+<xs:element name="PrimaryBend" type="DimensionsType" minOccurs="1"/>
+<xs:element name="VariesBend" type="DimensionsType" minOccurs="0" maxOccurs="1"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="DimensionsType">
+  <xs:sequence>
+  <xs:element name="U" type="xs:double" />
+<xs:element name="W" type="xs:double" />
+<xs:element name="X" type="xs:double" />
+<xs:element name="Y" type="xs:double" />
+<xs:element name="Z" type="xs:double" />
+<xs:element name="T1" type="xs:double" />
+<xs:element name="T2" type="xs:double" />
+  </xs:sequence>
+</xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,403 @@
+///////////////////////////////////////////////////////////////////////
+// Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
+// Copyright © 2009-2019, Washington State Department of Transportation
+//                     Bridge and Structures Office
+//
+// This software was developed as part of the Alternate Route Project
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the Alternate Route Open Source License as 
+// published by the Washington State Department of Transportation,
+// Bridge and Structures Office.
+//
+// This program is distributed in the hope that it will be useful,
+// but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// PURPOSE.  See the Alternate Route Open Source License for more details.
+//
+// You should have received a copy of the Alternate Open Source License
+// along with this program; if not, write to the Washington State
+// Department of Transportation, Bridge and Structures Office,
+// 4500 3rd Ave SE, P.O. Box 47340, Olympia, WA 98503, USA or e-mail
+// Bridge_Support@wsdot.wa.gov
+///////////////////////////////////////////////////////////////////////
+
+
+// Barlst.idl
+//
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+interface IBarCollection;
+interface IGroupCollection;
+interface IBarRecordCollection;
+interface IBarRecord;
+interface IBend;
+interface IGroup;
+interface IStatusMessage;
+interface IStatusMessageCollection;
+   
+
+   typedef [public,uuid(21A44900-1381-11d3-8933-006097C68A9C),helpstring("enum HookType")]
+   enum HookType { ht90, ht135, ht180 } HookType;
+
+   typedef [public,uuid(21A44901-1381-11d3-8933-006097C68A9C),helpstring("enum UseType")]
+   enum UseType { utLongitudinal, utTransverse, utSeismic } UseType;
+
+   typedef [public,uuid(DCB18CC0-147C-11d3-8934-006097C68A9C),helpstring("enum StatusType")]
+   enum StatusType { stOK = 0, stWarning = 1, stError = 2 } StatusType;
+
+   typedef [public,uuid(AC18BAF6-22A6-11d3-8945-006097C68A9C),helpstring("enum DimensionType")]
+   enum DimensionType { dimU=0, dimW=1, dimX=2, dimY=3, dimZ=4, dimT1=5, dimT2=6 } DimensionType;
+
+   typedef [public,uuid(F220640C-825C-11d3-89D1-006097C68A9C),helpstring("enum MoveType")]
+   enum MoveType { mtBefore = 1, mtAfter = 2 } MoveType;
+
+	[
+		object,
+		uuid(F1F5C067-12AA-11D3-8932-006097C68A9C),
+		dual,
+		helpstring("IBarInfoMgr Interface"),
+		pointer_default(unique)
+	]
+	interface IBarInfoMgr : IDispatch
+	{
+		[propget, id(1), helpstring("property Specification")] HRESULT Specification([out, retval] BSTR *pVal);
+		[propget, id(2), helpstring("property Bars")] HRESULT Bars([out, retval] IBarCollection* *pVal);
+	};
+
+	[
+		object,
+		uuid(F1F5C069-12AA-11D3-8932-006097C68A9C),
+		dual,
+		helpstring("IHookData Interface"),
+		pointer_default(unique)
+	]
+	interface IHookData : IDispatch
+	{
+		[propget, id(1), helpstring("property Type")] HRESULT Type([out, retval] HookType *pVal);
+		[propget, id(2), helpstring("property Use")] HRESULT Use([out, retval] UseType *pVal);
+		[propget, id(3), helpstring("property Tail")] HRESULT Tail([out, retval] double *pVal);
+		[propget, id(4), helpstring("property MinTail")] HRESULT MinTail([out, retval] double *pVal);
+	};
+	[
+		object,
+		uuid(1454C8E3-1380-11D3-8933-006097C68A9C),
+		dual,
+		helpstring("IBendData Interface"),
+		pointer_default(unique)
+	]
+	interface IBendData : IDispatch
+	{
+		[propget, id(1), helpstring("property Use")] HRESULT Use([out, retval] UseType *pVal);
+		[propget, id(2), helpstring("property InsideDiameter")] HRESULT InsideDiameter([out, retval] double *pVal);
+	};
+	[
+		object,
+		uuid(1454C8E5-1380-11D3-8933-006097C68A9C),
+		dual,
+		helpstring("IBarData Interface"),
+		pointer_default(unique)
+	]
+	interface IBarData : IDispatch
+	{
+		[propget, id(1), helpstring("property Diameter")] HRESULT Diameter([out, retval] double *pVal);
+		[propget, id(2), helpstring("property Mass")] HRESULT Mass([out, retval] double *pVal);
+		[propget, id(3), helpstring("property NormalLength")] HRESULT NormalLength([out, retval] double *pVal);
+		[propget, id(4), helpstring("property MaxLength")] HRESULT MaxLength([out, retval] double *pVal);
+		[propget, id(5), helpstring("property BendData")] HRESULT BendData([in] UseType use, [out, retval] IBendData* *pVal);
+		[propget, id(6), helpstring("property HookData")] HRESULT HookData([in] UseType use,[in] HookType hook,[out, retval] IHookData* *pVal);
+		[propget, id(7), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+	};
+	[
+		object,
+		uuid(1454C8E9-1380-11D3-8933-006097C68A9C),
+		dual,
+		helpstring("IBarCollection Interface"),
+		pointer_default(unique)
+	]
+	interface IBarCollection : IDispatch
+	{
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+		[propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] LPUNKNOWN *pVal);
+		[propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] VARIANT varIndex,[out, retval] IBarData* *pVal);
+	};
+	[
+		object,
+		uuid(BFC2D3A7-143B-11D3-8934-006097C68A9C),
+		dual,
+		helpstring("IBarRecord Interface"),
+		pointer_default(unique)
+	]
+	interface IBarRecord : IDispatch
+	{
+		[propget, id(1), helpstring("property Mark")] HRESULT Mark([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Mark")] HRESULT Mark([in] BSTR newVal);
+		[propget, id(2), helpstring("property Location")] HRESULT Location([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property Location")] HRESULT Location([in] BSTR newVal);
+		[propget, id(3), helpstring("property NumReqd")] HRESULT NumReqd([out, retval] long *pVal);
+		[propput, id(3), helpstring("property NumReqd")] HRESULT NumReqd([in] long newVal);
+		[propget, id(4), helpstring("property Use")] HRESULT Use([out, retval] UseType *pVal);
+		[propput, id(4), helpstring("property Use")] HRESULT Use([in] UseType newVal);
+		[propget, id(5), helpstring("property LumpSum")] HRESULT LumpSum([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property LumpSum")] HRESULT LumpSum([in] VARIANT_BOOL newVal);
+		[propget, id(6), helpstring("property Substructure")] HRESULT Substructure([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property Substructure")] HRESULT Substructure([in] VARIANT_BOOL newVal);
+		[propget, id(7), helpstring("property Epoxy")] HRESULT Epoxy([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property Epoxy")] HRESULT Epoxy([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property Varies")] HRESULT Varies([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(9), helpstring("property NumEach")] HRESULT NumEach([out, retval] long *pVal);
+		[propput, id(9), helpstring("property NumEach")] HRESULT NumEach([in] long newVal);
+		[propget, id(10), helpstring("property PrimaryBend")] HRESULT PrimaryBend([out, retval] IBend* *pVal);
+		[propput, id(10), helpstring("property PrimaryBend")] HRESULT PrimaryBend([in] IBend *newVal);
+		[propget, id(11), helpstring("property VariesBend")] HRESULT VariesBend([out, retval] IBend* *pVal);
+		[propput, id(11), helpstring("property VariesBend")] HRESULT VariesBend([in] IBend* newVal);
+		[propget, id(12), helpstring("property BendType")] HRESULT BendType([out, retval] long *pVal);
+		[propget, id(14), helpstring("property Size")] HRESULT Size([out, retval] BSTR *pVal);
+		[propget, id(15), helpstring("property Status")] HRESULT Status([out, retval] StatusType *pVal);
+		[propget, id(17), helpstring("property Mass")] HRESULT Mass([out, retval] double *pVal);
+		[propget, id(18), helpstring("property BarData")] HRESULT BarData([out, retval] IBarData* *pVal);
+		[propput, id(18), helpstring("property BarData")] HRESULT BarData([in] IBarData* newVal);
+		[propget, id(19), helpstring("property StatusMessages")] HRESULT StatusMessages([out, retval] IStatusMessageCollection* *pVal);
+	};
+	[
+		object,
+		uuid(C90BC1E0-1869-11d3-893B-006097C68A9C),
+		oleautomation,
+		helpstring("IBarRecordEvents Interface"),
+		pointer_default(unique)
+	]
+	interface IBarRecordEvents : IUnknown
+	{
+		[helpstring("method OnBarRecordChanged")] HRESULT OnBarRecordChanged([in] IBarRecord* pBarRecord);
+   };
+
+	[
+		object,
+		uuid(BFC2D3A9-143B-11D3-8934-006097C68A9C),
+		dual,
+		helpstring("IBarlist Interface"),
+		pointer_default(unique)
+	]
+	interface IBarlist : IDispatch
+	{
+		[propget, id(1), helpstring("property Groups")] HRESULT Groups([out, retval] IGroupCollection* *pVal);
+		[propget, id(2), helpstring("property TrafficBarrierQuantity")] HRESULT TrafficBarrierQuantity([out, retval] double *pVal);
+		[propput, id(2), helpstring("property TrafficBarrierQuantity")] HRESULT TrafficBarrierQuantity([in] double newVal);
+		[propget, id(3), helpstring("property BridgeGrateInletQuantity")] HRESULT BridgeGrateInletQuantity([out, retval] double *pVal);
+		[propput, id(3), helpstring("property BridgeGrateInletQuantity")] HRESULT BridgeGrateInletQuantity([in] double newVal);
+		[propget, id(4), helpstring("property RetainingWallQuantity")] HRESULT RetainingWallQuantity([out, retval] double *pVal);
+		[propput, id(4), helpstring("property RetainingWallQuantity")] HRESULT RetainingWallQuantity([in] double newVal);
+		[propget, id(5), helpstring("property SuperstructureMass")] HRESULT SuperstructureMass([out, retval] double *pVal);
+		[propget, id(6), helpstring("property SuperstructureMassEpoxy")] HRESULT SuperstructureMassEpoxy([out, retval] double *pVal);
+		[propget, id(7), helpstring("property SubstructureMass")] HRESULT SubstructureMass([out, retval] double *pVal);
+		[propget, id(8), helpstring("property SubstructureMassEpoxy")] HRESULT SubstructureMassEpoxy([out, retval] double *pVal);
+		[propget, id(9), helpstring("property Status")] HRESULT Status([out, retval] StatusType *pVal);
+		[propget, id(10), helpstring("property Project")] HRESULT Project([out, retval] BSTR *pVal);
+		[propput, id(10), helpstring("property Project")] HRESULT Project([in] BSTR newVal);
+		[propget, id(11), helpstring("property JobNumber")] HRESULT JobNumber([out, retval] BSTR *pVal);
+		[propput, id(11), helpstring("property JobNumber")] HRESULT JobNumber([in] BSTR newVal);
+		[propget, id(12), helpstring("property Engineer")] HRESULT Engineer([out, retval] BSTR *pVal);
+		[propput, id(12), helpstring("property Engineer")] HRESULT Engineer([in] BSTR newVal);
+		[propget, id(13), helpstring("property Company")] HRESULT Company([out, retval] BSTR *pVal);
+		[propput, id(13), helpstring("property Company")] HRESULT Company([in] BSTR newVal);
+		[propget, id(14), helpstring("property Comments")] HRESULT Comments([out, retval] BSTR *pVal);
+		[propput, id(14), helpstring("property Comments")] HRESULT Comments([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(E43ECCBC-1875-11d3-893B-006097C68A9C),
+		oleautomation,
+		helpstring("IBarlistEvents Interface"),
+		pointer_default(unique)
+	]
+	interface IBarlistEvents : IUnknown
+   {
+		[helpstring("method OnNotIncludedQuantitiesChanged")] HRESULT OnNotIncludedQuantitiesChanged();
+		[helpstring("method OnGroupAdded")] HRESULT OnGroupAdded([in] IGroup* pGroup);
+		[helpstring("method OnGroupRemoved")] HRESULT OnGroupRemoved([in] BSTR Name);
+		[helpstring("method OnGroupChanged")] HRESULT OnGroupChanged([in] IGroup* pGroup);
+		[helpstring("method OnGroupMoved")] HRESULT OnGroupMoved([in] IGroup* pGroup,[in] long idxFrom, [in] long idxTo );
+		[helpstring("method OnBarRecordAdded")] HRESULT OnBarRecordAdded([in] IGroup* pGroup,[in] IBarRecord* pNewRecord);
+		[helpstring("method OnBarRecordChanged")] HRESULT OnBarRecordChanged([in] IGroup* pGroup,[in] IBarRecord* pBarRecord);
+		[helpstring("method OnBarRecordRemoved")] HRESULT OnBarRecordRemoved([in] IGroup* pGroup,[in] BSTR bstrMark);
+		[helpstring("method OnBarRecordsSorted")] HRESULT OnBarRecordsSorted([in] IGroup* pGroup);
+		[helpstring("method OnBarRecordMoved")] HRESULT OnBarRecordMoved([in] IGroup* pGroup, [in] IBarRecord* pBarRecord,[in] long idxFrom, [in] long idxTo);
+   };
+
+	[
+		object,
+		uuid(BFC2D3AB-143B-11D3-8934-006097C68A9C),
+		dual,
+		helpstring("IGroup Interface"),
+		pointer_default(unique)
+	]
+	interface IGroup : IDispatch
+	{
+		[propget, id(1), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Name")] HRESULT Name([in] BSTR newVal);
+		[propget, id(2), helpstring("property BarRecords")] HRESULT BarRecords([out, retval] IBarRecordCollection* *pVal);
+		[propget, id(3), helpstring("property SuperstructureMass")] HRESULT SuperstructureMass([out, retval] double *pVal);
+		[propget, id(4), helpstring("property SubstructureMass")] HRESULT SubstructureMass([out, retval] double *pVal);
+		[propget, id(5), helpstring("property SubstructureMassEpoxy")] HRESULT SubstructureMassEpoxy([out, retval] double *pVal);
+		[propget, id(6), helpstring("property SuperstructureMassEpoxy")] HRESULT SuperstructureMassEpoxy([out, retval] double *pVal);
+      [propget, id(7), helpstring("property Status")] HRESULT Status([out,retval] StatusType *pVal);
+	};
+	[
+		object,
+		uuid(9E3CC3A4-1870-11d3-893B-006097C68A9C),
+		oleautomation,
+		helpstring("IGroupEvents Interface"),
+		pointer_default(unique)
+	]
+	interface IGroupEvents : IUnknown
+	{
+		[helpstring("method OnGroupChanged")] HRESULT OnGroupChanged([in] IGroup* pGroup);
+		[helpstring("method OnBarRecordAdded")] HRESULT OnBarRecordAdded([in] IGroup* pGroup,[in] IBarRecord* pNewRecord);
+		[helpstring("method OnBarRecordChanged")] HRESULT OnBarRecordChanged([in] IGroup* pGroup,[in] IBarRecord* pBarRecord);
+		[helpstring("method OnBarRecordRemoved")] HRESULT OnBarRecordRemoved([in] IGroup* pGroup,[in] BSTR bstrMark);
+		[helpstring("method OnBarRecordsSorted")] HRESULT OnBarRecordsSorted([in] IGroup* pGroup);
+		[helpstring("method OnBarRecordMoved")] HRESULT OnBarRecordMoved([in] IGroup* pGroup,[in] IBarRecord* pBarRecord,[in] long idxFrom,[in] long idxTo);
+	};
+	[
+		object,
+		uuid(BFC2D3AD-143B-11D3-8934-006097C68A9C),
+		dual,
+		helpstring("IGroupCollection Interface"),
+		pointer_default(unique)
+	]
+	interface IGroupCollection : IDispatch
+	{
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+		[propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] LPUNKNOWN *pVal);
+		[propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] VARIANT varIndex, [out, retval] IGroup* *pVal);
+		[id(2), helpstring("method Add")] HRESULT Add([in] BSTR group);
+		[id(3), helpstring("method Remove")] HRESULT Remove([in] VARIANT varIndex);
+		[id(4), helpstring("method Move")] HRESULT Move([in] VARIANT grp,[in] MoveType mt,[in] VARIANT target);
+		[id(5), helpstring("method MoveUp")] HRESULT MoveUp([in] VARIANT grp);
+		[id(6), helpstring("method MoveDown")] HRESULT MoveDown([in] VARIANT grp);
+	};
+	[
+		object,
+		uuid(EA833EF0-1870-11d3-893B-006097C68A9C),
+		oleautomation,
+		helpstring("IGroupCollectionEvents Interface"),
+		pointer_default(unique)
+	]
+	interface IGroupCollectionEvents : IUnknown
+	{
+		[helpstring("method OnGroupAdded")] HRESULT OnGroupAdded([in] IGroup* pGroup);
+		[helpstring("method OnGroupRemoved")] HRESULT OnGroupRemoved([in] BSTR name);
+		[helpstring("method OnGroupChanged")] HRESULT OnGroupChanged([in] IGroup* pGroup);
+		[helpstring("method OnGroupMoved")] HRESULT OnGroupMoved([in] IGroup* pGroup,[in] long idxFrom,[in] long idxTo);
+		[helpstring("method OnBarRecordAdded")] HRESULT OnBarRecordAdded([in] IGroup* pGroup,[in] IBarRecord* pNewRecord);
+		[helpstring("method OnBarRecordChanged")] HRESULT OnBarRecordChanged([in] IGroup* pGroup,[in] IBarRecord* pBarRecord);
+		[helpstring("method OnBarRecordRemoved")] HRESULT OnBarRecordRemoved([in] IGroup* pGroup,[in] BSTR bstrMark);
+		[helpstring("method OnBarRecordsSorted")] HRESULT OnBarRecordsSorted([in] IGroup* pGroup);
+		[helpstring("method OnBarRecordMoved")] HRESULT OnBarRecordMoved([in] IGroup* pGroup,[in] IBarRecord* pBarRecord,[in] long idxFrom, [in] long idxTo );
+	};
+	[
+		object,
+		uuid(BFC2D3AF-143B-11D3-8934-006097C68A9C),
+		dual,
+		helpstring("IBarRecordCollection Interface"),
+		pointer_default(unique)
+	]
+	interface IBarRecordCollection : IDispatch
+	{
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+		[propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] LPUNKNOWN *pVal);
+		[propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] VARIANT varIndex, [out, retval] IBarRecord* *pVal);
+		[id(4), helpstring("method Add")] HRESULT Add([in] IBarRecord* pBarRecord);
+		[id(5), helpstring("method Remove")] HRESULT Remove([in] VARIANT varIndex);
+		[id(6), helpstring("method Sort")] HRESULT Sort();
+		[id(7), helpstring("method Replace")] HRESULT Replace([in] VARIANT varIndex,[in] IBarRecord* pBarRecord);
+		[id(8), helpstring("method Move")] HRESULT Move([in] VARIANT rec, [in] MoveType mt, [in] VARIANT target);
+		[id(9), helpstring("method MoveUp")] HRESULT MoveUp([in] VARIANT rec);
+		[id(10), helpstring("method MoveDown")] HRESULT MoveDown([in] VARIANT rec);
+	};
+	[
+		object,
+		uuid(B52921F0-186D-11d3-893B-006097C68A9C),
+		oleautomation,
+		helpstring("IBarRecordCollectionEvents Interface"),
+		pointer_default(unique)
+	]
+	interface IBarRecordCollectionEvents : IUnknown
+	{
+		[helpstring("method OnBarRecordAdded")] HRESULT OnBarRecordAdded([in] IBarRecord* pNewRecord);
+		[helpstring("method OnBarRecordRemoved")] HRESULT OnBarRecordRemoved([in] BSTR mark);
+		[helpstring("method OnBarRecordChanged")] HRESULT OnBarRecordChanged([in] IBarRecord* pBarRecord);
+		[helpstring("method OnBarRecordsSorted")] HRESULT OnBarRecordsSorted();
+		[helpstring("method OnBarRecordMoved")] HRESULT OnBarRecordMoved([in] IBarRecord* pBarRecord,[in] long idxFrom, [in] long idxTo);
+   };
+   [
+      object,
+      uuid(2A04F206-147C-11d3-8934-006097C68A9C),
+      dual,
+      helpstring("IBend Interface"),
+      pointer_default(unique)
+   ]
+   interface IBend : IDispatch
+   {
+      [propget, id(1), helpstring("property U")] HRESULT U([out,retval] double* pVal);
+      [propput, id(1), helpstring("property U")] HRESULT U([in] double newVal);
+      [propget, id(2), helpstring("property W")] HRESULT W([out,retval] double* pVal);
+      [propput, id(2), helpstring("property W")] HRESULT W([in] double newVal);
+      [propget, id(3), helpstring("property X")] HRESULT X([out,retval] double* pVal);
+      [propput, id(3), helpstring("property X")] HRESULT X([in] double newVal);
+      [propget, id(4), helpstring("property Y")] HRESULT Y([out,retval] double* pVal);
+      [propput, id(4), helpstring("property Y")] HRESULT Y([in] double newVal);
+      [propget, id(5), helpstring("property Z")] HRESULT Z([out,retval] double* pVal);
+      [propput, id(5), helpstring("property Z")] HRESULT Z([in] double newVal);
+      [propget, id(6), helpstring("property T1")] HRESULT T1([out,retval] double* pVal);
+      [propput, id(6), helpstring("property T1")] HRESULT T1([in] double newVal);
+      [propget, id(7), helpstring("property T2")] HRESULT T2([out,retval] double* pVal);
+      [propput, id(7), helpstring("property T2")] HRESULT T2([in] double newVal);
+      [propget, id(8), helpstring("property Status")] HRESULT Status([out,retval] StatusType* pVal);
+      [propget, id(9), helpstring("property StatusMessages")] HRESULT StatusMessages([out,retval] IStatusMessageCollection** pVal);
+      [propget, id(10), helpstring("property Length")] HRESULT Length([out,retval] double* pVal);
+		[propget, id(11), helpstring("property BendType")] HRESULT BendType([out, retval] long *pVal);
+		[propget, id(12), helpstring("property BarRecord")] HRESULT BarRecord([out, retval] IBarRecord* *pVal);
+		[propput, id(12), helpstring("property BarRecord")] HRESULT BarRecord([in] IBarRecord* newVal);
+      [propget, id(13), helpstring("property SupportsDimension")] HRESULT SupportsDimension([in] DimensionType type,[out,retval] VARIANT_BOOL* pbResult);
+   };
+   [
+      object,
+      uuid(C87B98E2-1862-11d3-893B-006097C68A9C),
+      oleautomation,
+      helpstring("IBendEvents Interface"),
+      pointer_default(unique)
+   ]
+   interface IBendEvents : IUnknown
+   {
+		[helpstring("method OnBendChanged")] HRESULT OnBendChanged();
+   };
+	[
+		object,
+		uuid(0A69D045-1DB1-11D3-893F-006097C68A9C),
+		dual,
+		helpstring("IStatusMessage Interface"),
+		pointer_default(unique)
+	]
+	interface IStatusMessage : IDispatch
+	{
+		[propget, id(1), helpstring("property Text")] HRESULT Text([out, retval] BSTR *pVal);
+		[propget, id(2), helpstring("property Val1")] HRESULT Val1([out, retval] VARIANT *pVal);
+		[propget, id(3), helpstring("property Val2")] HRESULT Val2([out, retval] VARIANT *pVal);
+	};
+	[
+		object,
+		uuid(9DE5701C-1919-11D3-893C-006097C68A9C),
+		dual,
+		helpstring("IStatusMessageCollection Interface"),
+		pointer_default(unique)
+	]
+	interface IStatusMessageCollection : IDispatch
+	{
+		[propget, id(1), helpstring("property Count")] HRESULT Count([out, retval] long *pVal);
+		[id(2), helpstring("method Add")] HRESULT Add([in] IStatusMessage* pMsg);
+		[propget, id(DISPID_NEWENUM), helpstring("property _NewEnum")] HRESULT _NewEnum([out, retval] LPUNKNOWN *pVal);
+		[propget, id(DISPID_VALUE), helpstring("property Item")] HRESULT Item([in] long index, [out, retval] IStatusMessage** ppVal);
+	};

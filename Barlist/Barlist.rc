@@ -1,0 +1,640 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""Barlist.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 5,0,0,0
+ PRODUCTVERSION 5,0,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "A member of the Alternate Route Project"
+            VALUE "CompanyName", "Washington State Department of Transportation"
+            VALUE "FileDescription", "Barlist Module"
+            VALUE "FileVersion", "5.0.0.0"
+            VALUE "InternalName", "Barlist"
+            VALUE "LegalCopyright", "Copyright © 2009-2019, Washington State Department of Transportation, All Rights Reserved"
+            VALUE "OriginalFilename", "Barlist.DLL"
+            VALUE "ProductName", "Barlist Module"
+            VALUE "ProductVersion", "5.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_PLUGIN              REGISTRY                "Plugin.rgs"
+
+IDR_COMPONENTINFO       REGISTRY                "ComponentInfo.rgs"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_BARLIST MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Properties...",               33045
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "Edit"
+    BEGIN
+        MENUITEM "Cut\tCtrl+X",                 ID_EDIT_CUT
+        MENUITEM "Copy\tCtrl+C",                ID_EDIT_COPY
+        MENUITEM "Paste\tCtrl+V",               ID_EDIT_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "Select All",                  IDC_SELECT_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      IDC_DELETE
+        MENUITEM "Rename",                      IDC_RENAME
+        MENUITEM SEPARATOR
+        MENUITEM "Move Up",                     IDC_MOVE_UP
+        MENUITEM "Move Down",                   IDC_MOVE_DOWN
+        MENUITEM SEPARATOR
+        MENUITEM "Generate Mark Numbers",       33061
+    END
+    POPUP "Project"
+    BEGIN
+        MENUITEM "Add Group",                   ID_ADD_GROUP
+        MENUITEM "Add/Edit Bar",                IDC_ADD_BAR
+        MENUITEM "Quantities not included...",  ID_QNI
+        MENUITEM "Quantities...",               IDC_QUANTITIES
+        MENUITEM SEPARATOR
+        MENUITEM "View Report",                 33064
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbars...",                ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "Options",                     ID_VIEW_OPTIONS
+    END
+    POPUP "Add-Ins"
+    BEGIN
+        MENUITEM "No addins were found",        ID_PLACEHOLDER
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "Help Source",                 EAFID_HELP_SOURCE
+        MENUITEM "&Help Topics",                ID_HELP_FINDER
+        MENUITEM SEPARATOR
+        MENUITEM "&About...",                   ID_APP_ABOUT
+    END
+END
+
+IDR_TREE_CONTEXT MENU
+BEGIN
+    POPUP "TreeViewContext"
+    BEGIN
+        MENUITEM "Delete Group",                IDC_DELETE
+        MENUITEM "Rename Group",                IDC_RENAME
+    END
+END
+
+IDR_LIST_CONTEXT MENU
+BEGIN
+    POPUP "ListContext"
+    BEGIN
+        MENUITEM "Edit Bar",                    IDC_ADD_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "Cut",                         ID_EDIT_CUT
+        MENUITEM "Copy",                        ID_EDIT_COPY
+        MENUITEM "Paste",                       ID_EDIT_PASTE
+        MENUITEM "Delete",                      IDC_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Edit Mark No.",               IDC_RENAME
+        MENUITEM "Renumber Bars",               ID_GENERATE_MARK_NUMBERS
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_BARLIST ACCELERATORS
+BEGIN
+    VK_DELETE,      IDC_DELETE,             VIRTKEY, NOINVERT
+    VK_DOWN,        IDC_MOVE_DOWN,          VIRTKEY, CONTROL, NOINVERT
+    VK_UP,          IDC_MOVE_UP,            VIRTKEY, CONTROL, NOINVERT
+    "A",            IDC_SELECT_ALL,         VIRTKEY, CONTROL, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON                ICON                    "res\\Barlist.ico"
+
+IDI_RED                 ICON                    "res\\Red.ico"
+
+IDI_YELLOW              ICON                    "res\\Yellow.ico"
+
+IDI_GREEN               ICON                    "res\\Green.ico"
+
+IDI_SAVE                ICON                    "res\\Save.ico"
+
+IDI_HELP                ICON                    "res\\Help.ico"
+
+IDI_PRINT               ICON                    "res\\printer.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR TOOLBAR 16, 16
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    BUTTON      IDC_DELETE
+    SEPARATOR
+    BUTTON      ID_ADD_GROUP
+    BUTTON      IDC_ADD_BAR
+    BUTTON      ID_QNI
+    BUTTON      IDC_MOVE_UP
+    BUTTON      IDC_MOVE_DOWN
+    SEPARATOR
+    BUTTON      IDC_QUANTITIES
+    BUTTON      ID_VIEW_REPORT
+    SEPARATOR
+    BUTTON      EAFID_UNITS_SI
+    BUTTON      EAFID_UNITS_US
+    SEPARATOR
+    BUTTON      ID_PLACEHOLDER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTIONS DIALOGEX 0, 0, 311, 94
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,198,73,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,254,73,50,14
+    GROUPBOX        "Select System of Units",IDC_STATIC,7,7,98,53
+    CONTROL         "SI Units",IDC_SI,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,15,23,41,10
+    CONTROL         "Traditional U.S. Units",IDC_US,"Button",BS_AUTORADIOBUTTON,16,41,83,10
+    GROUPBOX        "Auto-Increment",IDC_STATIC,109,7,195,52
+    LTEXT           "Amount to auto-increment Mark number by:",IDC_STATIC,115,23,141,8
+    EDITTEXT        IDC_INCREMENT,259,20,40,14,ES_AUTOHSCROLL
+END
+
+IDD_QNI DIALOGEX 0, 0, 155, 97
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quantities Not Included"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,43,76,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,97,76,50,14
+    LTEXT           "Traffic Barrier:",IDC_STATIC,7,18,48,8
+    EDITTEXT        IDC_TRAFFIC,78,15,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Static",IDC_TRAFFIC_UNIT,123,18,19,8
+    LTEXT           "Bridge Grate Inlets:",IDC_STATIC,7,35,64,8
+    EDITTEXT        IDC_BRIDGE,78,32,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Static",IDC_BRIDGE_UNIT,123,35,19,8
+    LTEXT           "Retaining Walls:",IDC_STATIC,7,52,52,8
+    EDITTEXT        IDC_WALL,78,49,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Static",IDC_WALL_UNIT,123,52,19,8
+END
+
+IDD_BAR DIALOGEX 0, 0, 309, 290
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Input Bar Data"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Group Name",IDC_STATIC,7,7,40,8
+    COMBOBOX        IDC_GROUPS,57,7,95,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Add Group",ID_ADD_GROUP,160,7,50,14
+    LTEXT           "Status:",IDC_STATIC,212,9,24,8
+    ICON            IDI_GREEN,IDC_STATUS,238,7,20,20
+    LTEXT           "Location",IDC_STATIC,7,36,28,8
+    EDITTEXT        IDC_LOCATION,42,33,151,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_TYPE,197,34,93,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Mark No.",IDC_STATIC,7,58,30,8
+    COMBOBOX        IDC_MARK,42,55,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Size",IDC_STATIC,7,78,14,8
+    COMBOBOX        IDC_BAR_SIZE,41,74,48,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "No. Reqd",IDC_STATIC,7,95,31,8
+    EDITTEXT        IDC_NUM_REQUIRED,41,92,47,14,ES_AUTOHSCROLL
+    GROUPBOX        "Use",IDC_STATIC,97,51,76,58
+    CONTROL         "Longitudinal",IDC_LONGITUDINAL,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,101,64,54,10
+    CONTROL         "Transverse",IDC_TRANSVERSE,"Button",BS_AUTORADIOBUTTON,101,77,52,10
+    CONTROL         "Seismic",IDC_SEISMIC,"Button",BS_AUTORADIOBUTTON,101,90,39,10
+    GROUPBOX        "Flags",IDC_STATIC,178,51,114,58
+    CONTROL         "Lump Sum",IDC_LUMP_SUM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,66,48,10
+    CONTROL         "Substructure",IDC_SUBSTRUCTURE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,78,57,10
+    CONTROL         "Epoxy",IDC_EPOXY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,182,90,36,10
+    CONTROL         "Varies",IDC_VARIES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,249,66,35,10
+    LTEXT           "No. Each",IDC_STATIC,249,78,30,8
+    EDITTEXT        IDC_NUM_EACH,249,88,30,14,ES_AUTOHSCROLL
+    GROUPBOX        "Dimensions",IDC_DIMENSIONS_GROUP,7,110,295,86
+    LTEXT           "U",IDC_STATIC,25,123,8,8
+    EDITTEXT        IDC_U,9,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "W",IDC_STATIC,67,123,8,8
+    EDITTEXT        IDC_W,51,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "X",IDC_STATIC,109,123,8,8
+    EDITTEXT        IDC_X,93,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Y",IDC_STATIC,151,123,8,8
+    EDITTEXT        IDC_Y,135,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Z",IDC_STATIC,193,123,8,8
+    EDITTEXT        IDC_Z,177,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "q1",IDC_T1_LABEL,235,123,9,8
+    EDITTEXT        IDC_T1,219,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "q2",IDC_T2_LABEL,279,123,9,8
+    EDITTEXT        IDC_T2,261,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Varies",IDC_STATIC,12,154,20,8
+    LTEXT           "U",IDC_STATIC,25,163,8,8
+    EDITTEXT        IDC_VARIES_U,9,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "W",IDC_STATIC,67,163,8,8
+    EDITTEXT        IDC_VARIES_W,51,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "X",IDC_STATIC,109,163,8,8
+    EDITTEXT        IDC_VARIES_X,93,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Y",IDC_STATIC,151,163,8,8
+    EDITTEXT        IDC_VARIES_Y,135,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "Z",IDC_STATIC,193,163,8,8
+    EDITTEXT        IDC_VARIES_Z,177,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "q1",IDC_VARIES_T1_LABEL,235,163,9,8
+    EDITTEXT        IDC_VARIES_T1,219,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    LTEXT           "q2",IDC_VARIES_T2_LABEL,279,163,9,8
+    EDITTEXT        IDC_VARIES_T2,261,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
+    EDITTEXT        IDC_STATUS_MESSAGE,7,203,295,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Add Bar",IDC_ADD_BAR,21,269,50,14
+    PUSHBUTTON      "Delete",IDC_DELETE,73,269,50,14
+    PUSHBUTTON      "Help",IDCHELP,159,269,14,14,BS_ICON
+    PUSHBUTTON      "Save",IDC_SAVE,177,269,14,14,BS_ICON
+    DEFPUSHBUTTON   "Update",IDC_UPDATE_BAR,198,269,50,14
+    PUSHBUTTON      "Close",IDCANCEL,252,269,50,14
+END
+
+IDD_PROPERTIES DIALOGEX 0, 0, 207, 276
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Project Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,96,255,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,150,255,50,14
+    LTEXT           "Project Name (Required)",IDC_STATIC,7,7,80,8
+    EDITTEXT        IDC_PROJECT_NAME,7,18,193,14,ES_AUTOHSCROLL
+    LTEXT           "Job Number",IDC_STATIC,7,39,39,8
+    EDITTEXT        IDC_JOB_NUMBER,7,48,193,14,ES_AUTOHSCROLL
+    LTEXT           "Engineer",IDC_STATIC,7,66,29,8
+    EDITTEXT        IDC_ENGINEER,7,79,193,14,ES_AUTOHSCROLL
+    LTEXT           "Company",IDC_STATIC,7,97,31,8
+    EDITTEXT        IDC_COMPANY,7,107,193,14,ES_AUTOHSCROLL
+    LTEXT           "Comments",IDC_STATIC,7,124,34,8
+    EDITTEXT        IDC_COMMENTS,7,137,193,114,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL
+END
+
+IDD_QUANTITIES DIALOGEX 0, 0, 273, 120
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quantities"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Group",IDC_STATIC,7,9,20,8
+    EDITTEXT        IDC_GROUP,81,7,185,14,ES_AUTOHSCROLL
+    LTEXT           "Substructure",IDC_STATIC,7,33,42,8
+    EDITTEXT        IDC_SUBSTRUCTURE,81,30,185,14,ES_AUTOHSCROLL
+    LTEXT           "Substructure Epoxy",IDC_STATIC,7,57,64,8
+    EDITTEXT        IDC_SUBSTRUCTURE_EPOXY,81,53,185,14,ES_AUTOHSCROLL
+    LTEXT           "Superstructure",IDC_STATIC,7,80,49,8
+    EDITTEXT        IDC_SUPERSTRUCTURE,81,76,185,14,ES_AUTOHSCROLL
+    LTEXT           "Superstructure Epoxy",IDC_STATIC,7,103,71,8
+    EDITTEXT        IDC_SUPERSTRUCTURE_EPOXY,81,99,185,14,ES_AUTOHSCROLL
+END
+
+IDD_RENUMBER DIALOGEX 0, 0, 131, 68
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Generate Mark Numbers"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,20,47,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,74,47,50,14
+    LTEXT           "First Mark No",IDC_STATIC,7,7,43,8
+    EDITTEXT        IDC_FIRST,59,7,40,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Increment",IDC_STATIC,7,27,34,8
+    EDITTEXT        IDC_INCREMENT,59,24,40,14,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_REPORT DIALOGEX 0, 0, 757, 249
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Report"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,7,7,50,14
+    CONTROL         "Static",IDC_HEADER,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,7,20,743,86
+    EDITTEXT        IDC_REPORT,7,113,743,129,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    PUSHBUTTON      "Print",IDC_PRINT,63,7,15,14,BS_ICON
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 304
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 87
+    END
+
+    IDD_QNI, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 148
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 90
+    END
+
+    IDD_BAR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 283
+    END
+
+    IDD_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 200
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 269
+    END
+
+    IDD_QUANTITIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 266
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 113
+    END
+
+    IDD_RENUMBER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 124
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 61
+    END
+
+    IDD_REPORT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 750
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 242
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_OPTIONS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_QNI AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_BAR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PROPERTIES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_QUANTITIES AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_RENUMBER AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_REPORT AFX_DIALOG_LAYOUT
+BEGIN
+    0,
+    0, 0, 0, 0,
+    0, 0, 100, 0,
+    0, 0, 100, 100,
+    0, 0, 0, 0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_PROJNAME            "Barlist"
+END
+
+STRINGTABLE
+BEGIN
+    IDR_BARLIST             "\nBarlist\nBarlist\nBarlist Files (*.bar)\n.bar\nBarlist.Document\nBarlist Document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the current project\nClose"
+    ID_FILE_SAVE            "Save the current project\nSave (Ctrl+S)"
+    ID_FILE_SAVE_AS         "Save the current project with a new name\nSave As"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+    ID_HELP_FINDER          "List Help topics\nHelp Topics"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_ADD_BAR             "Add a bar\nAdd/Edit Bar"
+    ID_ADD_GROUP            "Add a group\nAdd a group"
+    IDC_QUANTITIES          "Reinforcement Quantites Estimate\nShow/Hide Quantities"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_MOVE_UP             "Move Group/Bar Up/nMove Up"
+    IDC_MOVE_DOWN           "Move Group/Bar Down\nMove Down"
+    IDC_DELETE              "Delete selected group or bar\nDelete"
+    ID_QNI                  "Edit quantities not included\nEdit quantities not included"
+END
+
+STRINGTABLE
+BEGIN
+    EAFID_UNITS_SI          "Change units to SI\nSI Units"
+    EAFID_UNITS_US          "Change units to US\nUS Units"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_COPY            "Copy\nCopy"
+    ID_EDIT_CUT             "Cut\nCut"
+    ID_EDIT_PASTE           "Paste\nPaste"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_REPORT          "View quantities report\nReport"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "Barlist.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

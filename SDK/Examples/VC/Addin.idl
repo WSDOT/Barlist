@@ -1,0 +1,29 @@
+// Addin.idl : IDL source for Addin.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (Addin.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "BarlistAddin.idl";
+
+[
+	uuid(12FCFC87-1F41-11D3-8941-006097C68A9C),
+	version(1.0),
+	helpstring("Addin 1.0 Type Library")
+]
+library ADDINLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(12FCFC94-1F41-11D3-8941-006097C68A9C),
+		helpstring("TestAddin Class")
+	]
+	coclass TestAddin
+	{
+		[default] interface IBarlistAddin;
+	};
+};

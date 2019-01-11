@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" 
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+
+<!-- These are the components that make up the Barlist application -->
+   <!-- That is to say, the main application framework (not the plug in applications) -->
+
+   <!-- Include project wide variables -->
+   <?include Variables.wxi?>
+
+   <Fragment>
+      <DirectoryRef Id="APPLICATIONFOLDER"
+                    FileSource ="$(var.BarlistSourceRoot)$(var.PlatformFolder)" >
+         <Component Id ="BarlistComponents"
+                    Guid="{9F639678-37CE-48a2-8EDD-ED5F699EDC0D}"
+                    Win64="$(var.IsWin64)">
+
+           <File Id="Barlist.exe"    Name="Barlist.exe" KeyPath ="yes">
+             <fire:FirewallException Id="FWX1" Name="Barlist" Scope="any" IgnoreFailure="yes"/>
+           </File>
+            
+            <!-- define component categories for the main executable
+            Categories are: Barlist Application Plugins (Barlist DLL)
+            Barlist Components (the little COM objects that integrated into the About dialog)-->
+            <RegistryKey ForceCreateOnInstall="yes"
+                         ForceDeleteOnUninstall="yes"
+                         Root="HKCR"
+                         Key ="Component Categories\$(var.BarlistAppPluginCATID)"/>
+            <RegistryValue Root="HKCR"
+                           Key="Component Categories\$(var.BarlistAppPluginCATID)"
+                           Name="800"
+                           Value="Barlist Application Plugin"
+                           Type="string" />
+            <RegistryValue Root="HKCR"
+                           Key="Component Categories\$(var.BarlistComponentInfoCATID)"
+                           Name="800"
+                           Value="Barlist Components"
+                           Type="string" />
+
+            <!-- NOTE: Ideally these file associations should go with the various plug-in types. However I can't figure
+            out how to make that work. So here it is.-->
+
+           <!-- NOTE: Also need to add add ProgId for the associated icons... search for <ProgId for examples -->
+
+
+           <!-- File associations -->
+            <ProgId Id="Barlist.Document">
+               <Extension Id="bar"
+                          ContentType="application/bar">
+                  <Verb Id="Open"
+                        Command="&amp;Open with Barlist"
+                        TargetFile="Barlist.exe"
+                        Argument='"%1"' />
+               </Extension>
+            </ProgId>
+
+         </Component>
+      </DirectoryRef >
+
+      <DirectoryRef Id="APPLICATIONFOLDER"
+                    FileSource ="$(var.BarlistSourceRoot)" >
+         <Component Id="BarlistSupportFiles" Guid="{5A89BEFB-446F-48f9-82DE-184681A1F9AF}" Win64="$(var.IsWin64)">
+         <File Id="License.txt"       Name="License.txt"/>
+      </Component>
+      </DirectoryRef >
+   </Fragment>
+</Wix>

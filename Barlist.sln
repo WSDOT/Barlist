@@ -1,0 +1,69 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Barlist", "Barlist\Barlist.vcxproj", "{36182FB2-2336-4465-8616-F30023DC958C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A} = {BAF8F8B7-5950-4E78-8A32-892636F6197A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bars", "Bars\Bars.vcxproj", "{BAF8F8B7-5950-4E78-8A32-892636F6197A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BarlistDriver", "BarlistDriver.vcxproj", "{64DB12F5-FF88-497F-9150-AEDC5C924D6A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{36182FB2-2336-4465-8616-F30023DC958C} = {36182FB2-2336-4465-8616-F30023DC958C}
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A} = {BAF8F8B7-5950-4E78-8A32-892636F6197A}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Profile|x64 = Profile|x64
+		Profile|x86 = Profile|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36182FB2-2336-4465-8616-F30023DC958C}.Debug|x64.ActiveCfg = Debug|x64
+		{36182FB2-2336-4465-8616-F30023DC958C}.Debug|x64.Build.0 = Debug|x64
+		{36182FB2-2336-4465-8616-F30023DC958C}.Debug|x86.ActiveCfg = Debug|Win32
+		{36182FB2-2336-4465-8616-F30023DC958C}.Debug|x86.Build.0 = Debug|Win32
+		{36182FB2-2336-4465-8616-F30023DC958C}.Profile|x64.ActiveCfg = Profile|x64
+		{36182FB2-2336-4465-8616-F30023DC958C}.Profile|x64.Build.0 = Profile|x64
+		{36182FB2-2336-4465-8616-F30023DC958C}.Profile|x86.ActiveCfg = Profile|Win32
+		{36182FB2-2336-4465-8616-F30023DC958C}.Profile|x86.Build.0 = Profile|Win32
+		{36182FB2-2336-4465-8616-F30023DC958C}.Release|x64.ActiveCfg = Release|x64
+		{36182FB2-2336-4465-8616-F30023DC958C}.Release|x64.Build.0 = Release|x64
+		{36182FB2-2336-4465-8616-F30023DC958C}.Release|x86.ActiveCfg = Release|Win32
+		{36182FB2-2336-4465-8616-F30023DC958C}.Release|x86.Build.0 = Release|Win32
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Debug|x64.ActiveCfg = Debug|x64
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Debug|x64.Build.0 = Debug|x64
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Debug|x86.ActiveCfg = Debug|Win32
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Debug|x86.Build.0 = Debug|Win32
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Profile|x64.ActiveCfg = Release|x64
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Profile|x64.Build.0 = Release|x64
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Profile|x86.ActiveCfg = Release|Win32
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Profile|x86.Build.0 = Release|Win32
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Release|x64.ActiveCfg = Release|x64
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Release|x64.Build.0 = Release|x64
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Release|x86.ActiveCfg = Release|Win32
+		{BAF8F8B7-5950-4E78-8A32-892636F6197A}.Release|x86.Build.0 = Release|Win32
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Debug|x64.ActiveCfg = Debug|x64
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Debug|x64.Build.0 = Debug|x64
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Debug|x86.ActiveCfg = Debug|Win32
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Debug|x86.Build.0 = Debug|Win32
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Profile|x64.ActiveCfg = Profile|x64
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Profile|x64.Build.0 = Profile|x64
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Profile|x86.ActiveCfg = Profile|Win32
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Profile|x86.Build.0 = Profile|Win32
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Release|x64.ActiveCfg = Release|x64
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Release|x64.Build.0 = Release|x64
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Release|x86.ActiveCfg = Release|Win32
+		{64DB12F5-FF88-497F-9150-AEDC5C924D6A}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
