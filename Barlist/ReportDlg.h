@@ -43,8 +43,14 @@ protected:
 
    CFont m_Font;
 
+   int m_cxMin;
+   int m_cyMin;
+
 	DECLARE_MESSAGE_MAP()
 public:
    virtual BOOL OnInitDialog();
    afx_msg void OnClickedPrint();
+   afx_msg void OnDestroy();
+   afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
+   virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 };

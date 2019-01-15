@@ -26,6 +26,7 @@
 #include "stdafx.h"
 #include "QNIDlg.h"
 #include "afxdialogex.h"
+#include "CollaborationDoc.h"
 
 #include <MfcTools\CustomDDX.h>
 #include <EAF\EAFApp.h>
@@ -62,3 +63,21 @@ END_MESSAGE_MAP()
 
 
 // CQNIDlg message handlers
+
+
+BOOL CQNIDlg::OnInitDialog()
+{
+   CDialog::OnInitDialog();
+
+   // TODO:  Add extra initialization here
+   CEAFDocument* pDoc = EAFGetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
+   {
+      GetDlgItem(IDOK)->ShowWindow(SW_HIDE);
+      GetDlgItem(IDCANCEL)->SetWindowText(_T("Close"));
+      SetDefID(IDCANCEL);
+   }
+
+   return TRUE;  // return TRUE unless you set the focus to a control
+                 // EXCEPTION: OCX Property Pages should return FALSE
+}

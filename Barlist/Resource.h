@@ -14,13 +14,14 @@
 #define IDS_PROJNAME                    100
 #define IDR_PLUGIN                      102
 #define IDR_BARLIST                     129
-#define IDR_COMPONENTINFO               130
+#define IDR_COLLABORATION               130
+#define IDR_COMPONENTINFO               131
 #define IDC_SI                          201
 #define IDC_US                          202
 #define IDC_INCREMENT                   203
 #define IDC_TRAFFIC                     203
 #define IDC_TRAFFIC_UNIT                204
-#define IDI_ICON                        205
+#define IDI_BARLIST                     205
 #define IDC_BRIDGE                      205
 #define IDR_TOOLBAR                     206
 #define IDC_BRIDGE_UNIT                 206
@@ -57,6 +58,7 @@
 #define IDD_REPORT                      225
 #define IDC_DIMENSIONS_GROUP            226
 #define IDC_U                           227
+#define IDD_COLLABORATION_MANAGER       227
 #define IDC_W                           228
 #define IDC_X                           229
 #define IDC_Y                           230
@@ -93,6 +95,13 @@
 #define IDC_REPORT                      264
 #define IDC_PRINT                       265
 #define IDI_PRINT                       266
+#define IDC_BEND_GUIDE                  266
+#define IDI_COLLABORATION               267
+#define IDC_FILES                       267
+#define IDC_REMOVE                      268
+#define IDC_BUTTON3                     270
+#define IDC_ADD                         271
+#define IDC_BUTTON2                     272
 #define EAF_RESERVED_COMMAND_BASE       0x8000
 #define EAFID_UNITS_SI                  32772
 #define EAFID_UNITS_US                  32773
@@ -110,23 +119,23 @@
 #define ID_PLACEHOLDER                  33044
 #define ID_PROPERTIES                   33045
 #define FIRST_ADDIN_COMMAND             33046
-#define IDC_QUANTITIES                  33047
 #define LAST_ADDIN_COMMAND              33050
-#define ID_BUTTON33050                  33050
 #define IDC_EDIT_CUT                    33054
-#define ID_EDIT_COPY33055               33055
+#define IDC_QUANTITIES                  33060
 #define ID_GENERATE_MARK_NUMBERS        33061
 #define ID_DELETE                       33062
 #define ID_EDIT_BAR                     33063
 #define ID_VIEW_REPORT                  33064
+#define IDC_FILE_PRINT                  33066
+#define IDC_COLLABORATION_MANAGER       33067
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        227
-#define _APS_NEXT_COMMAND_VALUE         33066
-#define _APS_NEXT_CONTROL_VALUE         266
-#define _APS_NEXT_SYMED_VALUE           103
+#define _APS_NEXT_RESOURCE_VALUE        229
+#define _APS_NEXT_COMMAND_VALUE         33068
+#define _APS_NEXT_CONTROL_VALUE         273
+#define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

@@ -24,6 +24,7 @@
 #include "resource.h"
 #include "BarDlgStateMachine.h"
 #include <MfcTools\CacheEdit.h>
+#include <MfcTools\MetaFileStatic.h>
 
 interface IBarInfoMgr;
 interface IBarlist;
@@ -34,6 +35,15 @@ interface IStatusMessageCollection;
 enum StatusType;
 
 void DDX_Text(CDataExchange* pDX, int nIDC, BSTR& bstr);
+
+// Want to be able to update the bend image as the user scrolls
+// over the list of bend... the only way to do this is with
+// an owner draw combo box.
+class CBendTypeComboBox : public CComboBox
+{
+public:
+   virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);
+};
 
 // CBarDlg dialog
 
@@ -57,6 +67,10 @@ protected:
    CBarDlgStateMachine m_SM;
    friend CBarDlgStateMachine;
 
+   CBendTypeComboBox m_cbBendType;
+   friend CBendTypeComboBox;
+
+   CMetaFileStatic m_BendGuide;
    CCacheEdit m_ctrlNumEach;
    CFont m_Font;
 
@@ -87,6 +101,9 @@ protected:
    void UpdateMarkNumbers();
    void UpdateDimensions(IBarRecord* pBarRecord);
    void UpdateDimensions(long bendType,bool bVaries);
+
+   void UpdateBendGuide(IBarRecord* pBarRecord);
+   void UpdateBendGuide(long bendType);
 
    BOOL CheckEditState();
    CString AutoIncrementMark(const CString& strMark);

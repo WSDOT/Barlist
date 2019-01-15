@@ -532,6 +532,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
     <ClCompile Include="BarlistDoc.cpp" />
     <ClCompile Include="BarlistApp.cpp" />
     <ClCompile Include="BarlistDocTemplate.cpp" />
+    <ClCompile Include="BarlistPrintDialog.cpp" />
     <ClCompile Include="BarlistStatusBar.cpp" />
     <ClCompile Include="BarlistTreeView.cpp" />
     <ClCompile Include="BarlistListView.cpp" />
@@ -553,6 +554,9 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
     </ClCompile>
     <ClCompile Include="BendFactory.cpp" />
     <ClCompile Include="BarlistFrame.cpp" />
+    <ClCompile Include="CollaborationDoc.cpp" />
+    <ClCompile Include="CollaborationDocTemplate.cpp" />
+    <ClCompile Include="CollaborationManagerDlg.cpp" />
     <ClCompile Include="ComponentInfo.cpp" />
     <ClCompile Include="GenerateMarkNumbersDlg.cpp" />
     <ClCompile Include="mfcdual.cpp" />
@@ -576,6 +580,42 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
     <None Include="Barlist.def" />
     <None Include="ComponentInfo.rgs" />
     <None Include="Plugin.rgs" />
+    <None Include="res\Type_50.emf" />
+    <None Include="res\Type_51.emf" />
+    <None Include="res\Type_52.emf" />
+    <None Include="res\Type_53.emf" />
+    <None Include="res\Type_54.emf" />
+    <None Include="res\Type_55.emf" />
+    <None Include="res\Type_56.emf" />
+    <None Include="res\Type_57.emf" />
+    <None Include="res\Type_58.emf" />
+    <None Include="res\Type_59.emf" />
+    <None Include="res\Type_60.emf" />
+    <None Include="res\Type_61.emf" />
+    <None Include="res\Type_62.emf" />
+    <None Include="res\Type_63.emf" />
+    <None Include="res\Type_66.emf" />
+    <None Include="res\Type_67.emf" />
+    <None Include="res\Type_68.emf" />
+    <None Include="res\Type_69.emf" />
+    <None Include="res\Type_70.emf" />
+    <None Include="res\Type_71.emf" />
+    <None Include="res\Type_72.emf" />
+    <None Include="res\Type_73.emf" />
+    <None Include="res\Type_74.emf" />
+    <None Include="res\Type_75.emf" />
+    <None Include="res\Type_76.emf" />
+    <None Include="res\Type_77.emf" />
+    <None Include="res\Type_78.emf" />
+    <None Include="res\Type_79.emf" />
+    <None Include="res\Type_80.emf" />
+    <None Include="res\Type_81.emf" />
+    <None Include="res\Type_82.emf" />
+    <None Include="res\Type_83.emf" />
+    <None Include="res\Type_84.emf" />
+    <None Include="res\Type_89.emf" />
+    <None Include="res\Type_90.emf" />
+    <None Include="res\Type_Unknown.emf" />
   </ItemGroup>
   <ItemGroup>
     <Midl Include="Barlist.idl">
@@ -624,11 +664,15 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
     <ClInclude Include="BarlistDoc.h" />
     <ClInclude Include="BarlistApp.h" />
     <ClInclude Include="BarlistDocTemplate.h" />
+    <ClInclude Include="BarlistPrintDialog.h" />
     <ClInclude Include="BarlistStatusBar.h" />
     <ClInclude Include="BarlistTreeView.h" />
     <ClInclude Include="BarlistListView.h" />
     <ClInclude Include="BendFactory.h" />
     <ClInclude Include="BarlistFrame.h" />
+    <ClInclude Include="CollaborationDoc.h" />
+    <ClInclude Include="CollaborationDocTemplate.h" />
+    <ClInclude Include="CollaborationManagerDlg.h" />
     <ClInclude Include="ComponentInfo.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="GenerateMarkNumbersDlg.h" />
@@ -645,6 +689,8 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Barlist.ico" />
+    <Image Include="res\Collaboration.ico" />
+    <Image Include="res\collaboration_toolbar.bmp" />
     <Image Include="res\Green.ico" />
     <Image Include="res\help.ico" />
     <Image Include="res\printer.ico" />

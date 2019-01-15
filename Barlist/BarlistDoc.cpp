@@ -53,6 +53,9 @@
 
 #include <fstream>
 
+#pragma Reminder("WORKING HERE - create a new document type for collaboration projects")
+#pragma Reminder("WORKING HERE - update documentation")
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -87,17 +90,24 @@ DELEGATE_CUSTOM_INTERFACE(CBarlistDoc, Events);
 #define ID_MYTOOLBAR ID_MAINFRAME_TOOLBAR+1
 #define PLUGIN_COMMAND_COUNT 256
 
-#pragma Reminder("WORKING HERE - implement printing")
-
 #include <MfcTools\Format.h>
 static std::array<unitmgtMassData, 2> gs_WeightUnit{ unitmgtMassData(unitMeasure::Kilogram,0.001,9,0),unitmgtMassData(unitMeasure::PoundMass,0.001,9,0) };
 const unitmgtMassData* g_pWeightUnit = nullptr;
 
 static std::array<unitmgtLengthData, 2> gs_LengthUnit{ unitmgtLengthData(unitMeasure::Meter,0.001,9,0),unitmgtLengthData(unitMeasure::Feet,0.001,9,0) };
 
-CString FormatMass(Float64 mass,bool bUnits)
+CString FormatMass(Float64 mass, bool bUnits)
 {
-   return FormatDimension(mass, *g_pWeightUnit,bUnits);
+   CString strMass;
+   if (bUnits)
+   {
+      strMass.Format(_T("%5.0f %s"), ConvertFromSysUnits(mass, g_pWeightUnit->UnitOfMeasure), g_pWeightUnit->UnitOfMeasure.UnitTag().c_str());
+   }
+   else
+   {
+      strMass.Format(_T("%5.0f"), ConvertFromSysUnits(mass, g_pWeightUnit->UnitOfMeasure));
+   }
+   return strMass;
 }
 
 CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
@@ -105,14 +115,48 @@ CString FormatLength(Float64 length,bool bUnits)
 {
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
-      return FormatDimension(length, gs_LengthUnit[0], bUnits);
+      CString strLength;
+      if (bUnits)
+      {
+         strLength.Format(_T("%7.3f %s"), ConvertFromSysUnits(length, gs_LengthUnit[0].UnitOfMeasure),gs_LengthUnit[0].UnitOfMeasure.UnitTag().c_str());
+      }
+      else
+      {
+         strLength.Format(_T("%7.3f"), ConvertFromSysUnits(length, gs_LengthUnit[0].UnitOfMeasure));
+      }
+      return strLength;
    }
    else
    {
-      USES_CONVERSION;
-      CComBSTR bstr;
-      g_formatter->Format(::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), bUnits ? _T("") : nullptr, &bstr);
-      return OLE2T(bstr);
+      if (bUnits)
+      {
+         USES_CONVERSION;
+         CComBSTR bstr;
+         g_formatter->Format(::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
+         return OLE2T(bstr);
+      }
+      else
+      {
+         // convert from system units
+         length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
+         int sign = BinarySign(length);
+         length = fabs(length);
+         long feet = (long)floor(length);
+         double inches = (length-feet)*12;
+         if (IsEqual(inches, 12.0))
+         {
+            // don't want 6'-12"... make it 7'-0"
+            feet++;
+            inches = 0;
+         }
+
+         CString strBuffer;
+         strBuffer.Format(_T("%s%3d %4.1f"), sign < 0 ? _T("-") : _T(""), feet, inches);
+         
+         CString strLength;
+         strLength.Format(_T("%-s"), strBuffer);
+         return strLength;
+      }
    }
 }
 
@@ -168,6 +212,39 @@ bool ParseLength(const CString& strValue,Float64* pValue)
    return true;
 }
 
+CString FormatStatusValue(CComVariant& var)
+{
+   CString strValue;
+   if (var.vt == VT_R8)
+   {
+      strValue.Format(_T("%s"), FormatLength(var.dblVal));
+   }
+   else
+   {
+      USES_CONVERSION;
+      var.ChangeType(VT_BSTR);
+      strValue.Format(_T("%s"), OLE2T(var.bstrVal));
+   }
+   return strValue;
+}
+
+CString FormatStatusMessage(IStatusMessage* pStatusMessage)
+{
+   CComBSTR bstrText;
+   pStatusMessage->get_Text(&bstrText);
+   CString strMsg(bstrText);
+
+   CComVariant val1, val2;
+   pStatusMessage->get_Val1(&val1);
+   pStatusMessage->get_Val2(&val2);
+   CString strVal1 = FormatStatusValue(val1);
+   CString strVal2 = FormatStatusValue(val2);
+
+   strMsg.Replace(_T("%1"), strVal1);
+   strMsg.Replace(_T("%2"), strVal2);
+
+   return strMsg;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarlistDoc construction/destruction
@@ -227,6 +304,11 @@ void CBarlistDoc::GetBarlist(IBarlist** ppBarlist)
    m_Barlist.CopyTo(ppBarlist);
 }
 
+UINT CBarlistDoc::GetToolbarResourceID()
+{
+   return IDR_TOOLBAR;
+}
+
 void CBarlistDoc::DoIntegrateWithUI(BOOL bIntegrate)
 {
    __super::DoIntegrateWithUI(bIntegrate);
@@ -239,7 +321,7 @@ void CBarlistDoc::DoIntegrateWithUI(BOOL bIntegrate)
          AFX_MANAGE_STATE(AfxGetStaticModuleState());
          m_ToolbarID = CreateToolBar(_T("Barlist"));
          CEAFToolBar* pToolbar = GetToolBar(m_ToolbarID);
-         pToolbar->LoadToolBar(IDR_TOOLBAR, nullptr);
+         pToolbar->LoadToolBar(GetToolbarResourceID(), nullptr);
          pToolbar->CreateDropDownButton(ID_FILE_OPEN, nullptr, BTNS_DROPDOWN);
 
          pToolbar->HideButton(ID_PLACEHOLDER, nullptr, TRUE); // hides the placeholder button that reserves a little extra space
@@ -297,8 +379,19 @@ BOOL CBarlistDoc::OnNewDocument()
    return TRUE;
 }
 
-BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
+BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist)
 {
+   CComPtr<IBarlist> barlist;
+   if (*ppBarlist == nullptr)
+   {
+      barlist.CoCreateInstance(CLSID_Barlist);
+      barlist.CopyTo(ppBarlist);
+   }
+   else
+   {
+      barlist = *ppBarlist;
+   }
+
    CString strPathName(lpszPathName);
    std::ifstream ifile(strPathName);
    if (ifile.bad())
@@ -307,7 +400,7 @@ BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
    }
    else
    {
-      std::auto_ptr<BarlistType> barlist;
+      std::auto_ptr<BarlistType> barlist_xml;
       try
       {
          xml_schema::properties props;
@@ -315,36 +408,36 @@ BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
          CString strSchemaFile(pApp->GetAppLocation());
          strSchemaFile.Append(_T("Barlist.xsd"));
          props.no_namespace_schema_location(strSchemaFile.GetBuffer());
-         barlist = Barlist(ifile,0,props);
+         barlist_xml = Barlist(ifile, 0, props);
       }
       catch (const xml_schema::exception& e)
       {
-         AfxMessageBox(CString(e.what()),MB_OK);
+         AfxMessageBox(CString(e.what()), MB_OK);
          return FALSE;
       }
 
-      auto properties = barlist->Properties();
-      m_Barlist->put_Project(CComBSTR(properties.Project().c_str()));
-      m_Barlist->put_JobNumber(CComBSTR(properties.JobNumber().c_str()));
-      m_Barlist->put_Engineer(CComBSTR(properties.Engineer().c_str()));
-      m_Barlist->put_Company(CComBSTR(properties.Company().c_str()));
-      m_Barlist->put_Comments(CComBSTR(properties.Comments().c_str()));
+      auto properties = barlist_xml->Properties();
+      barlist->put_Project(CComBSTR(properties.Project().c_str()));
+      barlist->put_JobNumber(CComBSTR(properties.JobNumber().c_str()));
+      barlist->put_Engineer(CComBSTR(properties.Engineer().c_str()));
+      barlist->put_Company(CComBSTR(properties.Company().c_str()));
+      barlist->put_Comments(CComBSTR(properties.Comments().c_str()));
 
-      auto qni = barlist->QNI();
-      m_Barlist->put_BridgeGrateInletQuantity(qni.Bridge());
-      m_Barlist->put_RetainingWallQuantity(qni.Wall());
-      m_Barlist->put_TrafficBarrierQuantity(qni.Traffic());
+      auto qni = barlist_xml->QNI();
+      barlist->put_BridgeGrateInletQuantity(qni.Bridge());
+      barlist->put_RetainingWallQuantity(qni.Wall());
+      barlist->put_TrafficBarrierQuantity(qni.Traffic());
 
       CComPtr<IGroupCollection> groups;
-      m_Barlist->get_Groups(&groups);
+      barlist->get_Groups(&groups);
       int nGroups = 0;
-      auto& grps = barlist->Group();
+      auto& grps = barlist_xml->Group();
       for (auto& grp : grps)
       {
          groups->Add(CComBSTR(grp.Name().c_str()));
 
          CComPtr<IGroup> group;
-         groups->get_Item(CComVariant(nGroups++),&group);
+         groups->get_Item(CComVariant(nGroups++), &group);
 
          CComPtr<IBarRecordCollection> barRecords;
          group->get_BarRecords(&barRecords);
@@ -359,7 +452,7 @@ BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
             barRecord.CoCreateInstance(CLSID_BarRecord);
 
             CComPtr<IBarData> barData;
-            bars->get_Item(CComVariant(barrec.Size().c_str()),&barData);
+            bars->get_Item(CComVariant(barrec.Size().c_str()), &barData);
             barRecord->put_BarData(barData);
 
             barRecord->put_Mark(CComBSTR(barrec.Mark().c_str()));
@@ -369,7 +462,7 @@ BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
             UseType use = (UseType)barrec.Use();
             barRecord->put_Use(use);
 
-            
+
             LCID lcid = 0x0409; // US English
             VARIANT_BOOL vbLumpSum;
             VarBoolFromStr(CComBSTR(barrec.LumpSum().c_str()), lcid, VAR_LOCALBOOL, &vbLumpSum);
@@ -419,13 +512,22 @@ BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
             barRecords->Add(barRecord);
          }
       }
-
-      // start getting events after the barlist is loaded, otherwise
-      // there will be loads of events fired during loading (we don't want that)
-      GetBarlistEvents(TRUE); 
-
-      return TRUE;
    }
+   return TRUE;
+}
+
+BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
+{
+   if (!ReadBarlistFromFile(lpszPathName, &m_Barlist.p))
+   {
+      return FALSE;
+   }
+
+   // start getting events after the barlist is loaded, otherwise
+   // there will be tons of events fired during loading (we don't want that)
+   GetBarlistEvents(TRUE); 
+
+   return TRUE;
 }
 
 BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
@@ -610,6 +712,13 @@ void CBarlistDoc::SaveDocumentSettings()
    VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("MarkIncrement"), m_MarkIncrement));
    VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("Units"), (int)(pApp->GetUnitsMode())));
 }
+
+void CBarlistDoc::SetModifiedFlag(BOOL bModified)
+{
+   __super::SetModifiedFlag(bModified);
+   m_bDirtyReport = true;
+}
+
 
 CString CBarlistDoc::GetDocumentationRootLocation()
 {
@@ -808,6 +917,7 @@ void CBarlistDoc::GetBarlistEvents(BOOL bListenForEvents)
 void CBarlistDoc::OnUnitsModeChanged(eafTypes::UnitMode newUnitMode)
 {
    g_pWeightUnit = &gs_WeightUnit[newUnitMode == eafTypes::umSI ? 0 : 1];
+   m_bDirtyReport = true;
    __super::OnUnitsModeChanged(newUnitMode);
 }
 
@@ -962,6 +1072,16 @@ void CBarlistDoc::CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const
    clone.CopyTo(ppClone);
 }
 
+CReport& CBarlistDoc::GetReport()
+{
+   if (m_bDirtyReport)
+   {
+      m_Report.BuildReport(m_Barlist);
+      m_bDirtyReport = false;
+   }
+   return m_Report;
+}
+
 STDMETHODIMP CBarlistDoc::XEvents::OnNotIncludedQuantitiesChanged()
 {
    METHOD_PROLOGUE(CBarlistDoc, Events);
@@ -1048,3 +1168,4 @@ STDMETHODIMP CBarlistDoc::XEvents::OnBarRecordMoved(IGroup* pGroup, IBarRecord* 
    pThis->UpdateAllViews(nullptr, HINT_BAR_MOVED, &hint);
    return S_OK;
 }
+

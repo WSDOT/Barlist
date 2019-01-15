@@ -30,9 +30,10 @@
             <File Id="Barlist.dll"    Name="Barlist.dll" KeyPath ="yes"/>
            
             <!-- Barlist file associations -->
-            <ProgId Id="Barlist.Document" Icon="Barlist.dll" IconIndex="0" />
+           <ProgId Id="Barlist.Document" Icon="Barlist.dll" IconIndex="0" />
+           <ProgId Id="BarlistCollaboration.Document" Icon="Barlist.dll" IconIndex="7" />
 
-            <!-- Barlist registry entries-->
+           <!-- Barlist registry entries-->
             
             <!-- Barlist - Barlist Application Plugin -->
             <?define BarlistAppPluginCLSID={CFD04C61-6C91-42ED-8CAB-33DB07D08069}?>

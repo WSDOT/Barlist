@@ -21,7 +21,8 @@
 ///////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include <Bars\Bars.h>
+#include <Bars\Bars_i.h>
+#include <vector>
 
 class CReport
 {
@@ -29,17 +30,44 @@ public:
    CReport();
    ~CReport();
 
-   CString GetReport(IBarlist* pBarlist);
+   static CString GetReportHeader();
+
+   void BuildReport(IBarlist* pBarlist);
+
+   const std::vector<CString>& GetReport();
+
+   void PrepareForPrinting(CDC* pDC, CPrintInfo* pInfo);
+   void Print(CDC* pDC, CPrintInfo* pInfo);
+   void EndPrinting(CDC* pDC, CPrintInfo* pInfo);
 
 private:
-   CString ReportGroups(IBarlist* pBarlist);
-   CString ReportBarRecords(IGroup* pGroup);
-   CString ReportBarRecord(IBarRecord* pBarRecord);
-   CString ReportQNI(IBarlist* pBarlist);
-   CString ReportSummary(IBarlist* pBarlist);
+   void PageHeader(CDC* pDC, CPrintInfo* pInfo);
+   void PrintCoverPage(CDC* pDC, CPrintInfo* pInfo);
+   void ReportGroups(IBarlist* pBarlist);
+   void ReportBarRecords(IGroup* pGroup);
+   void ReportBarRecord(IBarRecord* pBarRecord);
+   CString ReportBend(IBend* pBend, bool bVaries);
+   void ReportErrors(IBend* pBend);
+   void ReportQNI(IBarlist* pBarlist);
+   void ReportSummary(IBarlist* pBarlist);
 
    TCHAR CReport::GetUse(UseType use);
    TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c);
-   CString ReportBend(IBend* pBend,bool bVaries);
+
+   std::vector<CString> m_vReportLines;
+
+   CString m_strProject;
+   CString m_strJobNumber;
+   CString m_strEngineer;
+   CString m_strCompany;
+   CString m_strComments;
+
+   CFont m_Font;
+   CFont* m_pOldFont;
+   LONG m_hLine;
+   LONG m_nHeaderLines;
+   LONG m_nLinesPerPage;
+   CRect m_Border;
+   CRect m_Rect;
 };
 

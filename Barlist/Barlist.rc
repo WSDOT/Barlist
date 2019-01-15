@@ -110,9 +110,9 @@ BEGIN
         MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
         MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
         MENUITEM SEPARATOR
-        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM "&Print",                      ID_FILE_PRINT
         MENUITEM SEPARATOR
-        MENUITEM "Properties...",               33045
+        MENUITEM "Properties...",               ID_PROPERTIES
         MENUITEM SEPARATOR
         MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
         MENUITEM SEPARATOR
@@ -132,7 +132,7 @@ BEGIN
         MENUITEM "Move Up",                     IDC_MOVE_UP
         MENUITEM "Move Down",                   IDC_MOVE_DOWN
         MENUITEM SEPARATOR
-        MENUITEM "Generate Mark Numbers",       33061
+        MENUITEM "Generate Mark Numbers",       ID_GENERATE_MARK_NUMBERS
     END
     POPUP "Project"
     BEGIN
@@ -141,7 +141,54 @@ BEGIN
         MENUITEM "Quantities not included...",  ID_QNI
         MENUITEM "Quantities...",               IDC_QUANTITIES
         MENUITEM SEPARATOR
-        MENUITEM "View Report",                 33064
+        MENUITEM "View Report",                 ID_VIEW_REPORT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbars...",                ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "Options",                     ID_VIEW_OPTIONS
+    END
+    POPUP "Add-Ins"
+    BEGIN
+        MENUITEM "No addins were found",        ID_PLACEHOLDER
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "Help Source",                 EAFID_HELP_SOURCE
+        MENUITEM "&Help Topics",                ID_HELP_FINDER
+        MENUITEM SEPARATOR
+        MENUITEM "&About...",                   ID_APP_ABOUT
+    END
+END
+
+IDR_COLLABORATION MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print",                      ID_FILE_PRINT
+        MENUITEM SEPARATOR
+        MENUITEM "Properties...",               ID_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "Project"
+    BEGIN
+        MENUITEM "View Bar Details",            IDC_ADD_BAR
+        MENUITEM "Quantities not included...",  ID_QNI
+        MENUITEM "Quantities...",               IDC_QUANTITIES
+        MENUITEM SEPARATOR
+        MENUITEM "View Report",                 ID_VIEW_REPORT
+        MENUITEM "Collaboration Manager",       IDC_COLLABORATION_MANAGER
     END
     POPUP "&View"
     BEGIN
@@ -213,7 +260,9 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON                ICON                    "res\\Barlist.ico"
+IDI_BARLIST             ICON                    "res\\Barlist.ico"
+
+IDI_COLLABORATION       ICON                    "res\\Collaboration.ico"
 
 IDI_RED                 ICON                    "res\\Red.ico"
 
@@ -230,6 +279,102 @@ IDI_PRINT               ICON                    "res\\printer.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// METAFILE
+//
+
+TYPE_UNKNOWN            METAFILE                "res\\Type_Unknown.emf"
+
+TYPE_50                 METAFILE                "res\\Type_50.emf"
+
+TYPE_51                 METAFILE                "res\\Type_51.emf"
+
+TYPE_52                 METAFILE                "res\\Type_52.emf"
+
+TYPE_53                 METAFILE                "res\\Type_53.emf"
+
+TYPE_54                 METAFILE                "res\\Type_54.emf"
+
+TYPE_55                 METAFILE                "res\\Type_55.emf"
+
+TYPE_56                 METAFILE                "res\\Type_56.emf"
+
+TYPE_57                 METAFILE                "res\\Type_57.emf"
+
+TYPE_58                 METAFILE                "res\\Type_58.emf"
+
+TYPE_59                 METAFILE                "res\\Type_59.emf"
+
+TYPE_60                 METAFILE                "res\\Type_60.emf"
+
+TYPE_61                 METAFILE                "res\\Type_61.emf"
+
+TYPE_62                 METAFILE                "res\\Type_62.emf"
+
+TYPE_63                 METAFILE                "res\\Type_63.emf"
+
+TYPE_66                 METAFILE                "res\\Type_66.emf"
+
+TYPE_67                 METAFILE                "res\\Type_67.emf"
+
+TYPE_68                 METAFILE                "res\\Type_68.emf"
+
+TYPE_69                 METAFILE                "res\\Type_69.emf"
+
+TYPE_70                 METAFILE                "res\\Type_70.emf"
+
+TYPE_71                 METAFILE                "res\\Type_71.emf"
+
+TYPE_72                 METAFILE                "res\\Type_72.emf"
+
+TYPE_73                 METAFILE                "res\\Type_73.emf"
+
+TYPE_74                 METAFILE                "res\\Type_74.emf"
+
+TYPE_75                 METAFILE                "res\\Type_75.emf"
+
+TYPE_76                 METAFILE                "res\\Type_76.emf"
+
+TYPE_77                 METAFILE                "res\\Type_77.emf"
+
+TYPE_78                 METAFILE                "res\\Type_78.emf"
+
+TYPE_79                 METAFILE                "res\\Type_79.emf"
+
+TYPE_80                 METAFILE                "res\\Type_80.emf"
+
+TYPE_81                 METAFILE                "res\\Type_81.emf"
+
+TYPE_82                 METAFILE                "res\\Type_82.emf"
+
+TYPE_83                 METAFILE                "res\\Type_83.emf"
+
+TYPE_84                 METAFILE                "res\\Type_84.emf"
+
+TYPE_89                 METAFILE                "res\\Type_89.emf"
+
+TYPE_90                 METAFILE                "res\\Type_90.emf"
+
+TYPE_91                 METAFILE                "res\\Type_90.emf"
+
+TYPE_92                 METAFILE                "res\\Type_90.emf"
+
+TYPE_93                 METAFILE                "res\\Type_90.emf"
+
+TYPE_94                 METAFILE                "res\\Type_90.emf"
+
+TYPE_95                 METAFILE                "res\\Type_90.emf"
+
+TYPE_96                 METAFILE                "res\\Type_90.emf"
+
+TYPE_97                 METAFILE                "res\\Type_90.emf"
+
+TYPE_98                 METAFILE                "res\\Type_90.emf"
+
+TYPE_99                 METAFILE                "res\\Type_90.emf"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Toolbar
 //
 
@@ -238,6 +383,8 @@ BEGIN
     BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
     BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
     SEPARATOR
     BUTTON      ID_EDIT_CUT
     BUTTON      ID_EDIT_COPY
@@ -259,6 +406,27 @@ BEGIN
     BUTTON      ID_PLACEHOLDER
 END
 
+IDR_COLLABORATION TOOLBAR 16, 16
+BEGIN
+    BUTTON      ID_FILE_NEW
+    BUTTON      ID_FILE_OPEN
+    BUTTON      ID_FILE_SAVE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    SEPARATOR
+    BUTTON      IDC_COLLABORATION_MANAGER
+    BUTTON      IDC_ADD_BAR
+    BUTTON      ID_QNI
+    SEPARATOR
+    BUTTON      IDC_QUANTITIES
+    BUTTON      ID_VIEW_REPORT
+    SEPARATOR
+    BUTTON      EAFID_UNITS_SI
+    BUTTON      EAFID_UNITS_US
+    SEPARATOR
+    BUTTON      ID_PLACEHOLDER
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -266,6 +434,8 @@ END
 //
 
 IDR_TOOLBAR             BITMAP                  "res\\toolbar.bmp"
+
+IDR_COLLABORATION       BITMAP                  "res\\collaboration_toolbar.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -306,7 +476,7 @@ BEGIN
     LTEXT           "Static",IDC_WALL_UNIT,123,52,19,8
 END
 
-IDD_BAR DIALOGEX 0, 0, 309, 290
+IDD_BAR DIALOGEX 0, 0, 623, 290
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Input Bar Data"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -318,7 +488,7 @@ BEGIN
     ICON            IDI_GREEN,IDC_STATUS,238,7,20,20
     LTEXT           "Location",IDC_STATIC,7,36,28,8
     EDITTEXT        IDC_LOCATION,42,33,151,14,ES_AUTOHSCROLL
-    COMBOBOX        IDC_TYPE,197,34,93,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_TYPE,197,33,93,227,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Mark No.",IDC_STATIC,7,58,30,8
     COMBOBOX        IDC_MARK,42,55,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Size",IDC_STATIC,7,78,14,8
@@ -336,7 +506,7 @@ BEGIN
     CONTROL         "Varies",IDC_VARIES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,249,66,35,10
     LTEXT           "No. Each",IDC_STATIC,249,78,30,8
     EDITTEXT        IDC_NUM_EACH,249,88,30,14,ES_AUTOHSCROLL
-    GROUPBOX        "Dimensions",IDC_DIMENSIONS_GROUP,7,110,295,86
+    GROUPBOX        "Dimensions",IDC_DIMENSIONS_GROUP,7,110,298,86
     LTEXT           "U",IDC_STATIC,25,123,8,8
     EDITTEXT        IDC_U,9,134,40,14,ES_RIGHT | ES_AUTOHSCROLL
     LTEXT           "W",IDC_STATIC,67,123,8,8
@@ -366,13 +536,14 @@ BEGIN
     EDITTEXT        IDC_VARIES_T1,219,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
     LTEXT           "q2",IDC_VARIES_T2_LABEL,279,163,9,8
     EDITTEXT        IDC_VARIES_T2,261,174,40,14,ES_RIGHT | ES_AUTOHSCROLL
-    EDITTEXT        IDC_STATUS_MESSAGE,7,203,295,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "Add Bar",IDC_ADD_BAR,21,269,50,14
-    PUSHBUTTON      "Delete",IDC_DELETE,73,269,50,14
-    PUSHBUTTON      "Help",IDCHELP,159,269,14,14,BS_ICON
-    PUSHBUTTON      "Save",IDC_SAVE,177,269,14,14,BS_ICON
-    DEFPUSHBUTTON   "Update",IDC_UPDATE_BAR,198,269,50,14
-    PUSHBUTTON      "Close",IDCANCEL,252,269,50,14
+    EDITTEXT        IDC_STATUS_MESSAGE,7,203,298,60,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "Add Bar",IDC_ADD_BAR,7,269,50,14
+    PUSHBUTTON      "Delete",IDC_DELETE,59,269,50,14
+    PUSHBUTTON      "Help",IDCHELP,145,269,14,14,BS_ICON
+    PUSHBUTTON      "Save",IDC_SAVE,161,269,14,14,BS_ICON
+    DEFPUSHBUTTON   "Update",IDC_UPDATE_BAR,204,269,50,14
+    PUSHBUTTON      "Close",IDCANCEL,256,269,50,14
+    CONTROL         "",IDC_BEND_GUIDE,"Static",SS_ENHMETAFILE | WS_BORDER,315,7,301,276
 END
 
 IDD_PROPERTIES DIALOGEX 0, 0, 207, 276
@@ -424,15 +595,31 @@ BEGIN
     EDITTEXT        IDC_INCREMENT,59,24,40,14,ES_AUTOHSCROLL | ES_NUMBER
 END
 
-IDD_REPORT DIALOGEX 0, 0, 757, 249
+IDD_REPORT DIALOGEX 0, 0, 711, 280
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Report"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Close",IDOK,7,7,50,14
-    CONTROL         "Static",IDC_HEADER,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,7,20,743,86
-    EDITTEXT        IDC_REPORT,7,113,743,129,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
-    PUSHBUTTON      "Print",IDC_PRINT,63,7,15,14,BS_ICON
+    EDITTEXT        IDC_HEADER,7,22,697,94,ES_MULTILINE | ES_READONLY
+    EDITTEXT        IDC_REPORT,7,115,697,158,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    PUSHBUTTON      "Print",IDC_PRINT,60,7,15,14,BS_ICON
+END
+
+IDD_COLLABORATION_MANAGER DIALOGEX 0, 0, 335, 213
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Collaboration Manager"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,278,160,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,278,176,50,14
+    LISTBOX         IDC_FILES,7,19,266,187,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Drag and Drop Barlist files to include in the collaboration",IDC_STATIC,7,7,179,8
+    PUSHBUTTON      "Remove",IDC_REMOVE,278,34,50,14
+    PUSHBUTTON      "Move Up",IDC_MOVE_UP,278,87,50,14
+    PUSHBUTTON      "Move Down",IDC_MOVE_DOWN,278,102,50,14
+    PUSHBUTTON      "Add",IDC_ADD,278,19,50,14
+    PUSHBUTTON      "Help",IDCHELP,278,192,50,14
 END
 
 
@@ -463,7 +650,7 @@ BEGIN
     IDD_BAR, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 302
+        RIGHTMARGIN, 616
         TOPMARGIN, 7
         BOTTOMMARGIN, 283
     END
@@ -495,9 +682,17 @@ BEGIN
     IDD_REPORT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 750
+        RIGHTMARGIN, 704
         TOPMARGIN, 7
-        BOTTOMMARGIN, 242
+        BOTTOMMARGIN, 273
+    END
+
+    IDD_COLLABORATION_MANAGER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 328
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 206
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -547,6 +742,11 @@ BEGIN
     0, 0, 0, 0
 END
 
+IDD_COLLABORATION_MANAGER AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -561,6 +761,7 @@ END
 STRINGTABLE
 BEGIN
     IDR_BARLIST             "\nBarlist\nBarlist\nBarlist Files (*.bar)\n.bar\nBarlist.Document\nBarlist Document"
+    IDR_COLLABORATION       "\nCollaboration\nBarlist\nBarlist Collaboration Files (*.cbm)\n.cbm\nBarlistCollaboration.Document\nBarlist Collaboration Document"
 END
 
 STRINGTABLE
@@ -571,6 +772,7 @@ BEGIN
     ID_FILE_SAVE            "Save the current project\nSave (Ctrl+S)"
     ID_FILE_SAVE_AS         "Save the current project with a new name\nSave As"
     ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print barlist report\tPrint"
 END
 
 STRINGTABLE
@@ -621,6 +823,8 @@ END
 STRINGTABLE
 BEGIN
     ID_VIEW_REPORT          "View quantities report\nReport"
+    IDC_FILE_PRINT          "Print barlist report\nPrint"
+    33067                   "Collaboration Manager\nCollaboration Manager"
 END
 
 #endif    // English (United States) resources

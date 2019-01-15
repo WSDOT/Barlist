@@ -344,3 +344,9 @@ Installer/*Fragments.wxs
 /Barlist/Schema/Barlist.cxx
 !/Barlist/BXF/bin/Win32
 !/Barlist/BarlistSheets/bin/Win32
+
+# the following are compiler generated files
+AddinMgr.h
+Bars.h
+BarlistAddin.h
+Barlst.h

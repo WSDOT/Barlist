@@ -25,10 +25,12 @@
 
 #include "stdafx.h"
 #include "resource.h"
-#include "BarlistDoc.h"
+#include "CollaborationDoc.h"
 #include "BarlistTreeView.h"
 #include "BarlistListView.h"
 #include "Events.h"
+
+#include "BarlistPrintDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -161,6 +163,7 @@ void CBarlistTreeView::OnInitialUpdate()
 
 void CBarlistTreeView::OnDraw(CDC* pDC)
 {
+
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -168,18 +171,33 @@ void CBarlistTreeView::OnDraw(CDC* pDC)
 
 BOOL CBarlistTreeView::OnPreparePrinting(CPrintInfo* pInfo)
 {
-	// default preparation
-	return DoPreparePrinting(pInfo);
+   // default preparation
+
+   // Use our own printer dialog
+   // Our printer dialog is the default MFC printer dialog
+   // however, we force the page setup to be Landscape and Letter size paper
+   delete pInfo->m_pPD;
+   pInfo->m_pPD = new CBarlistPrintDialog(FALSE);
+
+   CBarlistDoc* pDoc = GetDocument();
+   CReport& report = pDoc->GetReport();
+
+   pInfo->m_pPD->m_pd.Flags |= PD_ALLPAGES | PD_NOPAGENUMS | PD_NOSELECTION | PD_NOCURRENTPAGE;
+   pInfo->m_pPD->m_pd.nFromPage = 1;
+   pInfo->m_pPD->m_pd.nMinPage = 1;
+   pInfo->m_pPD->m_pd.nToPage = -1;
+   pInfo->m_pPD->m_pd.nMaxPage = -1;
+
+   return DoPreparePrinting(pInfo);
 }
 
-void CBarlistTreeView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
+void CBarlistTreeView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 {
-	// TODO: add extra initialization before printing
-}
-
-void CBarlistTreeView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
-{
-	// TODO: add cleanup after printing
+   CBarlistDoc* pDoc = GetDocument();
+   CReport& report = pDoc->GetReport();
+   report.PrepareForPrinting(pDC, pInfo);
+   report.Print(pDC, pInfo);
+   report.EndPrinting(pDC, pInfo);
 }
 
 void CBarlistTreeView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
@@ -688,7 +706,13 @@ void CBarlistTreeView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBarlistTreeView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
-   // TODO: Add your control notification handler code here
+   CBarlistDoc* pDoc = GetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
+   {
+      // no context editing for collaboration projects
+      return;
+   }
+
    CTreeCtrl& tree = GetTreeCtrl();
    CPoint point;
    GetCursorPos(&point);
@@ -707,3 +731,4 @@ void CBarlistTreeView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 
    *pResult = 0;
 }
+

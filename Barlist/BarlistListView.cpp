@@ -27,7 +27,7 @@
 #include "resource.h"
 #include "BarlistListView.h"
 #include "BarlistTreeView.h"
-#include "BarlistDoc.h"
+#include "CollaborationDoc.h"
 #include "Events.h"
 
 #include "GenerateMarkNumbersDlg.h"
@@ -81,6 +81,9 @@ BEGIN_MESSAGE_MAP(CBarlistListView, CListView)
    ON_COMMAND(ID_GENERATE_MARK_NUMBERS, &CBarlistListView::OnGenerateMarkNumbers)
    ON_WM_DESTROY()
    ON_NOTIFY_REFLECT(NM_RCLICK, &CBarlistListView::OnNMRClick)
+   ON_COMMAND(ID_FILE_PRINT, CView::OnFilePrint)
+   ON_COMMAND(ID_FILE_PRINT_DIRECT, CView::OnFilePrint)
+   ON_COMMAND(ID_FILE_PRINT_PREVIEW, CView::OnFilePrintPreview)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -88,6 +91,8 @@ END_MESSAGE_MAP()
 
 void CBarlistListView::OnDraw(CDC* pDC)
 {
+   // drawing is used for printing... printing is delegated to the tree view
+   m_pTreeView->OnDraw(pDC);
 }
 
 BOOL CBarlistListView::PreCreateWindow(CREATESTRUCT& cs)
@@ -138,15 +143,19 @@ void CBarlistListView::OnInitialUpdate()
 
    RECT rect;
    list.GetClientRect(&rect);
-   int width = rect.right / 8;
+   int width = rect.right / 13;
 
    int col = 0;
    list.InsertColumn(col++, _T("Mark No."), LVCFMT_LEFT, width);
-   list.InsertColumn(col++, _T("Location"), LVCFMT_LEFT, width);
+   list.InsertColumn(col++, _T("Location"), LVCFMT_LEFT, 2*width);
    list.InsertColumn(col++, _T("Size"), LVCFMT_CENTER, width);
    list.InsertColumn(col++, _T("No. Reqd"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Bend Type"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Use"), LVCFMT_LEFT, width);
+   list.InsertColumn(col++, _T("Lump Sum"), LVCFMT_LEFT, width);
+   list.InsertColumn(col++, _T("Substructure"), LVCFMT_LEFT, width);
+   list.InsertColumn(col++, _T("Epoxy"), LVCFMT_LEFT, width);
+   list.InsertColumn(col++, _T("Varies"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Length"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Wgt"), LVCFMT_LEFT, width);
 
@@ -334,6 +343,19 @@ void CBarlistListView::SetBarRecord(int row, IBarRecord* pBarRecord)
    }
    list.SetItemText(row, subItem++, strUse);
 
+   VARIANT_BOOL vbFlag;
+   pBarRecord->get_LumpSum(&vbFlag);
+   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("L") : _T("")));
+
+   pBarRecord->get_Substructure(&vbFlag);
+   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("S") : _T("")));
+
+   pBarRecord->get_Epoxy(&vbFlag);
+   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("E") : _T("")));
+
+   pBarRecord->get_Varies(&vbFlag);
+   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("V") : _T("")));
+
    // length
    CComPtr<IBend> primaryBend;
    pBarRecord->get_PrimaryBend(&primaryBend);
@@ -346,6 +368,31 @@ void CBarlistListView::SetBarRecord(int row, IBarRecord* pBarRecord)
    pBarRecord->get_Mass(&mass);
    CString strMass = FormatMass(mass);
    list.SetItemText(row, subItem++, strMass);
+}
+
+
+void CBarlistListView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
+{
+   // printing is delegated to the tree view class
+   m_pTreeView->OnPrint(pDC, pInfo);
+}
+
+BOOL CBarlistListView::OnPreparePrinting(CPrintInfo* pInfo)
+{
+   // printing is delegated to the tree view class
+   return m_pTreeView->OnPreparePrinting(pInfo);
+}
+
+void CBarlistListView::OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo)
+{
+   // printing is delegated to the tree view class
+   m_pTreeView->OnBeginPrinting(pDC, pInfo);
+}
+
+void CBarlistListView::OnEndPrinting(CDC* pDC, CPrintInfo* pInfo)
+{
+   // printing is delegated to the tree view class
+   m_pTreeView->OnEndPrinting(pDC, pInfo);
 }
 
 void CBarlistListView::OnBarRenamed(NMHDR* pNMHDR, LRESULT* pResult)
@@ -388,6 +435,8 @@ void CBarlistListView::OnColumnClicked(NMHDR* pNMHDR, LRESULT* pResult)
       CComPtr<IBarRecordCollection> bars;
       group->get_BarRecords(&bars);
       bars->Sort();
+      
+      OnGroupSelected(m_GroupIdx);
    }
 }
 
@@ -751,6 +800,13 @@ void CBarlistListView::OnDestroy()
 
 void CBarlistListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
+   CBarlistDoc* pDoc = GetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
+   {
+      // no context editing for collaboration projects
+      return;
+   }
+
    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    CMenu menu;

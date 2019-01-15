@@ -68,6 +68,8 @@ public:
 	protected:
 	virtual void OnDraw(CDC* pDC) override;      // overridden to draw this view
    virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
+   virtual void OnInitialUpdate();
+   virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
    //}}AFX_VIRTUAL
 
 // Implementation
@@ -80,7 +82,12 @@ protected:
 
 	// Generated message map functions
 protected:
-	//{{AFX_MSG(CBarlistListView)
+   virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo);
+   virtual BOOL OnPreparePrinting(CPrintInfo* pInfo) override;
+   virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo) override;
+   virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo) override;
+   
+   //{{AFX_MSG(CBarlistListView)
 		// NOTE - the ClassWizard will add and remove member functions here.
    afx_msg void OnBarRenamed(NMHDR* pNMHDR, LRESULT* pResult);
    afx_msg void OnColumnClicked(NMHDR* pNMHDR, LRESULT* pResult);
@@ -106,8 +113,6 @@ protected:
 
 public:
    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-   virtual void OnInitialUpdate();
-   virtual void OnUpdate(CView* /*pSender*/, LPARAM /*lHint*/, CObject* /*pHint*/);
    afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
    afx_msg void OnUpdateEditCut(CCmdUI *pCmdUI);

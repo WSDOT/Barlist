@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 #include "BendFactory.h"
-#include <Bars\Bars.h>
+#include <Bars\Bars_i.h>
 
 const std::vector<long>& CBendFactory::GetBends()
 {
@@ -111,6 +111,13 @@ HRESULT CBendFactory::CreateBend(long bendType, IBend** ppBend)
 CString CBendFactory::GetBendName(long bend)
 {
    CString strName;
-   strName.Format(_T("Type %d"), bend);
+   if (bend < 0)
+   {
+      strName = _T("Type Unknown");
+   }
+   else
+   {
+      strName.Format(_T("Type %d"), bend);
+   }
    return strName;
 }

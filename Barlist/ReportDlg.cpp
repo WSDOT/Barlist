@@ -28,7 +28,6 @@
 #include "afxdialogex.h"
 #include <EAF\EAFApp.h>
 #include "BarlistDoc.h"
-#include "Report.h"
 
 
 // CReportDlg dialog
@@ -53,6 +52,8 @@ void CReportDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CReportDlg, CDialog)
    ON_BN_CLICKED(IDC_PRINT, &CReportDlg::OnClickedPrint)
+   ON_WM_DESTROY()
+   ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 
@@ -65,33 +66,7 @@ BOOL CReportDlg::OnInitDialog()
 
    m_Font.CreatePointFont(100, _T("Courier New"));
 
-   CString strHeader;
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
-   {
-      strHeader =
-         CString("                                             +---------- T = Transverse, S = Seismic\r\n") +
-         CString("                                             | +-------- L = Lump sum\r\n") +
-         CString("                                             | | +------ S = Substructure\r\n") +
-         CString("                                             | | | +---- E = Epoxy\r\n") +
-         CString("                                             | | | | +-- V = Varies\r\n") +
-         CString("                                             | | | | |\r\n") +
-         CString("Mark Description                  Si Num  Be | | | | | #     U        W        X       Y       Z    T1  T2   LENGTH     MASS\r\n") +
-         CString(" #                                ze Reqd nd T L S E V Ea  METER    METER    METER   METER   METER  DEG DEG   METER      KG\r\n") +
-         CString("==== ============================ == ==== == = = = = = == ===.===  ===.===  ===.=== ===.=== ===.=== === ===  ===.===   =====");
-   }
-   else
-   {
-      strHeader = 
-         CString("                                             +---------- T = Transverse, S = Seismic\r\n") +
-         CString("                                             | +-------- L = Lump sum\r\n") +
-         CString("                                             | | +------ S = Substructure\r\n") +
-         CString("                                             | | | +---- E = Epoxy\r\n") +
-         CString("                                             | | | | +-- V = Varies\r\n") +
-         CString("                                             | | | | |\r\n") +
-         CString("Mark Description                  Si Num  Be | | | | | #     U        W         X        Y        Z    T1  T2   LENGTH    WEIGHT\r\n") +
-         CString(" #                                ze Reqd nd T L S E V Ea  FT  IN   FT  IN   FT  IN   FT  IN   FT  IN  DEG DEG   FT  IN   LBS\r\n") +
-         CString("==== ============================ == ==== == = = = = = == === ==.= === ==.= === ==.= === ==.= === ==.= === ===  === ==.=  =====");
-   }
+   CString strHeader = CReport::GetReportHeader();
    CWnd* pHeader = GetDlgItem(IDC_HEADER);
    pHeader->SetFont(&m_Font);
    pHeader->SetWindowText(strHeader);
@@ -100,24 +75,103 @@ BOOL CReportDlg::OnInitDialog()
    pReport->SetFont(&m_Font);
 
    CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CReport report;
-   pReport->SetWindowText(report.GetReport(barlist));
+
+   const auto& vReportLines = pDoc->GetReport().GetReport();
+   CString strReport;
+   for (auto line : vReportLines)
+   {
+      line.Replace(_T("\n"), _T("\r\n"));
+      strReport += line;
+   }
+   pReport->SetWindowText(strReport);
 
    CButton* pPrint = (CButton*)GetDlgItem(IDC_PRINT);
    HICON hPrintIcon = (HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PRINT), IMAGE_ICON, 16, 16, 0);
    pPrint->SetIcon(hPrintIcon);
 
+   // minimum size of the window
+   CRect rect;
+   GetWindowRect(&rect);
+   m_cxMin = rect.Width();
+   m_cyMin = rect.Height();
 
    return TRUE;  // return TRUE unless you set the focus to a control
                  // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-
 void CReportDlg::OnClickedPrint()
 {
-   // TODO: Add your control notification handler code here
-#pragma Reminder("WORKING HERE - implement printing")
-   AfxMessageBox(_T("Implement"));
+   // Send the printing command to the main frame and let the
+   // command handler deal with it
+   EAFGetMainFrame()->SendMessage(WM_COMMAND, ID_FILE_PRINT);
+}
+
+
+void CReportDlg::OnDestroy()
+{
+   WINDOWPLACEMENT wp;
+   wp.length = sizeof wp;
+   if (GetWindowPlacement(&wp))
+   {
+      EAFGetApp()->WriteWindowPlacement(_T("Window Positions"), _T("Report"), &wp);
+   }
+
+   CDialog::OnDestroy();
+}
+
+
+void CReportDlg::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+   CDialog::OnShowWindow(bShow, nStatus);
+
+   if (bShow)
+   {
+      WINDOWPLACEMENT wp;
+      if (EAFGetApp()->ReadWindowPlacement(_T("Window Positions"), _T("Report"), &wp))
+      {
+         SetWindowPos(NULL, wp.rcNormalPosition.left, wp.rcNormalPosition.top, wp.rcNormalPosition.right - wp.rcNormalPosition.left, wp.rcNormalPosition.bottom - wp.rcNormalPosition.top, 0);
+      }
+   }
+}
+
+
+LRESULT CReportDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+   // prevent the dialog from getting smaller than the original size
+   if (message == WM_SIZING)
+   {
+      LPRECT rect = (LPRECT)lParam;
+      int cx = rect->right - rect->left;
+      int cy = rect->bottom - rect->top;
+
+      if (cx < m_cxMin || cy < m_cyMin)
+      {
+         // prevent the dialog from moving right or down
+         if (wParam == WMSZ_BOTTOMLEFT ||
+            wParam == WMSZ_LEFT ||
+            wParam == WMSZ_TOP ||
+            wParam == WMSZ_TOPLEFT ||
+            wParam == WMSZ_TOPRIGHT)
+         {
+            CRect r;
+            GetWindowRect(&r);
+            rect->left = r.left;
+            rect->top = r.top;
+         }
+
+         if (cx < m_cxMin)
+         {
+            rect->right = rect->left + m_cxMin;
+         }
+
+         if (cy < m_cyMin)
+         {
+            rect->bottom = rect->top + m_cyMin;
+         }
+
+         return TRUE;
+      }
+   }
+
+   return CDialog::WindowProc(message, wParam, lParam);
 }

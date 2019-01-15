@@ -62,8 +62,6 @@ public:
    virtual void OnInitialUpdate();
 protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo) override;
-	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo) override;
-	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo) override;
    virtual void OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint);
    //}}AFX_VIRTUAL
 
@@ -76,6 +74,7 @@ public:
 #endif
 
 protected:
+   friend CBarlistListView;
    CBarlistListView* m_pListView;
 
    CImageList m_ImageList;
@@ -117,6 +116,7 @@ public:
    virtual BOOL OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
    afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
    afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
+   virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo);
 };
 
 #ifndef _DEBUG  // debug version in BarlistTreeView.cpp

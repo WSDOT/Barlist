@@ -32,14 +32,18 @@
 #endif // _MSC_VER > 1000
 
 #include <EAF\EAFDocument.h>
-#include <Bars\Bars.h>
+#include <Bars\Bars_i.h>
 
 #include <array>
 #include <UnitMgt\IndirectMeasure.h>
 
+#include "Report.h"
+
 CString FormatMass(Float64 mass, bool bUnits = true);
 CString FormatLength(Float64 length,bool bUnits=true);
 bool ParseLength(const CString& strValue,Float64* pValue);
+
+CString FormatStatusMessage(IStatusMessage* pStatusMessage);
 
 class CBarlistDoc : public CEAFDocument
 {
@@ -69,12 +73,16 @@ public:
    virtual BOOL OpenTheDocument(LPCTSTR lpszPathName) override;
    virtual BOOL SaveTheDocument(LPCTSTR lpszPathName) override;
 
+   BOOL ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist);
+
    virtual CString GetToolbarSectionName() override;
    virtual BOOL GetStatusBarMessageString(UINT nID,CString& rMessage) const override;
    virtual BOOL GetToolTipMessageString(UINT nID, CString& rMessage) const override;
 
    virtual void LoadDocumentSettings() override;
    virtual void SaveDocumentSettings() override;
+
+   virtual void SetModifiedFlag(BOOL bModified = TRUE) override;
 
    virtual CString GetDocumentationRootLocation() override;
 
@@ -83,6 +91,8 @@ public:
    void SelectGroup(long groupIdx);
 
    void CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const;
+
+   CReport& GetReport();
 
 // Implementation
 public:
@@ -104,6 +114,12 @@ protected:
 
    UINT m_MarkIncrement;
 
+   bool m_bDirtyReport{ true };
+   CReport m_Report;
+
+   virtual UINT GetToolbarResourceID();
+
+
 // Generated message map functions
 protected:
 	//{{AFX_MSG(CBarlistDoc)
@@ -113,6 +129,7 @@ protected:
    afx_msg void OnQNI();
    afx_msg void OnProperties();
    afx_msg void OnAddin(UINT cmd);
+   afx_msg void OnViewReport();
    //}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -142,9 +159,6 @@ protected:
 
    //virtual void OnUnitsModeChanging() override;
    virtual void OnUnitsModeChanged(eafTypes::UnitMode newUnitMode) override;
-
-public:
-   afx_msg void OnViewReport();
 };
 
 /////////////////////////////////////////////////////////////////////////////

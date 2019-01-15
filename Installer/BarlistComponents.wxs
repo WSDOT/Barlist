@@ -54,6 +54,16 @@
                </Extension>
             </ProgId>
 
+           <ProgId Id="BarlistCollaboration.Document">
+             <Extension Id="cbm"
+                        ContentType="application/cbm">
+               <Verb Id="Open"
+                     Command="&amp;Open with Barlist"
+                     TargetFile="Barlist.exe"
+                     Argument='"%1"' />
+             </Extension>
+           </ProgId>
+
          </Component>
       </DirectoryRef >
 

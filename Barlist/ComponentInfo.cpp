@@ -78,7 +78,7 @@ CString CBarlistComponentInfo::GetDescription()
 HICON CBarlistComponentInfo::GetIcon()
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   return AfxGetApp()->LoadIcon(IDI_ICON);
+   return AfxGetApp()->LoadIcon(IDI_BARLIST);
 }
 
 bool CBarlistComponentInfo::HasMoreInfo()

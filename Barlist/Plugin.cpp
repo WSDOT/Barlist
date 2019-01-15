@@ -27,9 +27,11 @@
 #include "Plugin.h"
 
 #include "BarlistFrame.h"
-#include "BarlistDoc.h"
 #include "BarlistTreeView.h"
+#include "BarlistDoc.h"
 #include "BarlistDocTemplate.h"
+#include "CollaborationDoc.h"
+#include "CollaborationDocTemplate.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,6 +84,19 @@ std::vector<CEAFDocTemplate*> CPlugin::CreateDocTemplates()
    pDocTemplate->SetPlugin(this);
 
    templates.push_back(pDocTemplate);
+
+   pDocTemplate = new CCollaborationDocTemplate(
+      IDR_COLLABORATION,
+      nullptr,
+      RUNTIME_CLASS(CCollaborationDoc),
+      RUNTIME_CLASS(CBarlistFrame),
+      RUNTIME_CLASS(CBarlistTreeView),
+      nullptr, 1);
+
+   pDocTemplate->SetPlugin(this);
+
+   templates.push_back(pDocTemplate);
+
    return templates;
 }
 

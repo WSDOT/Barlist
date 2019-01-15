@@ -23,3 +23,4 @@
 #pragma once
 #define IDH_BARLIST              200
 #define IDH_BARS                 201
+#define IDH_COLLABORATION        202

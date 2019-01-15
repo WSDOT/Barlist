@@ -73,6 +73,18 @@
     <ClCompile Include="Report.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BarlistPrintDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CollaborationDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CollaborationDocTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CollaborationManagerDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ComponentInfo.h">
@@ -150,6 +162,18 @@
     <ClInclude Include="Report.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BarlistPrintDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CollaborationDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CollaborationDocTemplate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CollaborationManagerDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="Barlist.idl">
@@ -168,6 +192,114 @@
     </None>
     <None Include="Barlist.def">
       <Filter>Source Files</Filter>
+    </None>
+    <None Include="res\Type_50.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_51.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_52.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_53.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_54.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_55.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_56.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_57.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_58.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_59.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_60.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_61.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_62.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_63.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_66.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_67.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_68.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_69.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_70.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_71.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_72.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_73.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_74.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_75.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_76.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_77.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_78.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_79.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_80.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_81.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_82.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_83.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_84.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_89.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_90.emf">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Type_Unknown.emf">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +343,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\printer.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Collaboration.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\collaboration_toolbar.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

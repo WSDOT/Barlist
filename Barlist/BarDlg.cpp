@@ -29,8 +29,8 @@
 
 #include "BendFactory.h"
 
-#include "BarlistDoc.h" // for FormatWeight and FormatLength
-#include <Bars\Bars.h>
+#include "CollaborationDoc.h" // for FormatWeight and FormatLength
+#include <Bars\Bars_i.h>
 
 #include <array>
 
@@ -202,38 +202,47 @@ void DDX_Check_VariantBool(CDataExchange* pDX, int nIDC, VARIANT_BOOL& value)
 }
 
 
-CString FormatStatusValue(CComVariant& var)
+void CBendTypeComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
-   CString strValue;
-   if (var.vt == VT_R8)
+   ASSERT(lpDrawItemStruct->CtlType == ODT_COMBOBOX);
+
+   CDC dc;
+   dc.Attach(lpDrawItemStruct->hDC);
+
+   COLORREF oldTextColor = dc.GetTextColor();
+   COLORREF oldBkColor = dc.GetBkColor();
+
+   CString lpszText;
+   GetLBText(lpDrawItemStruct->itemID, lpszText);
+
+   if ((lpDrawItemStruct->itemAction | ODA_SELECT) &&
+      (lpDrawItemStruct->itemState & ODS_SELECTED))
    {
-      strValue.Format(_T("%s"), FormatLength(var.dblVal));
+      dc.SetTextColor(::GetSysColor(COLOR_HIGHLIGHTTEXT));
+      dc.SetBkColor(::GetSysColor(COLOR_HIGHLIGHT));
+      dc.FillSolidRect(&lpDrawItemStruct->rcItem, ::GetSysColor(COLOR_HIGHLIGHT));
+
+      // Tell the parent page to update the girder image
+      long bendType = (long)GetItemData(lpDrawItemStruct->itemID);
+      CBarDlg* pParent = (CBarDlg*)GetParent();
+      pParent->UpdateBendGuide(bendType);
    }
    else
    {
-      USES_CONVERSION;
-      var.ChangeType(VT_BSTR);
-      strValue.Format(_T("%s"), OLE2T(var.bstrVal));
+      dc.FillSolidRect(&lpDrawItemStruct->rcItem, oldBkColor);
    }
-   return strValue;
-}
 
-CString FormatStatusMessage(IStatusMessage* pStatusMessage)
-{
-   CComBSTR bstrText;
-   pStatusMessage->get_Text(&bstrText);
-   CString strMsg(bstrText);
+   dc.DrawText(lpszText, &lpDrawItemStruct->rcItem, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
 
-   CComVariant val1, val2;
-   pStatusMessage->get_Val1(&val1);
-   pStatusMessage->get_Val2(&val2);
-   CString strVal1 = FormatStatusValue(val1);
-   CString strVal2 = FormatStatusValue(val2);
+   if (lpDrawItemStruct->itemState & ODS_FOCUS)
+   {
+      dc.DrawFocusRect(&lpDrawItemStruct->rcItem);
+   }
 
-   strMsg.Replace(_T("%1"), strVal1);
-   strMsg.Replace(_T("%2"), strVal2);
+   dc.SetTextColor(oldTextColor);
+   dc.SetBkColor(oldBkColor);
 
-   return strMsg;
+   dc.Detach();
 }
 
 IMPLEMENT_DYNAMIC(CBarDlg, CDialog)
@@ -251,6 +260,7 @@ void CBarDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
    DDX_Control(pDX, IDC_NUM_EACH, m_ctrlNumEach);
+   DDX_Control(pDX, IDC_TYPE, m_cbBendType);
 }
 
 
@@ -339,6 +349,12 @@ BOOL CBarDlg::OnInitDialog()
 
    CEdit* pEdit = (CEdit*)GetDlgItem(IDC_LOCATION);
    pEdit->LimitText(28); // location description is limited to 28 characters
+
+   pEdit = (CEdit*)GetDlgItem(IDC_NUM_REQUIRED);
+   pEdit->LimitText(4);
+
+   pEdit = (CEdit*)GetDlgItem(IDC_NUM_EACH);
+   pEdit->LimitText(2);
    
    CButton* pSave = (CButton*)GetDlgItem(IDC_SAVE);
    HICON hSaveIcon = (HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SAVE), IMAGE_ICON, 16, 16, 0);
@@ -393,6 +409,18 @@ BOOL CBarDlg::OnInitDialog()
 
    UpdateStatus();
    OnStateChanged();
+
+   CEAFDocument* pDoc = EAFGetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
+   {
+      GetDlgItem(ID_ADD_GROUP)->ShowWindow(SW_HIDE);
+      GetDlgItem(IDC_ADD_BAR)->ShowWindow(SW_HIDE);
+      GetDlgItem(IDC_DELETE)->ShowWindow(SW_HIDE);
+      GetDlgItem(IDC_SAVE)->ShowWindow(SW_HIDE);
+      GetDlgItem(IDC_UPDATE_BAR)->ShowWindow(SW_HIDE);
+      SetDefID(IDCANCEL);
+      GetDlgItem(IDCANCEL)->SetWindowText(_T("Close"));
+   }
 
    return TRUE;  // return TRUE unless you set the focus to a control
                  // EXCEPTION: OCX Property Pages should return FALSE
@@ -952,6 +980,25 @@ void CBarDlg::UpdateVaries()
    m_SM.SetState(state);
 }
 
+void CBarDlg::UpdateBendGuide(IBarRecord* pBarRecord)
+{
+   long bendType = -1;
+   if (pBarRecord)
+   {
+      pBarRecord->get_BendType(&bendType);
+   }
+   UpdateBendGuide(bendType);
+}
+
+void CBarDlg::UpdateBendGuide(long bendType)
+{
+   CDataExchange dc(this, FALSE);
+   CString strBend = CBendFactory::GetBendName(bendType);
+   strBend.Replace(_T(" "), _T("_"));
+   strBend.MakeUpper();
+   DDX_MetaFileStatic(&dc, IDC_BEND_GUIDE, m_BendGuide, AfxGetInstanceHandle(), strBend, _T("Metafile"), EMF_RESIZE);
+}
+
 void CBarDlg::UpdateDimensions(IBarRecord* pBarRecord)
 {
    long bendType = 50;
@@ -962,6 +1009,7 @@ void CBarDlg::UpdateDimensions(IBarRecord* pBarRecord)
       pBarRecord->get_Varies(&vbVaries);
    }
    UpdateDimensions(bendType, vbVaries == VARIANT_TRUE);
+   UpdateBendGuide(bendType);
 }
 
 
@@ -970,7 +1018,7 @@ bend->get_SupportsDimension(_dim_, &vbSupported);\
 GetDlgItem(_IDC_)->EnableWindow(vbSupported == VARIANT_TRUE); \
 GetDlgItem(_IDC_VARIES_)->EnableWindow(bVaries && vbSupported == VARIANT_TRUE);\
 if(vbSupported==VARIANT_FALSE)GetDlgItem(_IDC_)->SetWindowText(_T("")); \
-if(!bVaries)GetDlgItem(_IDC_VARIES_)->SetWindowText(_T(""));
+if(!bVaries || vbSupported==VARIANT_FALSE)GetDlgItem(_IDC_VARIES_)->SetWindowText(_T(""));
 void CBarDlg::UpdateDimensions(long bendType, bool bVaries)
 {
    State state = m_SM.GetState();
@@ -1056,7 +1104,6 @@ void CBarDlg::OnBnClickedUpdate()
    UpdateStatus(barRecord);
 }
 
-
 void CBarDlg::OnCbnSelchangeType()
 {
    CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_TYPE);
@@ -1066,7 +1113,6 @@ void CBarDlg::OnCbnSelchangeType()
       long bendType = (long)(pCB->GetItemData(curSel));
       bool bVaries = IsDlgButtonChecked(IDC_VARIES) == BST_CHECKED ? true : false;
       UpdateDimensions(bendType, bVaries);
-
       m_SM.StateChange(Action::EditRecord);
    }
 }
@@ -1163,6 +1209,5 @@ void CBarDlg::OnBnClickedCancel()
 
 void CBarDlg::OnBnClickedHelp()
 {
-   // TODO: Add your control notification handler code here
    EAFHelp(EAFGetDocument()->GetDocumentationSetName(), IDH_BARS);
 }
