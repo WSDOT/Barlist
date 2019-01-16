@@ -53,9 +53,6 @@
 
 #include <fstream>
 
-#pragma Reminder("WORKING HERE - create a new document type for collaboration projects")
-#pragma Reminder("WORKING HERE - update documentation")
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -284,11 +281,19 @@ BOOL CBarlistDoc::Init()
    if (FAILED(hr))
    {
       AfxMessageBox(_T("Failed to create addin manager. Proceeding without Add-ins."));
+      return FALSE;
    }
 
    if (g_formatter == nullptr)
    {
-      g_formatter.CoCreateInstance(CLSID_AnnotatedDisplayUnitFormatter);
+      hr = g_formatter.CoCreateInstance(CLSID_AnnotatedDisplayUnitFormatter);
+      if (FAILED(hr))
+      {
+         CString strMessage;
+         strMessage.Format(_T("Failed to initialize unit system (%0#x)"), hr);
+         AfxMessageBox(strMessage);
+         return FALSE;
+      }
       g_formatter->put_Annotation(_T("'-,\""));
       g_formatter->put_Multiplier(12.0);
       g_formatter->put_OffsetDigits(0);
@@ -668,7 +673,10 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
          }
       }
 
-      Barlist(ofile, barlist);
+      // the no_xml_declaration flag prevents the <?xml...?> processing instruction from being written at the top of the
+      // file. the processing instruction was not used in version 4 so we will skip it here so previous versions can open files
+      // created with this version
+      Barlist(ofile, barlist, xml_schema::namespace_infomap(), _T("UTF-8"), xml_schema::flags::no_xml_declaration);
 
       return TRUE;
    }

@@ -174,7 +174,6 @@ void CBarlistListView::OnInitialUpdate()
 
 void CBarlistListView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 {
-#pragma Reminder("WORKING HERE - use smarter update logic based on the lHint parameter")
    if (lHint == HINT_GROUP_ADDED && m_GroupIdx < 0)
    {
       m_GroupIdx = 0;
@@ -255,7 +254,6 @@ void CBarlistListView::OnGroupSelected(long groupIdx)
    USES_CONVERSION;
 
    m_GroupIdx = groupIdx;
-#pragma Reminder("WORKING HERE - try to remember selection so it can be re-instated after the update")
    CListCtrl& list = GetListCtrl();
    list.DeleteAllItems();
 

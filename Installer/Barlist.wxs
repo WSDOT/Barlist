@@ -75,6 +75,7 @@
          
          <!-- Components for the required dependicies -->
          <ComponentRef Id="WBFLComponents"/> <!-- WBFL and dependent components -->
+         <ComponentRef Id="OpenBridgeML"/>
          <ComponentRef Id="Xerces"/>
          <FeatureRef Id="Redistributables" />
 

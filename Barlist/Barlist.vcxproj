@@ -88,42 +88,42 @@
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -221,6 +221,7 @@
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <AdditionalManifestFiles>
       </AdditionalManifestFiles>
+      <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).embed.manifest</OutputManifestFile>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
@@ -229,9 +230,13 @@
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
       <Command>xcopy /y /d .\Schema\Barlist.xsd  ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
-      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
+xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeML.* ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\OpenBridgeML.dll</Outputs>
     </CustomBuildStep>
+    <ManifestResourceCompile>
+      <ResourceOutputFileName>$(IntDir)$(TargetName)$(TargetExt).embed.manifest.res</ResourceOutputFileName>
+    </ManifestResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -276,8 +281,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1.dll ..\Re
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
@@ -348,8 +352,9 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll ..\Re
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
       <Command>xcopy /y /d .\Schema\Barlist.xsd  ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1D.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
-      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
+xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1D.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeML.* ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\OpenBridgeML.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -399,8 +404,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1D.dll ..\R
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
@@ -461,8 +465,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
     </CXX_Tree_Mapping_Rule>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
@@ -514,8 +517,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
     </CXX_Tree_Mapping_Rule>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>

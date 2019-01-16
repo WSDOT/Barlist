@@ -30,7 +30,7 @@
 #include "BendFactory.h"
 
 #include "CollaborationDoc.h" // for FormatWeight and FormatLength
-#include <Bars\Bars_i.h>
+#include <Bars\Bars.h>
 
 #include <array>
 

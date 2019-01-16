@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include <Bars\Bars_i.h>
+#include <Bars\Bars.h>
 #include <vector>
 
 class CReport

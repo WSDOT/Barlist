@@ -374,7 +374,7 @@
            <RegistryValue Root="HKCR" Key="Component Categories\$(var.BarlistAddinCATID)" Name="800" Value="Barlist Add-ins" Type="string" />
 
            <!-- BXF Add in -->
-           <?define BXFAddinCLSID={81E104D2-A46E-4782-B736-986867893751}?>
+           <?define BXFAddinCLSID={B026E9AF-CCE7-41D4-AFBF-E2DEF7528EDA}?>
            <RegistryKey ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Root="HKCR" Key ="CLSID\$(var.BXFAddinCLSID)"/>
            <RegistryValue Root="HKCR" Key="CLSID\$(var.BXFAddinCLSID)"  Value="Barlist Exchange File" Type="string" />
            <RegistryValue Root="HKCR" Key="CLSID\$(var.BXFAddinCLSID)\InprocServer32" Value="[APPLICATIONFOLDER]BXF.dll" Type="string" />

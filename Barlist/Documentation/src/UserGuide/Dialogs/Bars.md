@@ -14,7 +14,7 @@ Item | Description
 -----|-----------
 Location | Enter a descriptive location of the bar
 Mark No. | Enter a mark number. The mark number is a 4-digit alpha-numeric parameter
-Bend Type | Select the bend type from the drop down list. The bend guide shows the bend input parameters.
+Bend Type | Select the bend type from the drop down list. The bend guide shows the bend input parameters. (See note below for Type 90-99)
 Size | Select the bar size from the drop down list.
 No. Required | Enter of the total number of bars for this bar record
 Use | Select the bar use type. The use type indicates the bend diameter and tail length for bends and hooks.
@@ -44,3 +44,6 @@ Item | Description
 [Close] | Closes the bar definition window
 [?] | Opens this help topic
 [Disk] | Saves the barlist project
+
+## Notes
+> Type 90-99: Bend Types 90-99 are non-standard bends. Add a schematic of your non-standard bend to the Barlist drawing, using any of the dimension parameters except U. Because the bar is non-standard, the program does not know how to compute its length. Compute the length of one bar and enter it in the U field. The value entered into the U field is not provided in the Barlist drawing. The values entered into the W, X, Y, Z, T1, and T2 fields are shown in the Barlist drawing however, they are not used in the computations.

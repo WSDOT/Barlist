@@ -32,7 +32,7 @@
 #endif // _MSC_VER > 1000
 
 #include <EAF\EAFDocument.h>
-#include <Bars\Bars_i.h>
+#include <Bars\Bars.h>
 
 #include <array>
 #include <UnitMgt\IndirectMeasure.h>

@@ -22,7 +22,7 @@
 
 #include "stdafx.h"
 #include "BendFactory.h"
-#include <Bars\Bars_i.h>
+#include <Bars\Bars.h>
 
 const std::vector<long>& CBendFactory::GetBends()
 {
