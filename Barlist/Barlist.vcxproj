@@ -196,6 +196,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <DebugInformationFormat>None</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -212,6 +213,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\lib\xerces-c_3.lib</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers />
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ProgramDatabaseFile />
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
