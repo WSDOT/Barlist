@@ -1,6 +1,9 @@
 REM - Script to prepare for Release
 
 SET BINTARGET=..\bin
-xcopy /Y /d bin\Win32\BXF.dll		%BINTARGET%\Win32\
+SET REGFREECOM=\ARP\Barlist\RegFreeCOM
+
+
+xcopy /Y /d %REGFREECOM%\Win32\Release\BXF.dll		%BINTARGET%\Win32\
 
 
