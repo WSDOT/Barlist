@@ -62,8 +62,11 @@ BOOL CCollaborationDoc::OpenTheDocument(LPCTSTR lpszPathName)
 
    CString strPathName(lpszPathName);
    std::ifstream ifile(strPathName);
-   if (ifile.bad())
+   if (ifile.fail() || !ifile.is_open())
    {
+      CString strMsg;
+      strMsg.Format(_T("Unable to open %s."), lpszPathName);
+      AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
       return FALSE;
    }
    else
