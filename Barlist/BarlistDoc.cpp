@@ -257,6 +257,8 @@ CBarlistDoc::CBarlistDoc()
    m_MarkIncrement = 1;
 
    m_dwBarlistEventCookie = 0;
+
+   EAFGetApp()->RemoveUnitModeListener(this); // hold off on listening for unit mode change events until after the document is loaded
 }
 
 CBarlistDoc::~CBarlistDoc()
@@ -370,6 +372,22 @@ void CBarlistDoc::DoIntegrateWithUI(BOOL bIntegrate)
    else
    {
       DestroyToolBar(m_ToolbarID);
+
+      // be a good citizen and clean up our add-ins from the menu
+      CEAFMenu* pMainMenu = GetMainMenu();
+      UINT addinsPos = pMainMenu->FindMenuItem(_T("Add-Ins"));
+      CEAFMenu* pAddins = pMainMenu->GetSubMenu(addinsPos);
+      UINT cmdID = FIRST_ADDIN_COMMAND;
+      if (pAddins)
+      {
+         long nAddins;
+         m_AddinMgr->get_Count(&nAddins);
+         nAddins = Min(nAddins, (long)MAX_ADDIN_COUNT);
+         for (long i = 0; i < nAddins; i++)
+         {
+            pAddins->RemoveMenu(cmdID++, MF_BYCOMMAND, nullptr);
+         }
+      }
 
       // reset the status bar
       pFrame->SetStatusBar(nullptr);
@@ -536,6 +554,8 @@ BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
    // start getting events after the barlist is loaded, otherwise
    // there will be tons of events fired during loading (we don't want that)
    GetBarlistEvents(TRUE); 
+
+   EAFGetApp()->AddUnitModeListener(this); // resume listening for unit mode change events (see constructor)
 
    return TRUE;
 }
@@ -931,6 +951,7 @@ void CBarlistDoc::OnUnitsModeChanged(eafTypes::UnitMode newUnitMode)
    g_pWeightUnit = &gs_WeightUnit[newUnitMode == eafTypes::umSI ? 0 : 1];
    m_bDirtyReport = true;
    __super::OnUnitsModeChanged(newUnitMode);
+   SetModifiedFlag();
 }
 
 void CBarlistDoc::DeleteContents()
