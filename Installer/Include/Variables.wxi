@@ -2,8 +2,8 @@
 <Include>
   <?include CustomizationVariables.wxi?>
   
-   <?define BarlistReleaseVersion = 5.0.0?> <!-- This defines the version number of the product release (must only use x.y.z to get removal of previous versions) -->
-   <?define BarlistVersion   = 5.0.0.0?> <!-- This defines the version number of the executable application (probably won't change much)-->
+   <?define BarlistReleaseVersion = 5.0.1?> <!-- This defines the version number of the product release (must only use x.y.z to get removal of previous versions) -->
+   <?define BarlistVersion   = 5.0.1.0?> <!-- This defines the version number of the executable application (probably won't change much)-->
   <?define OpenBridgeMLVersion = 0.3.1.0?>
   <?define WBFLVersion         = 4.2.10.0?>
 
