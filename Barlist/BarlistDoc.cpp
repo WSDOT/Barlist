@@ -255,6 +255,8 @@ CBarlistDoc::CBarlistDoc()
    ATLASSERT(nCommands == PLUGIN_COMMAND_COUNT);
 
    m_MarkIncrement = 1;
+
+   m_dwBarlistEventCookie = 0;
 }
 
 CBarlistDoc::~CBarlistDoc()
@@ -399,8 +401,11 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
 
    CString strPathName(lpszPathName);
    std::ifstream ifile(strPathName);
-   if (ifile.bad())
+   if (ifile.fail() || !ifile.is_open())
    {
+      CString strMsg;
+      strMsg.Format(_T("Unable to open %s."), lpszPathName);
+      AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
       return FALSE;
    }
    else
@@ -539,8 +544,11 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
 {
    CString strPathName(lpszPathName);
    std::ofstream ofile(strPathName);
-   if (ofile.bad())
+   if (ofile.fail() || !ofile.is_open())
    {
+      CString strMsg;
+      strMsg.Format(_T("Unable to open %s for writing."), lpszPathName);
+      AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
       return FALSE;
    }
    else
@@ -902,23 +910,19 @@ HINSTANCE CBarlistDoc::GetResourceInstance()
 
 void CBarlistDoc::GetBarlistEvents(BOOL bListenForEvents)
 {
+   CComQIPtr<IConnectionPointContainer> pCPC(m_Barlist);
+   CComPtr<IConnectionPoint> pCP;
+   HRESULT hr = pCPC->FindConnectionPoint(IID_IBarlistEvents, &pCP);
    if (bListenForEvents)
    {
-      CComQIPtr<IConnectionPointContainer> pCPC(m_Barlist);
-      CComPtr<IConnectionPoint> pCP;
-      HRESULT hr = pCPC->FindConnectionPoint(IID_IBarlistEvents, &pCP);
-      ATLASSERT(SUCCEEDED(hr));
       hr = pCP->Advise(GetControllingUnknown(), &m_dwBarlistEventCookie);
-      ATLASSERT(SUCCEEDED(hr));
    }
    else
    {
-      CComQIPtr<IConnectionPointContainer> pCPC(m_Barlist);
-      CComPtr<IConnectionPoint> pCP;
-      HRESULT hr = pCPC->FindConnectionPoint(IID_IBarlistEvents, &pCP);
-      ATLASSERT(SUCCEEDED(hr));
-      hr = pCP->Unadvise(m_dwBarlistEventCookie);
-      ATLASSERT(SUCCEEDED(hr));
+      if (0 < m_dwBarlistEventCookie)
+      {
+         hr = pCP->Unadvise(m_dwBarlistEventCookie);
+      }
    }
 }
 
