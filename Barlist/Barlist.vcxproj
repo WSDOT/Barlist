@@ -179,7 +179,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
-      <TypeLibraryName>.\Release/Barlist.tlb</TypeLibraryName>
+      <TypeLibraryName>
+      </TypeLibraryName>
       <HeaderFileName />
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
@@ -301,7 +302,8 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll ..\Re
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
-      <TypeLibraryName>.\Debug/Barlist.tlb</TypeLibraryName>
+      <TypeLibraryName>
+      </TypeLibraryName>
       <HeaderFileName />
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
@@ -424,7 +426,8 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\R
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
     <Midl>
-      <TypeLibraryName>.\Release/Barlist.tlb</TypeLibraryName>
+      <TypeLibraryName>
+      </TypeLibraryName>
       <HeaderFileName />
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
