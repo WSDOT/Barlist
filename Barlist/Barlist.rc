@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 5,0,0,0
- PRODUCTVERSION 5,0,0,0
+ FILEVERSION 5,0,1,0
+ PRODUCTVERSION 5,0,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
             VALUE "Comments", "A member of the Alternate Route Project"
             VALUE "CompanyName", "Washington State Department of Transportation"
             VALUE "FileDescription", "Barlist Module"
-            VALUE "FileVersion", "5.0.0.0"
+            VALUE "FileVersion", "5.0.1.0"
             VALUE "InternalName", "Barlist"
             VALUE "LegalCopyright", "Copyright © 2009-2019, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Barlist.DLL"
             VALUE "ProductName", "Barlist Module"
-            VALUE "ProductVersion", "5.0.0.0"
+            VALUE "ProductVersion", "5.0.1.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -796,7 +796,14 @@ STRINGTABLE
 BEGIN
     IDC_ADD_BAR             "Add a bar\nAdd/Edit Bar"
     ID_ADD_GROUP            "Add a group\nAdd a group"
+END
+
+STRINGTABLE
+BEGIN
     IDC_QUANTITIES          "Reinforcement Quantites Estimate\nShow/Hide Quantities"
+    ID_VIEW_REPORT          "View quantities report\nReport"
+    IDC_FILE_PRINT          "Print barlist report\nPrint"
+    33067                   "Collaboration Manager\nCollaboration Manager"
 END
 
 STRINGTABLE
@@ -818,13 +825,6 @@ BEGIN
     ID_EDIT_COPY            "Copy\nCopy"
     ID_EDIT_CUT             "Cut\nCut"
     ID_EDIT_PASTE           "Paste\nPaste"
-END
-
-STRINGTABLE
-BEGIN
-    ID_VIEW_REPORT          "View quantities report\nReport"
-    IDC_FILE_PRINT          "Print barlist report\nPrint"
-    33067                   "Collaboration Manager\nCollaboration Manager"
 END
 
 #endif    // English (United States) resources
