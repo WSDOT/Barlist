@@ -88,42 +88,42 @@
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
+    <Import Project="$(WBFLDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
+    <Import Project="$(WBFLDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
+    <Import Project="$(WBFLDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
+    <Import Project="$(WBFLDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
+    <Import Project="$(WBFLDIR)\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
     <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
     <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(BRIDGELINKDIR)\XSD.props" />
+    <Import Project="$(WBFLDIR)\XSD.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -223,8 +223,7 @@
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
       <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).embed.manifest</OutputManifestFile>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
@@ -347,8 +346,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll ..\Re
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
