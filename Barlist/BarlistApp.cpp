@@ -40,6 +40,7 @@
 #include <WBFLUnitServer_i.c>
 
 #include "..\Include\BarlistCATID.h"
+#include <BridgeLinkCATID.h>
 #include <System\ComCatMgr.h>
 
 #include "BarlistApp.h"
@@ -132,8 +133,10 @@ STDAPI DllRegisterServer(void)
       return hr;
 
    sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, true);
-
    sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,true);
+
+   sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, true);
+   sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, true);
 
    return S_OK;
 }
@@ -144,8 +147,10 @@ STDAPI DllRegisterServer(void)
 STDAPI DllUnregisterServer(void)
 {
    sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, false);
-
    sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,false);
+
+   sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, false);
+   sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, false);
 
    return _Module.UnregisterServer(TRUE);
 }

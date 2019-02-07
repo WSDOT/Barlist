@@ -156,9 +156,10 @@ int CBarlistFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
    if (CMDIChildWnd::OnCreate(lpCreateStruct) == -1)
       return -1;
 
-   // TODO:  Add your specialized creation code here
-   AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   SetIcon(AfxGetApp()->LoadIcon(IDI_BARLIST),TRUE);
+   {
+      AFX_MANAGE_STATE(AfxGetStaticModuleState());
+      SetIcon(AfxGetApp()->LoadIcon(IDR_BARLIST), TRUE);
+   }
 
    return 0;
 }
