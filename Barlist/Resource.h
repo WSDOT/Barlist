@@ -21,7 +21,6 @@
 #define IDC_INCREMENT                   203
 #define IDC_TRAFFIC                     203
 #define IDC_TRAFFIC_UNIT                204
-#define IDI_BARLIST                     205
 #define IDC_BRIDGE                      205
 #define IDR_TOOLBAR                     206
 #define IDC_BRIDGE_UNIT                 206

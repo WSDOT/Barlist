@@ -260,7 +260,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_BARLIST             ICON                    "res\\Barlist.ico"
+IDR_BARLIST             ICON                    "res\\Barlist.ico"
 
 IDI_COLLABORATION       ICON                    "res\\Collaboration.ico"
 

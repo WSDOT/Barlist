@@ -100,7 +100,7 @@ BOOL CCollaborationDoc::OpenTheDocument(LPCTSTR lpszPathName)
       ATLASSERT(vProperties.size() == 5);
       if (vProperties.size() < 5)
       {
-         for (int i = vProperties.size(); i < 5; i++)
+         for (int i = (int)vProperties.size(); i < 5; i++)
          {
             vProperties.push_back(_T(""));
          }
