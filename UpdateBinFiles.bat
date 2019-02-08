@@ -1,9 +1,5 @@
 REM - Script to prepare for Release
 
-REM - Update WBFL Files
-cd \ARP\WBFL
-call UpdateBinFiles.bat
-
 REM - Update Barlist Files
 cd \ARP\Barlist\Barlist
 call UpdateBinFiles.bat
@@ -15,8 +11,8 @@ REM - Update Barlist Files
 
 cd \ARP\Barlist
 SET BINTARGET=bin
+SET REGFREECOM=\ARP\BridgeLink\RegFreeCOM
 
 REM - Application files
-xcopy /Y /d RegFreeCOM\Win32\Release\Barlist.exe 	%BINTARGET%\Win32\
-xcopy /Y /d License.txt					%BINTARGET%\
-xcopy /Y /d res\Barlist.ico                          %BINTARGET%\
+xcopy /Y /d %REGFREECOM%\x64\Release\Barlist.dll 	%BINTARGET%\x64\
+xcopy /Y /d %REGFREECOM%\x64\Release\Barlist.exe 	%BINTARGET%\x64\
