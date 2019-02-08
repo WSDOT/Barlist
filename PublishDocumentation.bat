@@ -7,7 +7,7 @@ REM - this assumes documentation for version 1.1.0 is the same as for version 1.
 REM - which will generally be true. This way we don't have to publish new documentation
 REM - for every bug-fix release. Just use 1.1 for the version number
 
-SET BARLIST_VERSION=5.0
+SET BARLIST_VERSION=5.1
 
 REM - Build the documentation sets
 call \ARP\Barlist\Documentation\BuildDocumentation.bat          %BARLIST_VERSION%
