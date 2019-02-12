@@ -130,8 +130,9 @@ void CReportDlg::OnShowWindow(BOOL bShow, UINT nStatus)
       if (EAFGetApp()->ReadWindowPlacement(_T("Window Positions"), _T("Report"), &wp))
       {
          CWnd* pDesktop = GetDesktopWindow();
-         CRect rDesktop;
-         pDesktop->GetWindowRect(&rDesktop);
+         //CRect rDesktop;
+         //pDesktop->GetWindowRect(&rDesktop); // this is the size of one monitor.... use GetSystemMetrics to get the entire desktop
+         CRect rDesktop(0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN));
          CRect rThisWnd(wp.rcNormalPosition);
          if (rDesktop.PtInRect(rThisWnd.TopLeft()) && rDesktop.PtInRect(rThisWnd.BottomRight()))
          {
