@@ -432,8 +432,7 @@
       <ProgramDatabaseFile>$(OutDir)BarlistDriver.pdb</ProgramDatabaseFile>
     </Link>
     <Manifest>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <AdditionalOptions>-manifest .\Bars\Bars.manifest %(AdditionalOptions)</AdditionalOptions>
     </Manifest>
@@ -489,8 +488,7 @@
       <ProgramDatabaseFile>$(OutDir)BarlistDriver.pdb</ProgramDatabaseFile>
     </Link>
     <Manifest>
-      <AdditionalManifestFiles>
-      </AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <AdditionalOptions>-manifest .\Bars\Bars.manifest %(AdditionalOptions)</AdditionalOptions>
     </Manifest>
