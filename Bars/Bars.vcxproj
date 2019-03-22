@@ -153,6 +153,7 @@
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).manifest</OutputManifestFile>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -214,6 +215,7 @@
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).manifest</OutputManifestFile>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -272,6 +274,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).manifest</OutputManifestFile>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -330,6 +333,7 @@ echo regsvr32 exec. time &gt; "$(OutDir)regsvr32.trg"
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
       <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).manifest</OutputManifestFile>
+      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>

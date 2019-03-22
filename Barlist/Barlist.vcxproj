@@ -292,11 +292,11 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <OutDir>.\Schema</OutDir>
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
+      <Outputs>$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -415,11 +415,11 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <OutDir>.\Schema</OutDir>
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
+      <Outputs>$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
