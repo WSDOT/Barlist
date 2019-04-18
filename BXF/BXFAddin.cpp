@@ -282,12 +282,12 @@ STDMETHODIMP CBXFAddin::Go(IBarlist* pBarlist)
       {
          strFile = dlg.GetNextPathName(pos);
       }
-   }
 
-   CreateBarlistExchangeFile(strFile, pBarlist);
-   CString strMsg;
-   strMsg.Format(_T("Barlist Exchange File Saved\r\n%s"),strFile);
-   AfxMessageBox(strMsg,MB_ICONINFORMATION | MB_OK);
+      CreateBarlistExchangeFile(strFile, pBarlist);
+      CString strMsg;
+      strMsg.Format(_T("Barlist Exchange File Saved\r\n%s"),strFile);
+      AfxMessageBox(strMsg,MB_ICONINFORMATION | MB_OK);
+   }
    return S_OK;
 }
 
