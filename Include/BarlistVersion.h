@@ -31,7 +31,7 @@
 // hot fixes - sometimes there are bugs that need to be fixed and deployed now. That is a hot fix.
 
 #ifndef _BARLIST_VERSION
-#define _BARLIST_VERSION 4011 // version 4.0.11
+#define _BARLIST_VERSION 512 // version 5.1.2
 #endif
 
 //#define _BETA_VERSION          // When defined, building beta versions
