@@ -663,6 +663,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Include\BarlistVersion.h" />
     <ClInclude Include="..\SDK\Include\BarlistAddinCatid.h" />
     <ClInclude Include="BarDlg.h" />
     <ClInclude Include="BarDlgStateMachine.h" />
