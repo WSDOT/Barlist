@@ -7,4 +7,4 @@ doxygen Doxygen.dox
 rmdir /S /Q \ARP\BridgeLink\Docs\Barlist\Barlist\%1\
 mkdir \ARP\BridgeLink\Docs\Barlist\Barlist\%1\
 copy \ARP\Barlist\Barlist\Documentation\doc\html\* \ARP\BridgeLink\Docs\Barlist\Barlist\%1\
-copy \ARP\Barlist\Barlist\Documentation\Barlist.dm \ARP\BridgeLink\Docs\Barlist\Barlist\%1\
+copy \ARP\Barlist\Barlist\Documentation\Barlist.dm \ARP\BridgeLink\Docs\Barlist\Barlist\%1\BarlistDocs.dm
