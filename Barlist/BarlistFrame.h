@@ -79,6 +79,7 @@ public:
    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
    afx_msg void OnUpdateEditPaste(CCmdUI *pCmdUI);
    afx_msg void OnEditPaste();
+   afx_msg void OnHelpFinder();
 };
 
 /////////////////////////////////////////////////////////////////////////////
