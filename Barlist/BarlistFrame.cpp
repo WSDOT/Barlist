@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(CBarlistFrame, CMDIChildWnd)
    ON_WM_CREATE()
    ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, &CBarlistFrame::OnUpdateEditPaste)
    ON_COMMAND(ID_EDIT_PASTE, &CBarlistFrame::OnEditPaste)
+   ON_COMMAND(ID_HELP_FINDER, OnHelpFinder)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -232,4 +233,10 @@ void CBarlistFrame::OnEditPaste()
 
       ::GlobalUnlock(hGlobal);
    }
+}
+
+void CBarlistFrame::OnHelpFinder()
+{
+   AFX_MANAGE_STATE(AfxGetStaticModuleState());
+   EAFHelp(AfxGetAppName(), IDH_BARLIST);
 }

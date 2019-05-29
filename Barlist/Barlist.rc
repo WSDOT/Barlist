@@ -156,8 +156,8 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "Help Source",                 EAFID_HELP_SOURCE
         MENUITEM "&Help Topics",                ID_HELP_FINDER
+        MENUITEM "Help Source",                 EAFID_HELP_SOURCE
         MENUITEM SEPARATOR
         MENUITEM "&About...",                   ID_APP_ABOUT
     END
@@ -203,8 +203,8 @@ BEGIN
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "Help Source",                 EAFID_HELP_SOURCE
         MENUITEM "&Help Topics",                ID_HELP_FINDER
+        MENUITEM "Help Source",                 EAFID_HELP_SOURCE
         MENUITEM SEPARATOR
         MENUITEM "&About...",                   ID_APP_ABOUT
     END
