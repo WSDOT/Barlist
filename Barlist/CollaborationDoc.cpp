@@ -28,6 +28,8 @@
 #include "CollaborationDoc.h"
 #include "CollaborationManagerDlg.h"
 
+#include "Events.h"
+
 // CCollaborationDoc
 
 IMPLEMENT_DYNCREATE(CCollaborationDoc, CBarlistDoc)
@@ -289,27 +291,37 @@ void CCollaborationDoc::OnCollaborationManager()
 
 BOOL CCollaborationDoc::EditCollaboration()
 {
-   AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   CCollaborationManagerDlg dlg;
-   dlg.m_vFiles = m_vFiles;
-   if (dlg.DoModal() == IDOK)
-   {
-      m_vFiles = dlg.m_vFiles;
+   BOOL bUpdate = FALSE;
+   { // scoping the managage stage 
+      AFX_MANAGE_STATE(AfxGetStaticModuleState());
+      CCollaborationManagerDlg dlg;
+      dlg.m_vFiles = m_vFiles;
+      if (dlg.DoModal() == IDOK)
+      {
+         m_vFiles = dlg.m_vFiles;
 
-      // Stop listening to events
-      GetBarlistEvents(FALSE);
+         // Stop listening to events
+         GetBarlistEvents(FALSE);
 
-      // Throw out the old barlist
-      m_Barlist.Release();
-      m_Barlist.CoCreateInstance(CLSID_Barlist);
+         // Throw out the old barlist
+         m_Barlist.Release();
+         m_Barlist.CoCreateInstance(CLSID_Barlist);
 
-      // Load the files to create the new barlist
-      LoadFiles();
-      NotifyDuplicateGroups();
+         // Load the files to create the new barlist
+         LoadFiles();
+         NotifyDuplicateGroups();
 
-      // Listen to events
-      GetBarlistEvents(TRUE);
-      return TRUE;
+         // Listen to events
+         GetBarlistEvents(TRUE);
+
+         bUpdate = TRUE;
+      }
    }
-   return FALSE;
+
+   if (bUpdate)
+   {
+      SetModifiedFlag();
+      UpdateAllViews(nullptr, HINT_PROJECT_CHANGED, nullptr); // asserts fire if this is called in the scope of AfxGetStaticModuleState
+   }
+   return bUpdate;
 }
