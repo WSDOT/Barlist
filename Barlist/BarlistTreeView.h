@@ -35,6 +35,7 @@
 #include "QuantitiesDlg.h"
 
 class CBarlistListView;
+class CBarlistFrame;
 
 class CBarlistTreeView : public CTreeView
 {
@@ -47,6 +48,7 @@ public:
 	CBarlistDoc* GetDocument();
 
    void SetListView(CBarlistListView* pListView);
+   void SetFrame(CBarlistFrame* pFrame);
 
    long GetSelectedGroup();
    void SelectGroup(long groupIdx);
@@ -76,6 +78,7 @@ public:
 protected:
    friend CBarlistListView;
    CBarlistListView* m_pListView;
+   CBarlistFrame* m_pFrame;
 
    CImageList m_ImageList;
 
@@ -83,10 +86,6 @@ protected:
 
    void UpdateTree(long selectGroupIdx=-1);
    void UpdateStatus();
-
-   std::unique_ptr<CQuantitiesDlg> m_pQuantitiesDlg;
-   void UpdateQuantities(long grpIdx);
-   void UpdateQuantities(IGroup* pGroup);
 
 // Generated message map functions
 protected:
@@ -109,9 +108,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-   afx_msg void OnQuantnties();
-   afx_msg void OnNcDestroy();
-   afx_msg void OnUpdateQuantities(CCmdUI *pCmdUI);
    virtual DROPEFFECT OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
    virtual BOOL OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
    afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);

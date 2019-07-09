@@ -28,6 +28,7 @@
 #include "CollaborationDoc.h"
 #include "BarlistTreeView.h"
 #include "BarlistListView.h"
+#include "BarlistFrame.h"
 #include "Events.h"
 
 #include "BarlistPrintDialog.h"
@@ -65,9 +66,6 @@ BEGIN_MESSAGE_MAP(CBarlistTreeView, CTreeView)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, CView::OnFilePrintPreview)
    ON_WM_MOUSEMOVE()
-   ON_COMMAND(IDC_QUANTITIES, &CBarlistTreeView::OnQuantnties)
-   ON_WM_NCDESTROY()
-   ON_UPDATE_COMMAND_UI(IDC_QUANTITIES, &CBarlistTreeView::OnUpdateQuantities)
 //   ON_WM_CLOSE()
 ON_NOTIFY_REFLECT(NM_DBLCLK, &CBarlistTreeView::OnNMDblclk)
 ON_NOTIFY_REFLECT(NM_RCLICK, &CBarlistTreeView::OnNMRClick)
@@ -80,7 +78,7 @@ CBarlistTreeView::CBarlistTreeView()
 {
 	// TODO: add construction code here
    m_pListView = nullptr;
-
+   m_pFrame = nullptr;
 }
 
 CBarlistTreeView::~CBarlistTreeView()
@@ -90,6 +88,11 @@ CBarlistTreeView::~CBarlistTreeView()
 void CBarlistTreeView::SetListView(CBarlistListView* pListView)
 {
    m_pListView = pListView;
+}
+
+void CBarlistTreeView::SetFrame(CBarlistFrame* pFrame)
+{
+   m_pFrame = pFrame;
 }
 
 long CBarlistTreeView::GetSelectedGroup()
@@ -133,7 +136,8 @@ void CBarlistTreeView::SelectGroup(long groupIdx)
       }
       tree.SelectItem(hGroupItem);
    }
-   UpdateQuantities(groupIdx);
+
+   m_pFrame->UpdateQuantities(groupIdx);
 }
 
 void CBarlistTreeView::OnInitialUpdate()
@@ -214,7 +218,7 @@ void CBarlistTreeView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
    else if (lHint == HINT_BAR_ADDED || lHint == HINT_BAR_CHANGED || lHint == HINT_BAR_REMOVED)
    {
       UpdateStatus();
-      UpdateQuantities(((CGroupEventHint*)pHint)->group);
+      m_pFrame->UpdateQuantities(((CGroupEventHint*)pHint)->group);
    }
 }
 
@@ -250,12 +254,6 @@ int CBarlistTreeView::OnCreate(LPCREATESTRUCT lpCreateStruct)
    if (CTreeView::OnCreate(lpCreateStruct) == -1)
    {
       return -1;
-   }
-
-   {
-      AFX_MANAGE_STATE(AfxGetStaticModuleState());
-      m_pQuantitiesDlg = std::make_unique<CQuantitiesDlg>(this);
-      m_pQuantitiesDlg->Create(CQuantitiesDlg::IDD);
    }
 
    m_DropTarget.Register(this);
@@ -307,28 +305,25 @@ void CBarlistTreeView::OnMouseMove(UINT nFlags, CPoint point)
    CTreeCtrl& tree = GetTreeCtrl();
    HTREEITEM hItem = tree.HitTest(point);
 
-   if (m_pQuantitiesDlg)
+   AFX_MANAGE_STATE(AfxGetStaticModuleState());
+   long grpIdx = -1;
+   if (hItem == NULL)
    {
-      AFX_MANAGE_STATE(AfxGetStaticModuleState());
-      long grpIdx = -1;
-      if (hItem == NULL)
-      {
-         // the mouse isn't over a tree item, so get the current selection
-         grpIdx = GetSelectedGroup();
-      }
-      else
-      {
-         grpIdx = (long)tree.GetItemData(hItem);
-      }
+      // the mouse isn't over a tree item, so get the current selection
+      grpIdx = GetSelectedGroup();
+   }
+   else
+   {
+      grpIdx = (long)tree.GetItemData(hItem);
+   }
 
-      if (grpIdx == -1 && hItem == NULL)
-      {
-         m_pQuantitiesDlg->Clear();
-      }
-      else
-      {
-         UpdateQuantities(grpIdx);
-      }
+   if (grpIdx == -1 && hItem == NULL)
+   {
+      m_pFrame->ClearQuantities();
+   }
+   else
+   {
+      m_pFrame->UpdateQuantities(grpIdx);
    }
 
    CTreeView::OnMouseMove(nFlags, point);
@@ -526,85 +521,6 @@ void CBarlistTreeView::UpdateStatus()
       tree.SetItemImage(hGroupItem, (int)status, (int)status);
 
       hGroupItem = tree.GetNextItem(hGroupItem, TVGN_NEXT); // gets the next group at the current level
-   }
-}
-
-
-void CBarlistTreeView::OnQuantnties()
-{
-   if (m_pQuantitiesDlg)
-   {
-      m_pQuantitiesDlg->ShowWindow(m_pQuantitiesDlg->IsWindowVisible() ? SW_HIDE : SW_SHOW);
-   }
-}
-
-void CBarlistTreeView::OnUpdateQuantities(CCmdUI *pCmdUI)
-{
-   // TODO: Add your command update UI handler code here
-   if (m_pQuantitiesDlg)
-   {
-      CString str;
-      str.Format(_T("%s Quantities"), m_pQuantitiesDlg->IsWindowVisible() ? _T("Hide") : _T("Show"));
-      pCmdUI->SetText(str);
-      pCmdUI->SetRadio(m_pQuantitiesDlg->IsWindowVisible());
-   }
-}
-
-void CBarlistTreeView::OnNcDestroy()
-{
-   if (m_pQuantitiesDlg)
-   {
-      AFX_MANAGE_STATE(AfxGetStaticModuleState());
-      m_pQuantitiesDlg->DestroyWindow();
-      m_pQuantitiesDlg = nullptr;
-   }
-   CTreeView::OnNcDestroy();
-}
-
-void CBarlistTreeView::UpdateQuantities(long grpIdx)
-{
-   CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(grpIdx), &group);
-
-   UpdateQuantities(group);
-}
-
-void CBarlistTreeView::UpdateQuantities(IGroup* pGroup)
-{
-   if (m_pQuantitiesDlg)
-   {
-      CComBSTR bstrName;
-      Float64 sub, subEpoxy, super, superEpoxy;
-      if (pGroup == nullptr)
-      {
-         CBarlistDoc* pDoc = GetDocument();
-         CComPtr<IBarlist> barlist;
-         pDoc->GetBarlist(&barlist);
-
-         barlist->get_Project(&bstrName);
-
-         barlist->get_SubstructureMass(&sub);
-         barlist->get_SubstructureMassEpoxy(&subEpoxy);
-         barlist->get_SuperstructureMass(&super);
-         barlist->get_SuperstructureMassEpoxy(&superEpoxy);
-      }
-      else
-      {
-         pGroup->get_Name(&bstrName);
-
-         pGroup->get_SubstructureMass(&sub);
-         pGroup->get_SubstructureMassEpoxy(&subEpoxy);
-         pGroup->get_SuperstructureMass(&super);
-         pGroup->get_SuperstructureMassEpoxy(&superEpoxy);
-      }
-      m_pQuantitiesDlg->SetQuantities(bstrName, sub, subEpoxy, super, superEpoxy);
    }
 }
 

@@ -27,6 +27,7 @@
 #include "resource.h"
 #include "BarlistListView.h"
 #include "BarlistTreeView.h"
+#include "BarlistFrame.h"
 #include "CollaborationDoc.h"
 #include "Events.h"
 
@@ -49,6 +50,7 @@ CBarlistListView::CBarlistListView()
 {
    m_GroupIdx = -1;
    m_pTreeView = nullptr;
+   m_pFrame = nullptr;
 }
 
 CBarlistListView::~CBarlistListView()
@@ -77,7 +79,6 @@ BEGIN_MESSAGE_MAP(CBarlistListView, CListView)
    ON_COMMAND(ID_EDIT_CUT, &CBarlistListView::OnEditCut)
    ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CBarlistListView::OnUpdateEditCopy)
    ON_COMMAND(ID_EDIT_COPY, &CBarlistListView::OnEditCopy)
-   ON_UPDATE_COMMAND_UI(ID_GENERATE_MARK_NUMBERS, &CBarlistListView::OnUpdateGenerateMarkNumbers)
    ON_COMMAND(ID_GENERATE_MARK_NUMBERS, &CBarlistListView::OnGenerateMarkNumbers)
    ON_WM_DESTROY()
    ON_NOTIFY_REFLECT(NM_RCLICK, &CBarlistListView::OnNMRClick)
@@ -221,6 +222,11 @@ CBarlistDoc* CBarlistListView::GetDocument()
 void CBarlistListView::SetTreeView(CBarlistTreeView* pTreeView)
 {
    m_pTreeView = pTreeView;
+}
+
+void CBarlistListView::SetFrame(CBarlistFrame* pFrame)
+{
+   m_pFrame = pFrame;
 }
 
 void CBarlistListView::SelectAll()
@@ -730,14 +736,6 @@ void CBarlistListView::OnEditCopy()
    pDataSource->SetClipboard();
 }
 
-
-void CBarlistListView::OnUpdateGenerateMarkNumbers(CCmdUI *pCmdUI)
-{
-   CListCtrl& list = GetListCtrl();
-   pCmdUI->Enable(1 < list.GetSelectedCount());
-}
-
-
 void CBarlistListView::OnGenerateMarkNumbers()
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -756,6 +754,12 @@ void CBarlistListView::OnGenerateMarkNumbers()
 
       CListCtrl& list = GetListCtrl();
       int n = list.GetSelectedCount();
+      if (n == 0)
+      {
+         SelectAll();
+         n = list.GetSelectedCount();
+      }
+
       POSITION pos = list.GetFirstSelectedItemPosition();
       long mark = dlg.m_First;
       while (pos)

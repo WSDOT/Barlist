@@ -49,6 +49,10 @@ public:
    CBarlistTreeView* GetTreeView();
    CBarlistListView* GetListView();
 
+   void UpdateQuantities(long grpIdx);
+   void UpdateQuantities(IGroup* pGroup);
+   void ClearQuantities();
+
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CBarlistFrame)
@@ -74,12 +78,19 @@ protected:
 
 
    CSplitterWnd m_SplitterWnd;
+
+
+   std::unique_ptr<CQuantitiesDlg> m_pQuantitiesDlg;
+
 public:
    afx_msg void OnSelectAll();
    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
    afx_msg void OnUpdateEditPaste(CCmdUI *pCmdUI);
    afx_msg void OnEditPaste();
    afx_msg void OnHelpFinder();
+   afx_msg void OnQuantnties();
+   afx_msg void OnUpdateQuantities(CCmdUI *pCmdUI);
+   afx_msg void OnNcDestroy();
 };
 
 /////////////////////////////////////////////////////////////////////////////
