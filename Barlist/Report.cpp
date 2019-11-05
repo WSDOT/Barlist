@@ -446,7 +446,7 @@ void CReport::Print(CDC* pDC, CPrintInfo* pInfo)
 
 void CReport::PageHeader(CDC* pDC, CPrintInfo* pInfo)
 {
-   AFX_MANAGE_STATE(AfxGetModuleState());
+   AFX_MANAGE_STATE(AfxGetStaticModuleState());
    
    pDC->Rectangle(m_Border);
 
