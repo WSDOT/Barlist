@@ -43,7 +43,7 @@ public:
 	virtual ~CBarComponent();
 
    bool Build();
-   virtual double Length();
+   virtual Float64 Length();
 
 protected:
    virtual bool BuildComponent() = 0;
@@ -54,8 +54,8 @@ private:
    std::vector<CBarComponent*> m_Components;
 
    // Copy and assignment not supported.
-   CBarComponent(const CBarComponent&);
-   CBarComponent& operator=(const CBarComponent&);
+   CBarComponent(const CBarComponent&) = delete;
+   CBarComponent& operator=(const CBarComponent&) = delete;
 };
 
 #endif // !defined(AFX_BARCOMPONENT_H__D6F6D553_1514_11D3_8937_006097C68A9C__INCLUDED_)

@@ -25,6 +25,7 @@
 
 #include "stdafx.h"
 #include "BarlistFrame.h"
+#include "Helpers.h"
 #include "resource.h"
 
 #ifdef _DEBUG
@@ -318,21 +319,34 @@ void CBarlistFrame::UpdateQuantities(IGroup* pGroup)
 
          barlist->get_Project(&bstrName);
 
-         barlist->get_SubstructureMass(&sub);
-         barlist->get_SubstructureMassEpoxy(&subEpoxy);
-         barlist->get_SuperstructureMass(&super);
-         barlist->get_SuperstructureMassEpoxy(&superEpoxy);
+         m_pQuantitiesDlg->SetGroup(bstrName);
+         for (int i = 0; i < MATERIAL_COUNT; i++)
+         {
+            MaterialType material = (MaterialType)(i);
+            barlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
+            barlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
+            barlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
+            barlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+
+            m_pQuantitiesDlg->SetQuantities(material, sub, subEpoxy, super, superEpoxy);
+         }
       }
       else
       {
          pGroup->get_Name(&bstrName);
 
-         pGroup->get_SubstructureMass(&sub);
-         pGroup->get_SubstructureMassEpoxy(&subEpoxy);
-         pGroup->get_SuperstructureMass(&super);
-         pGroup->get_SuperstructureMassEpoxy(&superEpoxy);
+         m_pQuantitiesDlg->SetGroup(bstrName);
+         for (int i = 0; i < MATERIAL_COUNT; i++)
+         {
+            MaterialType material = (MaterialType)(i);
+            pGroup->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
+            pGroup->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
+            pGroup->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
+            pGroup->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+
+            m_pQuantitiesDlg->SetQuantities(material, sub, subEpoxy, super, superEpoxy);
+         }
       }
-      m_pQuantitiesDlg->SetQuantities(bstrName, sub, subEpoxy, super, superEpoxy);
    }
 }
 

@@ -40,28 +40,22 @@ void CType53::BuildBend()
    if ( GetStatusLevel() == stError )
       return;
 
-   double deduct = 0;
-   double radius = 0;
-   double tail = 0;
-
    CComPtr<IBarData> pBarData;
    pBarData.Attach( GetBarData() );
 
    UseType use = GetUseType();
 
    // Error check data
-   deduct = CFabricationConstraints::GetHookDeduction( pBarData, use, ht180 );
-   radius = CFabricationConstraints::GetHookRadius( pBarData, use );
-   tail   = CFabricationConstraints::GetTailLength( pBarData, use, ht180 );
+   Float64 deduct = CFabricationConstraints::GetHookDeduction( pBarData, use, ht180 );
+   Float64 radius = CFabricationConstraints::GetHookRadius( pBarData, use );
+   Float64 tail   = CFabricationConstraints::GetTailLength( pBarData, use, ht180 );
 
    if ( (GetU() - 2*deduct) < 0 )
    {
       SetStatusLevel( stError );
       CComBSTR msg;
       msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg,
-                    CComVariant("U"),
-                    CComVariant(2*deduct));
+      AddStatusMsg( msg, CComVariant("U"), CComVariant(2*deduct));
 
       return;
    }

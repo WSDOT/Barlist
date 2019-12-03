@@ -244,20 +244,6 @@ void CCollaborationDoc::Merge(IBarlist* pBarlist)
          barRecords->Add(clone);
       }
    }
-
-   Float64 bridge, wall, traffic;
-   m_Barlist->get_BridgeGrateInletQuantity(&bridge);
-   m_Barlist->get_RetainingWallQuantity(&wall);
-   m_Barlist->get_TrafficBarrierQuantity(&traffic);
-
-   Float64 new_bridge, new_wall, new_traffic;
-   pBarlist->get_BridgeGrateInletQuantity(&new_bridge);
-   pBarlist->get_RetainingWallQuantity(&new_wall);
-   pBarlist->get_TrafficBarrierQuantity(&new_traffic);
-
-   m_Barlist->put_BridgeGrateInletQuantity(bridge + new_bridge);
-   m_Barlist->put_RetainingWallQuantity(wall + new_wall);
-   m_Barlist->put_TrafficBarrierQuantity(traffic + new_traffic);
 }
 
 // CCollaborationDoc diagnostics

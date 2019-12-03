@@ -44,7 +44,7 @@ void CBarData::FinalRelease()
    }
 }
 
-void CBarData::SetBarData(const std::string& name,double db,double mass,double length,double maxLength)
+void CBarData::SetBarData(const std::string& name,Float64 db,Float64 mass,Float64 length,Float64 maxLength)
 {
    m_Name      = name.c_str();
    m_db        = db;
@@ -53,51 +53,51 @@ void CBarData::SetBarData(const std::string& name,double db,double mass,double l
    m_MaxLength = maxLength;
 }
 
-void CBarData::AddBendData(UseType use,double ID)
+void CBarData::AddBendData(UseType use,Float64 ID,BendMeasureType bendMeasure)
 {
 	// TODO: Add your implementation code here
    CComObject<CBendData>* pBendData;
    CComObject<CBendData>::CreateInstance( &pBendData );
    pBendData->AddRef();
-   pBendData->SetData(ID,use);
+   pBendData->SetData(bendMeasure,ID,use);
    m_pBends[use].Attach(pBendData);
 }
 
-void CBarData::AddHookData(UseType use,HookType hook,double T,double Tmin)
+void CBarData::AddHookData(UseType use,HookType hook,Float64 T,BendMeasureType bendMeasure,Float64 Tmin)
 {
 	// TODO: Add your implementation code here
    CComObject<CHookData>* pHookData;
    CComObject<CHookData>::CreateInstance( &pHookData );
    pHookData->AddRef();
-   pHookData->SetData(hook,use,T,Tmin);
+   pHookData->SetData(hook,use,T,bendMeasure,Tmin);
    m_pHooks[use][hook].Attach(pHookData);
 }
 
-STDMETHODIMP CBarData::get_Diameter(double *pVal)
+STDMETHODIMP CBarData::get_Diameter(Float64 *pVal)
 {
 	// TODO: Add your implementation code here
    *pVal = m_db;
 	return S_OK;
 }
 
-STDMETHODIMP CBarData::get_Mass(double *pVal)
+STDMETHODIMP CBarData::get_Mass(Float64 *pVal)
 {
 	// TODO: Add your implementation code here
    *pVal = m_Mass;
 	return S_OK;
 }
 
-STDMETHODIMP CBarData::get_NormalLength(double *pVal)
+STDMETHODIMP CBarData::get_MaxLength(double *pVal)
+{
+   // TODO: Add your implementation code here
+   *pVal = m_MaxLength;
+   return S_OK;
+}
+
+STDMETHODIMP CBarData::get_NormalLength(Float64 *pVal)
 {
 	// TODO: Add your implementation code here
    *pVal = m_Length;
-	return S_OK;
-}
-
-STDMETHODIMP CBarData::get_MaxLength(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_MaxLength;
 	return S_OK;
 }
 

@@ -66,9 +66,9 @@ void CType66::BuildBend()
       return;
 
    // Build the bend
-   double db;
-   double radius;
-   double nTurns;
+   Float64 db;
+   Float64 radius;
+   Float64 nTurns;
 
    pBarData->get_Diameter(&db);
    radius = (GetU() - db)/2;

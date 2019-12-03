@@ -35,7 +35,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CLineComponent::CLineComponent(double dx, double dy, double dz) :
+CLineComponent::CLineComponent(Float64 dx, Float64 dy, Float64 dz) :
 CBarComponent(),
 m_Dx(dx),
 m_Dy(dy),
@@ -47,9 +47,9 @@ CLineComponent::~CLineComponent()
 {
 }
 
-double CLineComponent::Length()
+Float64 CLineComponent::Length()
 {
-   double length = CBarComponent::Length();
+   Float64 length = CBarComponent::Length();
 
    length += sqrt(m_Dx*m_Dx + m_Dy*m_Dy + m_Dz*m_Dz);
    return length;

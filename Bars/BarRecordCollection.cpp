@@ -467,11 +467,11 @@ public:
       pRec2->get_Mark( &bstrMark2 );
       std::string strMark2( OLE2A(bstrMark2) );
 
-      double val1;
+      Float64 val1;
       char* pStop1;
       val1 = strtod( strMark1.c_str(), &pStop1 );
 
-      double val2;
+      Float64 val2;
       char* pStop2;
       val2 = strtod( strMark2.c_str(), &pStop2 );
 

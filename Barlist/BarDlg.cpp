@@ -29,6 +29,8 @@
 
 #include "BendFactory.h"
 
+#include "Helpers.h"
+
 #include "CollaborationDoc.h" // for FormatWeight and FormatLength
 #include <Bars\Bars.h>
 
@@ -250,6 +252,7 @@ IMPLEMENT_DYNAMIC(CBarDlg, CDialog)
 CBarDlg::CBarDlg(IBarInfoMgr* pBarInfoMgr, IBarlist* pBarlist, long groupIdx, long barIdx,CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_BAR, pParent), m_BarInfoMgr(pBarInfoMgr), m_Barlist(pBarlist), m_GroupIdx(groupIdx), m_BarIdx(barIdx), m_SM(this)
 {
+   m_bIsCollaboration = false;
 }
 
 CBarDlg::~CBarDlg()
@@ -261,10 +264,12 @@ void CBarDlg::DoDataExchange(CDataExchange* pDX)
 	CDialog::DoDataExchange(pDX);
    DDX_Control(pDX, IDC_NUM_EACH, m_ctrlNumEach);
    DDX_Control(pDX, IDC_TYPE, m_cbBendType);
+   DDX_Control(pDX, IDC_EPOXY, m_cbEpoxy);
 }
 
 
 BEGIN_MESSAGE_MAP(CBarDlg, CDialog)
+   ON_CBN_SELCHANGE(IDC_MATERIALS, &CBarDlg::OnCbnSelchangeMaterials)
    ON_BN_CLICKED(ID_ADD_GROUP, &CBarDlg::OnClickedAddGroup)
    ON_CBN_SELCHANGE(IDC_GROUPS, &CBarDlg::OnSelchangeGroups)
    ON_CBN_SELCHANGE(IDC_MARK, &CBarDlg::OnCbnSelchangeMark)
@@ -275,7 +280,7 @@ BEGIN_MESSAGE_MAP(CBarDlg, CDialog)
    ON_BN_CLICKED(IDC_ADD_BAR, &CBarDlg::OnBnClickedAddBar)
    ON_BN_CLICKED(IDC_SAVE, &CBarDlg::OnBnClickedSave)
    ON_CBN_EDITCHANGE(IDC_MARK, &CBarDlg::OnCbnEditchangeMark)
-   
+
    ON_CBN_SELCHANGE(IDC_BAR_SIZE, &CBarDlg::OnChange)
    ON_EN_CHANGE(IDC_NUM_REQUIRED, &CBarDlg::OnChange)
    ON_EN_CHANGE(IDC_NUM_EACH, &CBarDlg::OnChange)
@@ -314,7 +319,6 @@ END_MESSAGE_MAP()
 BOOL CBarDlg::OnInitDialog()
 {
    UpdateGroups();
-   UpdateBarSizes();
    UpdateBendTypes();
 
    CWnd* pWnd = GetDlgItem(IDC_DIMENSIONS_GROUP);
@@ -338,6 +342,18 @@ BOOL CBarDlg::OnInitDialog()
 
    GetDlgItem(IDC_NUM_REQUIRED)->SetWindowText(_T("1"));
    GetDlgItem(IDC_NUM_EACH)->SetWindowText(_T("1"));
+
+   CComboBox* pcbMaterial = (CComboBox*)GetDlgItem(IDC_MATERIALS);
+   for (int i = 0; i < MATERIAL_COUNT; i++)
+   {
+      MaterialType material = (MaterialType)i;
+      CString strMaterial = GetMaterialSpecification(material);
+      CString strName = GetMaterialCommonName(material);
+      strMaterial += _T(" - ") + strName;
+      pcbMaterial->SetItemData(pcbMaterial->AddString(strMaterial), (DWORD_PTR)material);
+   }
+   pcbMaterial->SetCurSel(0);
+   UpdateBarSizes();
 
    CDialog::OnInitDialog();
 
@@ -406,6 +422,10 @@ BOOL CBarDlg::OnInitDialog()
       m_SM.SetState(State::EmptyList);
    }
 
+   CDataExchange dx(this,TRUE);
+   MaterialType material;
+   DDX_CBItemData(&dx, IDC_MATERIALS, material);
+   m_cbEpoxy.EnableWindow(CanBeEpoxyCoated(material));
 
    UpdateStatus();
    OnStateChanged();
@@ -413,6 +433,7 @@ BOOL CBarDlg::OnInitDialog()
    CEAFDocument* pDoc = EAFGetDocument();
    if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
    {
+      m_bIsCollaboration = true;
       GetDlgItem(ID_ADD_GROUP)->ShowWindow(SW_HIDE);
       GetDlgItem(IDC_ADD_BAR)->ShowWindow(SW_HIDE);
       GetDlgItem(IDC_DELETE)->ShowWindow(SW_HIDE);
@@ -510,19 +531,58 @@ void CBarDlg::UpdateGroups()
 
 void CBarDlg::UpdateBarSizes()
 {
+   USES_CONVERSION;
+
+   // Capture the current state of the combo box so it can
+   // be reset if possible
    CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_BAR_SIZE);
-   pCB->AddString(_T("#3"));
-   pCB->AddString(_T("#4"));
-   pCB->AddString(_T("#5"));
-   pCB->AddString(_T("#6"));
-   pCB->AddString(_T("#7"));
-   pCB->AddString(_T("#8"));
-   pCB->AddString(_T("#9"));
-   pCB->AddString(_T("#10"));
-   pCB->AddString(_T("#11"));
-   pCB->AddString(_T("#14"));
-   pCB->AddString(_T("#18"));
-   pCB->SetCurSel(0);
+   int curSel = pCB->GetCurSel();
+   CString strCurrentSize;
+   pCB->GetWindowText(strCurrentSize);
+
+
+   // Fill the combo box with the bar sizes available for the
+   // current material
+   CDataExchange dx(this, TRUE);
+   MaterialType material;
+   DDX_CBItemData(&dx, IDC_MATERIALS, material);
+
+   CComPtr<IBarCollection> bars;
+   m_BarInfoMgr->get_Bars(material, &bars);
+
+   CComPtr<IUnknown> unknown;
+   bars->get__NewEnum(&unknown);
+   CComQIPtr<IEnumVARIANT> enumVariant(unknown);
+
+   pCB->ResetContent();
+
+   CComVariant variant;
+   ULONG nFetched;
+   while (enumVariant->Next(1, &variant, &nFetched) == S_OK)
+   {
+      CComPtr<IBarData> barData;
+      (variant.punkVal)->QueryInterface(&barData);
+
+      CComBSTR bstrSize;
+      barData->get_Name(&bstrSize);
+
+      // not all materials have the all the bar sizes. look at gfrp bars
+      // put this name in the combo box
+      pCB->AddString(OLE2T(bstrSize));
+   }
+
+   // Restore the selection if possible... even though different materials
+   // have a different list of bars, the may have some of the same bars.
+   // First try to restore by bar name text string because the same bars
+   // may be at different indicies in the list.
+   dx.m_bSaveAndValidate = FALSE;
+   DDX_CBString(&dx, IDC_BAR_SIZE, strCurrentSize);
+   int i = pCB->GetCurSel(); // check if something was selected
+   if (i == CB_ERR && pCB->SetCurSel(curSel) == CB_ERR)
+   {
+      // still not selected... just select the first item
+      pCB->SetCurSel(0);
+   }
 }
 
 void CBarDlg::UpdateBendTypes()
@@ -740,9 +800,16 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
    CDataExchange dx(this, bSaveAndValidate);
    CDataExchange* pDX = &dx;
 
+   // get the current material... if the material changes, then
+   // we have to update the bar size list
+   CDataExchange dx2(this, TRUE);
+   MaterialType current_material;
+   DDX_CBItemData(&dx2, IDC_MATERIALS, current_material);
+
    CEAFApp* pApp = EAFGetApp();
    const auto* pDisplayUnits = pApp->GetDisplayUnits();
 
+   MaterialType material;
    CComBSTR bstrMark;
    CComBSTR bstrLocation;
    CComBSTR bstrSize;
@@ -750,26 +817,25 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
    long nReqd;
    long nEach;
    UseType use;
-   VARIANT_BOOL vbLumpSum;
    VARIANT_BOOL vbSubstructure;
    VARIANT_BOOL vbEpoxy;
    VARIANT_BOOL vbVaries;
 
    const int primary = 0;
    const int varies = 1;
-   std::array<double, 2> u{ 0,0 }, w{ 0,0 }, x{ 0,0 }, y{ 0,0 }, z{ 0,0 }, t1{ 0,0 }, t2{ 0,0 };
+   std::array<Float64, 2> u{ 0,0 }, w{ 0,0 }, x{ 0,0 }, y{ 0,0 }, z{ 0,0 }, t1{ 0,0 }, t2{ 0,0 };
 
    CComPtr<IBend> primaryBend;
 
    if (!bSaveAndValidate)
    {
+      pBarRecord->get_Material(&material);
       pBarRecord->get_Mark(&bstrMark);
       pBarRecord->get_Location(&bstrLocation);
       pBarRecord->get_BendType(&bendType);
       pBarRecord->get_Size(&bstrSize);
       pBarRecord->get_NumReqd(&nReqd);
       pBarRecord->get_Use(&use);
-      pBarRecord->get_LumpSum(&vbLumpSum);
       pBarRecord->get_Substructure(&vbSubstructure);
       pBarRecord->get_Epoxy(&vbEpoxy);
       pBarRecord->get_Varies(&vbVaries);
@@ -796,7 +862,16 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
          variesBend->get_T1(&t1[varies]);
          variesBend->get_T2(&t2[varies]);
       }
+
+      // Now that we know the bar size, fill up the bar size combo box so the DDX below will
+      // select the correct value. Only have to do this if the material type changes
+      if (material != current_material)
+      {
+         UpdateBarSizes();
+      }
    }
+
+   DDX_CBItemData(pDX, IDC_MATERIALS, material);
 
    DDX_Text(pDX, IDC_MARK, bstrMark.m_str);
    DDV_NonEmptyString(pDX, _T("Mark No."), bstrMark.m_str);
@@ -810,7 +885,6 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
    DDV_MinMaxLong(pDX, nReqd, 1, 9999);
 
    DDX_RadioEnum(pDX, IDC_LONGITUDINAL, use);
-   DDX_Check_VariantBool(pDX, IDC_LUMP_SUM, vbLumpSum);
    DDX_Check_VariantBool(pDX, IDC_SUBSTRUCTURE, vbSubstructure);
    DDX_Check_VariantBool(pDX, IDC_EPOXY, vbEpoxy);
    DDX_Check_VariantBool(pDX, IDC_VARIES, vbVaries);
@@ -845,11 +919,13 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
          pDX->Fail();
       }
 
+      pBarRecord->put_Material(material);
+
       pBarRecord->put_Mark(bstrMark);
       pBarRecord->put_Location(bstrLocation);
 
       CComPtr<IBarCollection> bars;
-      m_BarInfoMgr->get_Bars(&bars);
+      m_BarInfoMgr->get_Bars(material,&bars);
       CComPtr<IBarData> barData;
       bars->get_Item(CComVariant(bstrSize), &barData);
       pBarRecord->put_BarData(barData);
@@ -858,7 +934,6 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
 
       pBarRecord->put_Use(use);
 
-      pBarRecord->put_LumpSum(vbLumpSum);
       pBarRecord->put_Substructure(vbSubstructure);
       pBarRecord->put_Epoxy(vbEpoxy);
 
@@ -892,6 +967,10 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
       }
    }
 
+   // don't use m_cbEpoxy here... we want to set the enabled state
+   // without messing with the check mark
+   GetDlgItem(IDC_EPOXY)->EnableWindow(CanBeEpoxyCoated(material));
+
    // after a bar record is either put into the UI or extracted from the UI
    // we are in editing state
    m_SM.SetState(State::Editing);
@@ -902,18 +981,34 @@ void CBarDlg::UpdateMessages(IBarRecord* pBarRecord)
    if (pBarRecord)
    {
       CString strMsgs;
+
+      CComPtr<IBend> primaryBend;
+      pBarRecord->get_PrimaryBend(&primaryBend);
+      Float64 length;
+      primaryBend->get_Length(&length);
+      CString strLength = FormatLength(length);
+      strMsgs += _T("Primary bend length: ") + strLength + _T("\r\n");
+
+      VARIANT_BOOL vbVaries;
+      pBarRecord->get_Varies(&vbVaries);
+      if (vbVaries == VARIANT_TRUE)
+      {
+         CComPtr<IBend> variesBend;
+         pBarRecord->get_VariesBend(&variesBend);
+         Float64 length;
+         variesBend->get_Length(&length);
+         CString strLength = FormatLength(length);
+         strMsgs += _T("Varies bend length: ") + strLength + _T("\r\n");
+      }
+
       CComPtr<IStatusMessageCollection> statusMessages;
       pBarRecord->get_StatusMessages(&statusMessages);
       GetStatusMessages(_T("*** Bar Record ***"), strMsgs, statusMessages);
 
-      CComPtr<IBend> primaryBend;
-      pBarRecord->get_PrimaryBend(&primaryBend);
       statusMessages.Release();
       primaryBend->get_StatusMessages(&statusMessages);
       GetStatusMessages(_T("*** Primary Bend ***"), strMsgs, statusMessages);
 
-      VARIANT_BOOL vbVaries;
-      pBarRecord->get_Varies(&vbVaries);
       if (vbVaries == VARIANT_TRUE)
       {
          CComPtr<IBend> variesBend;
@@ -1117,6 +1212,19 @@ void CBarDlg::OnCbnSelchangeType()
    }
 }
 
+void CBarDlg::OnCbnSelchangeMaterials()
+{
+   CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_MATERIALS);
+   int curSel = pCB->GetCurSel();
+   if (curSel != CB_ERR)
+   {
+      MaterialType material = (MaterialType)(pCB->GetItemData(curSel));
+      m_cbEpoxy.EnableWindow(CanBeEpoxyCoated(material));
+      m_SM.StateChange(Action::EditRecord);
+      UpdateBarSizes(); // bar sizes are a function of material type... update the bar size list
+   }
+}
+
 void CBarDlg::OnBnClickedAddBar()
 {
    CComPtr<IBarRecord> barRecord;
@@ -1130,24 +1238,25 @@ void CBarDlg::OnBnClickedAddBar()
    CComPtr<IBarRecordCollection> bars;
    group->get_BarRecords(&bars);
 
+   CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_MARK);
+   CComBSTR bstrMark;
+   barRecord->get_Mark(&bstrMark);
+   bstrMark = AutoIncrementMark(CString(bstrMark));
+   barRecord->put_Mark(bstrMark);
+
    bars->Add(barRecord);
+
+   m_SM.StateChange(Action::AddRecord);
+
+   UpdateVaries();
+   UpdateDimensions(barRecord);
+   UpdateStatus(barRecord);
 
    long nBars;
    bars->get_Count(&nBars);
    m_BarIdx = nBars - 1;
 
-   m_SM.StateChange(Action::AddRecord);
-
-   UpdateMarkNumbers();
-   UpdateVaries();
-   UpdateDimensions(barRecord);
-   UpdateStatus(barRecord);
-
-   CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_MARK);
-   CComBSTR bstrMark;
-   barRecord->get_Mark(&bstrMark);
-   bstrMark = AutoIncrementMark(CString(bstrMark));
-   pCB->SetWindowText(CString(bstrMark));
+   SelectBar(m_GroupIdx, m_BarIdx);
 }
 
 CString CBarDlg::AutoIncrementMark(const CString& strMark)
@@ -1167,12 +1276,22 @@ void CBarDlg::OnBnClickedSave()
 
 BOOL CBarDlg::CheckEditState()
 {
-   int result = IDYES;
    State state = m_SM.GetState();
+
+   if (m_bIsCollaboration)
+   {
+      if (state == State::EditingWithChange)
+      {
+         AfxMessageBox(_T("Bars cannot be modified in a collaboration project. All changes to this bar record will be discarded."), MB_ICONWARNING | MB_OK);
+      }
+      return TRUE;
+   }
+
+   int result = IDYES;
    if (state == State::EditingWithChange || state == State::NewBar)
    {
       // the data in the dialog is in a modified state
-      // as the user if they want to save the data before proceeding
+      // ask the user if they want to save the data before proceeding
 
       result = AfxMessageBox(_T("There are unsaved changes to the current bar.\nWould you like to save them before proceeded?\nYes = Save changes and proceed\nNo = Discard changes and proceed\nCancel = Don't proceed"), MB_ICONQUESTION | MB_YESNOCANCEL);
       if (result == IDYES)
@@ -1197,7 +1316,6 @@ void CBarDlg::OnChange()
    m_SM.StateChange(Action::EditRecord);
 }
 
-
 void CBarDlg::OnBnClickedCancel()
 {
    if (CheckEditState())
@@ -1205,7 +1323,6 @@ void CBarDlg::OnBnClickedCancel()
       CDialog::OnCancel();
    }
 }
-
 
 void CBarDlg::OnBnClickedHelp()
 {

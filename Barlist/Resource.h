@@ -12,6 +12,7 @@
 #define EAF_REPORT_MENU_COUNT           50
 #define EAF_GRAPH_MENU_COUNT            50
 #define IDS_PROJNAME                    100
+#define IDR_BARLIST_10_TO_20_XSLT       101
 #define IDR_PLUGIN                      102
 #define IDR_BARLIST                     129
 #define IDR_COLLABORATION               130
@@ -19,16 +20,9 @@
 #define IDC_SI                          201
 #define IDC_US                          202
 #define IDC_INCREMENT                   203
-#define IDC_TRAFFIC                     203
-#define IDC_TRAFFIC_UNIT                204
-#define IDC_BRIDGE                      205
 #define IDR_TOOLBAR                     206
-#define IDC_BRIDGE_UNIT                 206
-#define IDC_WALL                        207
 #define IDD_OPTIONS                     208
-#define IDC_WALL_UNIT                   208
 #define IDC_GROUPS                      209
-#define IDD_QNI                         210
 #define IDC_STATUS                      211
 #define IDD_BAR                         212
 #define IDC_LOCATION                    212
@@ -86,6 +80,7 @@
 #define IDI_SAVE                        255
 #define IDCHELP                         256
 #define IDC_GROUP                       256
+#define XSLTFILE                        256
 #define IDC_SUBSTRUCTURE_EPOXY          258
 #define IDC_SUPERSTRUCTURE              259
 #define IDC_SUPERSTRUCTURE_EPOXY        260
@@ -101,6 +96,9 @@
 #define IDC_BUTTON3                     270
 #define IDC_ADD                         271
 #define IDC_BUTTON2                     272
+#define IDC_QUANTITIES_LIST             273
+#define IDC_COMBO1                      274
+#define IDC_MATERIALS                   274
 #define EAF_RESERVED_COMMAND_BASE       0x8000
 #define EAFID_UNITS_SI                  32772
 #define EAFID_UNITS_US                  32773
@@ -134,7 +132,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        229
 #define _APS_NEXT_COMMAND_VALUE         33068
-#define _APS_NEXT_CONTROL_VALUE         273
+#define _APS_NEXT_CONTROL_VALUE         275
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

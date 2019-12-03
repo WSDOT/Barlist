@@ -39,18 +39,18 @@
 class CHelixComponent : public CBarComponent  
 {
 public:
-	CHelixComponent(double radius,double numTurns,double pitch = 0);
+	CHelixComponent(Float64 radius,Float64 numTurns,Float64 pitch = 0);
 	virtual ~CHelixComponent();
 
-   double Length();
+   Float64 Length();
 
 protected:
    bool BuildComponent();
 
 private:
-   double m_Radius;
-   double m_NumTurns;
-   double m_Pitch;
+   Float64 m_Radius;
+   Float64 m_NumTurns;
+   Float64 m_Pitch;
 
 };
 

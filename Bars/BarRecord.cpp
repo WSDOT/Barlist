@@ -59,11 +59,15 @@ void CBarRecord::FinalRelease()
    //       the reference count for each connection point.
    long dwOldRef = m_dwRef;
 
-   if ( m_pPrimaryBend )
+   if (m_pPrimaryBend)
+   {
       InternalAddRef(); // Increment the RefCount
+   }
 
-   if ( m_pVariesBend )
+   if (m_pVariesBend)
+   {
       InternalAddRef(); // Increment the RefCount
+   }
 
    Disconnect( m_pPrimaryBend, m_PrimaryBendCookie );
    Disconnect( m_pVariesBend, m_VariesBendCookie );
@@ -81,6 +85,19 @@ void CBarRecord::Disconnect(IBend* pBend,DWORD dwCookie)
       pCPC->FindConnectionPoint( IID_IBendEvents, &pCP );
       pCP->Unadvise( dwCookie );
    }
+}
+
+STDMETHODIMP CBarRecord::get_Material(/*[out, retval]*/ MaterialType *pVal)
+{
+   *pVal = m_Material;
+   return S_OK;
+}
+
+STDMETHODIMP CBarRecord::put_Material(MaterialType newVal)
+{
+   m_Material = newVal;
+   Fire_OnBarRecordChanged(this);
+   return S_OK;
 }
 
 STDMETHODIMP CBarRecord::get_Mark(BSTR *pVal)
@@ -150,21 +167,6 @@ STDMETHODIMP CBarRecord::put_Use(UseType newVal)
 {
 	// TODO: Add your implementation code here
    m_Use = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
-}
-
-STDMETHODIMP CBarRecord::get_LumpSum(VARIANT_BOOL *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_bLumpSum;
-	return S_OK;
-}
-
-STDMETHODIMP CBarRecord::put_LumpSum(VARIANT_BOOL newVal)
-{
-	// TODO: Add your implementation code here
-   m_bLumpSum = newVal;
    Fire_OnBarRecordChanged(this);
    return S_OK;
 }
@@ -321,40 +323,46 @@ STDMETHODIMP CBarRecord::get_Status(StatusType *pVal)
    m_pPrimaryBend->get_Status( &primaryStatus );
    
    StatusType variesStatus = stOK;
-   if ( m_pVariesBend )
-      m_pVariesBend->get_Status( &variesStatus );
+   if (m_pVariesBend)
+   {
+      m_pVariesBend->get_Status(&variesStatus);
+   }
 
    StatusType status = max(recordStatus,max(primaryStatus,variesStatus));
    *pVal = status;
    return S_OK;
 }
 
-STDMETHODIMP CBarRecord::get_Mass(double *pVal)
+STDMETHODIMP CBarRecord::get_Mass(Float64 *pVal)
 {
 	// TODO: Add your implementation code here
-   double primaryLength;
-   double variesLength;
+   Float64 primaryLength;
+   Float64 variesLength;
 
    m_pPrimaryBend->get_Length(&primaryLength);
-   if ( m_pVariesBend )
+   if (m_pVariesBend)
+   {
       m_pVariesBend->get_Length(&variesLength);
+   }
    else
+   {
       variesLength = primaryLength;
+   }
 
-   double length = (primaryLength + variesLength)/2;
+   Float64 length = (primaryLength + variesLength)/2;
    
-   double unitMass;
+   Float64 unitMass;
    m_pBarData->get_Mass(&unitMass);
 
-   double mass = m_NumReqd * length * unitMass;
+   Float64 mass = m_NumReqd * length * unitMass;
 
    // If status is error, don't figure the mass.
    StatusType status;
-   get_Status( &status );
+   get_Status(&status);
 
-   *pVal = status == stError ? 0.00 :  mass;
+   *pVal = status == stError ? 0.00 : mass;
 
-	return S_OK;
+   return S_OK;
 }
 
 STDMETHODIMP CBarRecord::get_BarData(IBarData **pVal)

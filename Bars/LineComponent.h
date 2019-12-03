@@ -39,18 +39,18 @@
 class CLineComponent : public CBarComponent  
 {
 public:
-	CLineComponent(double dx = 0, double dy = 0, double dz = 0);
+	CLineComponent(Float64 dx = 0, Float64 dy = 0, Float64 dz = 0);
 	virtual ~CLineComponent();
 
-   virtual double Length();
+   virtual Float64 Length();
 
 protected:
    bool BuildComponent();
 
 private:
-   double m_Dx;
-   double m_Dy;
-   double m_Dz;
+   Float64 m_Dx;
+   Float64 m_Dy;
+   Float64 m_Dz;
 };
 
 #endif // !defined(AFX_LINECOMPONENT_H__D6F6D550_1514_11D3_8937_006097C68A9C__INCLUDED_)

@@ -8,6 +8,9 @@ The main window is continuously updated as bars are defined and modified.
 Use the drop down list to select a bar group.
 A new group can be created by pressing [Add Group]
 
+## Material
+Use the drop down list to select the bar material.
+
 ## Basic Bar Description
 
 Item | Description
@@ -26,7 +29,6 @@ Enter the bend dimensions. For US units, lengths are entered as "feet inches" (t
 ## Flags
 Item | Description
 -----|----------
-Lump Sum | Bars designated as lump sum are shown as a lump sum quantity in the barlist plan sheet. The number of bars and the bend dimensions are to be replaced with a "$" symbol in the barlist sheets drawing for bars designated as lump sum.
 Substructure | Indicates the bar is located in the substructure
 Epoxy | Indicates the bar is epoxy coated
 Varies | Indicate the length of the bars vary between two sets of bend dimensions

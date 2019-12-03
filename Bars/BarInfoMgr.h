@@ -63,11 +63,12 @@ END_COM_MAP()
 
 // IBarInfoMgr
 public:
-	STDMETHOD(get_Bars)(/*[out, retval]*/ IBarCollection* *pVal);
-	STDMETHOD(get_Specification)(/*[out, retval]*/ BSTR *pVal);
+	STDMETHOD(get_Bars)(/*[in]*/MaterialType material,/*[out, retval]*/ IBarCollection* *pVal);
 
 private:
-   CComPtr<IBarCollection> m_pBars;
+   CComPtr<IBarCollection> m_pSteelBars;
+   CComPtr<IBarCollection> m_pGalvanizedBars;
+   CComPtr<IBarCollection> m_pGFRPBars;
 };
 
 #endif //__BARINFOMGR_H_

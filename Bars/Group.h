@@ -32,6 +32,8 @@
 #include "BarsCP.h"
 #include "Barlist.h"
 
+#include <array>
+
 /////////////////////////////////////////////////////////////////////////////
 // CGroup
 class ATL_NO_VTABLE CGroup : 
@@ -47,13 +49,14 @@ public:
    CGroup() :
       m_Name("")
 	{
-      m_SuperstructureMass = 0;
-      m_SuperstructureMassEpoxy = 0;
-      m_SubstructureMass = 0;
-      m_SubstructureMassEpoxy = 0;
+      m_Superstructure.fill(0);
+      m_SuperstructureEpoxy.fill(0);
+      m_Substructure.fill(0);
+      m_SubstructureEpoxy.fill(0);
+
       m_Status = stOK;
 
-      m_pBarlist = 0;
+      m_pBarlist = nullptr;
    }
 
    void SetBarlist(CBarlist* pBarlist);
@@ -61,7 +64,7 @@ public:
    CBarlist* GetBarlist()
    {
       // If this ASSERT fires, you forget to call SetBarlist for this object
-      ATLASSERT( m_pBarlist != 0 );
+      ATLASSERT( m_pBarlist != nullptr );
       return m_pBarlist;
    }
 
@@ -85,10 +88,15 @@ private:
    CComPtr<IBarRecordCollection> m_Bars;
    DWORD m_BarsCookie;
    void UpdateStatus();
-   double m_SuperstructureMass;
-   double m_SuperstructureMassEpoxy;
-   double m_SubstructureMass;
-   double m_SubstructureMassEpoxy;
+
+   // array index is MaterialType
+   // quantities are mass/weight in all cases
+   // except D7957 (GFRP) in which case the quantity is length
+   std::array<Float64, 16> m_Superstructure;
+   std::array<Float64, 16> m_SuperstructureEpoxy;
+   std::array<Float64, 16> m_Substructure;
+   std::array<Float64, 16> m_SubstructureEpoxy;
+
    StatusType m_Status;
    CBarlist* m_pBarlist;
 
@@ -99,10 +107,7 @@ public:
 
 // IGroup
 public:
-	STDMETHOD(get_SubstructureMassEpoxy)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_SubstructureMass)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_SuperstructureMassEpoxy)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_SuperstructureMass)(/*[out, retval]*/ double *pVal);
+   STDMETHOD(get_Quantity)(/*[in]*/MaterialType material, /*[in]*/VARIANT_BOOL bEpoxy, /*[in]*/VARIANT_BOOL bSubstructure, /*[out, retval]*/Float64* pVal);
 	STDMETHOD(get_BarRecords)(/*[out, retval]*/ IBarRecordCollection* *pVal);
 	STDMETHOD(get_Name)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_Name)(/*[in]*/ BSTR newVal);

@@ -31,11 +31,12 @@
 /////////////////////////////////////////////////////////////////////////////
 // CHookData
 
-void CHookData::SetData(HookType hook,UseType use,double T,double Tmin)
+void CHookData::SetData(HookType hook,UseType use,Float64 T,BendMeasureType bm,Float64 Tmin)
 {
    m_HookType = hook;
    m_UseType  = use;
    m_Tail     = T;
+   m_BendMeasure = bm;
    m_MinTail  = Tmin;
 }
 
@@ -53,14 +54,20 @@ STDMETHODIMP CHookData::get_Use(UseType *pVal)
 	return S_OK;
 }
 
-STDMETHODIMP CHookData::get_Tail(double *pVal)
+STDMETHODIMP CHookData::get_Tail(Float64 *pVal)
 {
 	// TODO: Add your implementation code here
    *pVal = m_Tail;
 	return S_OK;
 }
 
-STDMETHODIMP CHookData::get_MinTail(double *pVal)
+STDMETHODIMP CHookData::get_BendMeasure(BendMeasureType* pVal)
+{
+   *pVal = m_BendMeasure;
+   return S_OK;
+}
+
+STDMETHODIMP CHookData::get_MinTail(Float64 *pVal)
 {
 	// TODO: Add your implementation code here
    *pVal = m_MinTail;

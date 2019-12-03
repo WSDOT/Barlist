@@ -45,9 +45,9 @@ void CType71::BuildBend()
 
    UseType use = GetUseType();
 
-   double db;
-   double radius;
-   double nTurns;
+   Float64 db;
+   Float64 radius;
+   Float64 nTurns;
 
    pBarData->get_Diameter( &db );
    radius = (GetU() - db)/2.0;

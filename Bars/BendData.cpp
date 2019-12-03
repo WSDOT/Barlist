@@ -39,9 +39,14 @@ STDMETHODIMP CBendData::get_Use(UseType *pVal)
 	return S_OK;
 }
 
-STDMETHODIMP CBendData::get_InsideDiameter(double *pVal)
+STDMETHODIMP CBendData::get_InsideDiameter(Float64 *pVal)
 {
-	// TODO: Add your implementation code here
    *pVal = m_ID;
 	return S_OK;
+}
+
+STDMETHODIMP CBendData::get_BendMeasure(BendMeasureType* pVal)
+{
+   *pVal = m_BendMeasure;
+   return S_OK;
 }
