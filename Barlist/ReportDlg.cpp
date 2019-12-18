@@ -103,7 +103,7 @@ void CReportDlg::OnClickedPrint()
 {
    // Send the printing command to the main frame and let the
    // command handler deal with it
-   EAFGetMainFrame()->SendMessage(WM_COMMAND, ID_FILE_PRINT);
+   EAFGetMainFrame()->PostMessage(WM_COMMAND, ID_FILE_PRINT);
 }
 
 

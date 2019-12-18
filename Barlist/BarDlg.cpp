@@ -1270,7 +1270,7 @@ void CBarDlg::OnBnClickedSave()
 {
    if (CheckEditState())
    {
-      EAFGetMainFrame()->SendMessage(WM_COMMAND, ID_FILE_SAVE);
+      EAFGetMainFrame()->PostMessage(WM_COMMAND, ID_FILE_SAVE);
    }
 }
 
