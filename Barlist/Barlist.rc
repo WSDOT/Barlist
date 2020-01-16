@@ -80,7 +80,7 @@ BEGIN
             VALUE "FileDescription", "Barlist Module"
             VALUE "FileVersion", "5.2.0.6"
             VALUE "InternalName", "Barlist"
-            VALUE "LegalCopyright", "Copyright © 2009-2019, Washington State Department of Transportation, All Rights Reserved"
+            VALUE "LegalCopyright", "Copyright © 1999-2020, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Barlist.DLL"
             VALUE "ProductName", "Barlist Module"
             VALUE "ProductVersion", "5.2.0.6"
