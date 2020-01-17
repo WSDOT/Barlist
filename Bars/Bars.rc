@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "Bars Module"
             VALUE "FileVersion", "5.1.5.0"
             VALUE "InternalName", "Bars"
-            VALUE "LegalCopyright", "Copyright © 2009-2019, Washington State Department of Transportation, All Rights Reserved"
+            VALUE "LegalCopyright", "Copyright © 1999-2020, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Bars.DLL"
             VALUE "ProductName", "Bars Module"
             VALUE "ProductVersion", "5.1.5.0"
