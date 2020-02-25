@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 5,2,0,8
- PRODUCTVERSION 5,2,0,8
+ FILEVERSION 5,2,0,9
+ PRODUCTVERSION 5,2,0,9
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
             VALUE "Comments", "A member of the Alternate Route Project"
             VALUE "CompanyName", "Washington State Department of Transportation"
             VALUE "FileDescription", "Bars Module"
-            VALUE "FileVersion", "5.2.0.8"
+            VALUE "FileVersion", "5.2.0.9"
             VALUE "InternalName", "Bars"
             VALUE "LegalCopyright", "Copyright © 1999-2020, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Bars.DLL"
             VALUE "ProductName", "Bars Module"
-            VALUE "ProductVersion", "5.2.0.8"
+            VALUE "ProductVersion", "5.2.0.9"
         END
     END
     BLOCK "VarFileInfo"
