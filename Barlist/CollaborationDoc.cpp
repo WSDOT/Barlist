@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,8 @@
 #include "Resource.h"
 #include "CollaborationDoc.h"
 #include "CollaborationManagerDlg.h"
+
+#include "Events.h"
 
 // CCollaborationDoc
 
@@ -242,20 +244,6 @@ void CCollaborationDoc::Merge(IBarlist* pBarlist)
          barRecords->Add(clone);
       }
    }
-
-   Float64 bridge, wall, traffic;
-   m_Barlist->get_BridgeGrateInletQuantity(&bridge);
-   m_Barlist->get_RetainingWallQuantity(&wall);
-   m_Barlist->get_TrafficBarrierQuantity(&traffic);
-
-   Float64 new_bridge, new_wall, new_traffic;
-   pBarlist->get_BridgeGrateInletQuantity(&new_bridge);
-   pBarlist->get_RetainingWallQuantity(&new_wall);
-   pBarlist->get_TrafficBarrierQuantity(&new_traffic);
-
-   m_Barlist->put_BridgeGrateInletQuantity(bridge + new_bridge);
-   m_Barlist->put_RetainingWallQuantity(wall + new_wall);
-   m_Barlist->put_TrafficBarrierQuantity(traffic + new_traffic);
 }
 
 // CCollaborationDoc diagnostics
@@ -289,27 +277,37 @@ void CCollaborationDoc::OnCollaborationManager()
 
 BOOL CCollaborationDoc::EditCollaboration()
 {
-   AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   CCollaborationManagerDlg dlg;
-   dlg.m_vFiles = m_vFiles;
-   if (dlg.DoModal() == IDOK)
-   {
-      m_vFiles = dlg.m_vFiles;
+   BOOL bUpdate = FALSE;
+   { // scoping the managage stage 
+      AFX_MANAGE_STATE(AfxGetStaticModuleState());
+      CCollaborationManagerDlg dlg;
+      dlg.m_vFiles = m_vFiles;
+      if (dlg.DoModal() == IDOK)
+      {
+         m_vFiles = dlg.m_vFiles;
 
-      // Stop listening to events
-      GetBarlistEvents(FALSE);
+         // Stop listening to events
+         GetBarlistEvents(FALSE);
 
-      // Throw out the old barlist
-      m_Barlist.Release();
-      m_Barlist.CoCreateInstance(CLSID_Barlist);
+         // Throw out the old barlist
+         m_Barlist.Release();
+         m_Barlist.CoCreateInstance(CLSID_Barlist);
 
-      // Load the files to create the new barlist
-      LoadFiles();
-      NotifyDuplicateGroups();
+         // Load the files to create the new barlist
+         LoadFiles();
+         NotifyDuplicateGroups();
 
-      // Listen to events
-      GetBarlistEvents(TRUE);
-      return TRUE;
+         // Listen to events
+         GetBarlistEvents(TRUE);
+
+         bUpdate = TRUE;
+      }
    }
-   return FALSE;
+
+   if (bUpdate)
+   {
+      SetModifiedFlag();
+      UpdateAllViews(nullptr, HINT_PROJECT_CHANGED, nullptr); // asserts fire if this is called in the scope of AfxGetStaticModuleState
+   }
+   return bUpdate;
 }

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist - Barlist Extensible Application Framework
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@
 // hot fixes - sometimes there are bugs that need to be fixed and deployed now. That is a hot fix.
 
 #ifndef _BARLIST_VERSION
-#define _BARLIST_VERSION 512 // version 5.1.2
+#define _BARLIST_VERSION 520 // version 5.2.0
 #endif
 
 //#define _BETA_VERSION          // When defined, building beta versions

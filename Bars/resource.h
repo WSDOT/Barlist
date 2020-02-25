@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by Bars.rc
 //
 #define IDS_PROJNAME                    100
@@ -84,6 +84,9 @@
 #define ERR_MUSTBEZEROIFOTHERISZERO     3008
 #define ERR_NOEACHNOTMULTIPLEOFNOREQD   3009
 #define ERR_NUMREQDISZERO               3010
+#define ERR_INVALIDGFRPBEND             3011
+#define ERR_INVALIDGFRPBEND80           3012
+#define ERR_TYPE89_U                    3013
 
 // Next default values for new objects
 // 

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,6 @@
 
 #include "OptionsDlg.h"
 #include "BarDlg.h"
-#include "QNIDlg.h"
 #include "PropertiesDlg.h"
 #include "ReportDlg.h"
 
@@ -53,11 +52,33 @@
 
 #include <fstream>
 
+#include <xalanc/Include/PlatformDefinitions.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/framework/LocalFileInputSource.hpp>
+#include <xalanc/Include/XalanAutoPtr.hpp>
+#include <xalanc/XalanDOM/XalanDocument.hpp>
+#include <xalanc/XalanDOM/XalanElement.hpp>
+#include <xalanc/PlatformSupport/XalanOutputStreamPrintWriter.hpp>
+#include <xalanc/PlatformSupport/XalanStdOutputStream.hpp>
+#include <xalanc/XMLSupport/FormatterToXML.hpp>
+#include <xalanc/XercesParserLiaison/FormatterToXercesDOM.hpp>
+#include <xalanc/XercesParserLiaison/XercesDOMFormatterWalker.hpp>
+#include <xalanc/XalanTransformer/XalanTransformer.hpp>
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+//XALAN_USING_XERCES(DOMDocument)
+
+XALAN_USING_XALAN(XalanCompiledStylesheet)
+XALAN_USING_XALAN(XalanParsedSource)
+XALAN_USING_XALAN(XalanTransformer)
 
 #define MAX_ADDIN_COUNT (LAST_ADDIN_COMMAND - FIRST_ADDIN_COMMAND)
 
@@ -71,7 +92,6 @@ BEGIN_MESSAGE_MAP(CBarlistDoc, CEAFDocument)
    ON_COMMAND(ID_VIEW_OPTIONS,OnViewOptions)
    ON_COMMAND(ID_ADD_GROUP, OnAddGroup)
    ON_COMMAND(IDC_ADD_BAR, OnAddBar)
-   ON_COMMAND(ID_QNI, OnQNI)
    ON_COMMAND(ID_PROPERTIES, OnProperties)
    ON_COMMAND_RANGE(FIRST_ADDIN_COMMAND,LAST_ADDIN_COMMAND,OnAddin)
    //}}AFX_MSG_MAP
@@ -139,7 +159,7 @@ CString FormatLength(Float64 length,bool bUnits)
          int sign = BinarySign(length);
          length = fabs(length);
          long feet = (long)floor(length);
-         double inches = (length-feet)*12;
+         Float64 inches = (length-feet)*12;
          if (IsEqual(inches, 12.0))
          {
             // don't want 6'-12"... make it 7'-0"
@@ -242,6 +262,21 @@ CString FormatStatusMessage(IStatusMessage* pStatusMessage)
 
    return strMsg;
 }
+
+
+
+BOOL LoadXMLResource(int name, int type, DWORD& size, const char*& data)
+{
+#pragma Reminder("UPDATE: add error handling")
+   AFX_MANAGE_STATE(AfxGetStaticModuleState());
+   HMODULE handle = AfxGetResourceHandle();
+   HRSRC rc = ::FindResource(handle, MAKEINTRESOURCE(name), MAKEINTRESOURCE(type));
+   HGLOBAL rcData = ::LoadResource(handle, rc);
+   size = ::SizeofResource(handle, rc);
+   data = static_cast<const char*>(::LockResource(rcData));
+   return TRUE;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarlistDoc construction/destruction
@@ -406,6 +441,8 @@ BOOL CBarlistDoc::OnNewDocument()
 
 BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist)
 {
+   USES_CONVERSION;
+
    CComPtr<IBarlist> barlist;
    if (*ppBarlist == nullptr)
    {
@@ -417,128 +454,200 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
       barlist = *ppBarlist;
    }
 
-   CString strPathName(lpszPathName);
-   std::ifstream ifile(strPathName);
-   if (ifile.fail() || !ifile.is_open())
+   std::auto_ptr<Barlist> barlist_xml;
+   try
    {
-      CString strMsg;
-      strMsg.Format(_T("Unable to open %s."), lpszPathName);
-      AfxMessageBox(strMsg, MB_ICONERROR | MB_OK);
-      return FALSE;
-   }
-   else
-   {
-      std::auto_ptr<BarlistType> barlist_xml;
-      try
+      XALAN_USING_XERCES(XMLPlatformUtils)
+
+      XMLPlatformUtils::Initialize();
+      XalanTransformer::initialize();
+
       {
-         xml_schema::properties props;
-         CEAFApp* pApp = EAFGetApp();
-         CString strSchemaFile(pApp->GetAppLocation());
-         strSchemaFile.Append(_T("Barlist.xsd"));
-         props.no_namespace_schema_location(strSchemaFile.GetBuffer());
-         barlist_xml = Barlist(ifile, 0, props);
-      }
-      catch (const xml_schema::exception& e)
-      {
-         AfxMessageBox(CString(e.what()), MB_OK);
-         return FALSE;
-      }
+         XalanTransformer  theTransformer;
+         const XalanParsedSource* theParsedSource = 0;
 
-      auto properties = barlist_xml->Properties();
-      barlist->put_Project(CComBSTR(properties.Project().c_str()));
-      barlist->put_JobNumber(CComBSTR(properties.JobNumber().c_str()));
-      barlist->put_Engineer(CComBSTR(properties.Engineer().c_str()));
-      barlist->put_Company(CComBSTR(properties.Company().c_str()));
-      barlist->put_Comments(CComBSTR(properties.Comments().c_str()));
+         int theResult = theTransformer.parseSource(lpszPathName, theParsedSource);
 
-      auto qni = barlist_xml->QNI();
-      barlist->put_BridgeGrateInletQuantity(qni.Bridge());
-      barlist->put_RetainingWallQuantity(qni.Wall());
-      barlist->put_TrafficBarrierQuantity(qni.Traffic());
-
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      int nGroups = 0;
-      auto& grps = barlist_xml->Group();
-      for (auto& grp : grps)
-      {
-         groups->Add(CComBSTR(grp.Name().c_str()));
-
-         CComPtr<IGroup> group;
-         groups->get_Item(CComVariant(nGroups++), &group);
-
-         CComPtr<IBarRecordCollection> barRecords;
-         group->get_BarRecords(&barRecords);
-
-         CComPtr<IBarCollection> bars;
-         m_BarInfoMgr->get_Bars(&bars);
-
-         auto& barrecs = grp.BarRecord();
-         for (auto& barrec : barrecs)
+         if (theResult != 0)
          {
-            CComPtr<IBarRecord> barRecord;
-            barRecord.CoCreateInstance(CLSID_BarRecord);
+            CString strMsg;
+            strMsg.Format(_T("Error parsing source document: %s"), A2T(theTransformer.getLastError()));
+            AfxMessageBox(strMsg);
+            return FALSE;
+         }
+         else
+         {
+            ATLASSERT(theParsedSource != 0);
 
-            CComPtr<IBarData> barData;
-            bars->get_Item(CComVariant(barrec.Size().c_str()), &barData);
-            barRecord->put_BarData(barData);
+            const XalanCompiledStylesheet*  theCompiledStylesheet = 0;
 
-            barRecord->put_Mark(CComBSTR(barrec.Mark().c_str()));
-            barRecord->put_Location(CComBSTR(barrec.Location().c_str()));
-            barRecord->put_NumReqd((long)barrec.NoReqd());
-
-            UseType use = (UseType)barrec.Use();
-            barRecord->put_Use(use);
-
-
-            LCID lcid = 0x0409; // US English
-            VARIANT_BOOL vbLumpSum;
-            VarBoolFromStr(CComBSTR(barrec.LumpSum().c_str()), lcid, VAR_LOCALBOOL, &vbLumpSum);
-            barRecord->put_LumpSum(vbLumpSum);
-
-            VARIANT_BOOL vbSubstructure;
-            VarBoolFromStr(CComBSTR(barrec.Substructure().c_str()), lcid, VAR_LOCALBOOL, &vbSubstructure);
-            barRecord->put_Substructure(vbSubstructure);
-
-            VARIANT_BOOL vbEpoxy;
-            VarBoolFromStr(CComBSTR(barrec.Epoxy().c_str()), lcid, VAR_LOCALBOOL, &vbEpoxy);
-            barRecord->put_Epoxy(vbEpoxy);
-
-            CComPtr<IBend> primaryBend;
-            CBendFactory::CreateBend((long)barrec.BendType(), &primaryBend);
-            auto& primaryBendDimensions = barrec.PrimaryBend();
-            primaryBend->put_U(primaryBendDimensions.U());
-            primaryBend->put_W(primaryBendDimensions.W());
-            primaryBend->put_X(primaryBendDimensions.X());
-            primaryBend->put_Y(primaryBendDimensions.Y());
-            primaryBend->put_Z(primaryBendDimensions.Z());
-            primaryBend->put_T1(primaryBendDimensions.T1());
-            primaryBend->put_T2(primaryBendDimensions.T2());
-            barRecord->put_PrimaryBend(primaryBend);
-
-            VARIANT_BOOL vbVaries;
-            VarBoolFromStr(CComBSTR(barrec.Varies().c_str()), 0x0409, VAR_LOCALBOOL, &vbVaries);
-            if (vbVaries == VARIANT_TRUE)
+            const char* lpstrXSLT = nullptr;
+            DWORD size = 0;
+#pragma Reminder("UPDATE: add error handling")
+            if (!LoadXMLResource(IDR_BARLIST_10_TO_20_XSLT, XSLTFILE, size, lpstrXSLT))
             {
-               CComPtr<IBend> variesBend;
-               CBendFactory::CreateBend((long)barrec.BendType(), &variesBend);
-               auto& variesBendDimensions = barrec.VariesBend();
-               ATLASSERT(variesBendDimensions.present());
-               variesBend->put_U(variesBendDimensions.get().U());
-               variesBend->put_W(variesBendDimensions.get().W());
-               variesBend->put_X(variesBendDimensions.get().X());
-               variesBend->put_Y(variesBendDimensions.get().Y());
-               variesBend->put_Z(variesBendDimensions.get().Z());
-               variesBend->put_T1(variesBendDimensions.get().T1());
-               variesBend->put_T2(variesBendDimensions.get().T2());
-               barRecord->put_VariesBend(variesBend);
-
-               barRecord->put_NumEach((long)barrec.NoEach());
+               AfxMessageBox(_T("Error loading XSL Transform resource"));
+               return FALSE;
             }
 
+            std::string strXSLT(lpstrXSLT, size);
+            std::istringstream xsltStream(strXSLT);
 
-            barRecords->Add(barRecord);
+            theResult = theTransformer.compileStylesheet(xsltStream, theCompiledStylesheet);
+            // Note: create multiple XalanTransformer objects, one for each transformation
+            // Version 1.0 -> Version 2.0
+            // Version 2.0 -> Version 2.1
+            // etc
+
+            if (theResult != 0)
+            {
+               CString strMsg;
+               strMsg.Format(_T("Error compiling stylesheet: %s"), A2T(theTransformer.getLastError()));
+               AfxMessageBox(strMsg);
+               return FALSE;
+            }
+            else
+            {
+               XALAN_USING_XERCES(DOMDocument)
+               XALAN_USING_XERCES(DOMImplementation)
+               XALAN_USING_XALAN(FormatterToXercesDOM)
+               XALAN_USING_XALAN(XalanAutoPtr)
+
+               // This is the document which we'll build...
+               const XalanAutoPtr<DOMDocument>     theDocument(DOMImplementation::getImplementation()->createDocument());
+               ATLASSERT(theDocument.get() != nullptr);
+
+               // This is a class derived from FormatterListener, which
+               // we'll hook up to Xalan's output stage...
+               FormatterToXercesDOM    theFormatter(theDocument.get(), 0);
+
+               // Do the transformation...
+               int     theResult =
+                  theTransformer.transform(
+                     *theParsedSource,
+                     theCompiledStylesheet,
+                     theFormatter);
+               // NOTE: do the transformation for each transformer
+
+               if (theResult != 0)
+               {
+                  CString strMsg;
+                  strMsg.Format(_T("Error transforming: %s"), theTransformer.getLastError());
+                  AfxMessageBox(strMsg);
+                  return FALSE;
+               }
+               else
+               {
+                  // Now that theDocument has been converted to the latest format
+                  // create the C++ binding
+                  xml_schema::properties props;
+                  CEAFApp* pApp = EAFGetApp();
+                  CString strSchemaFile(pApp->GetAppLocation());
+                  strSchemaFile.Append(_T("Barlist.xsd"));
+                  props.no_namespace_schema_location(strSchemaFile.GetBuffer());
+                  barlist_xml = Barlist_(*theDocument.get()/*lpszPathName*/, 0, props);
+               }
+            }
          }
+      }
+      XalanTransformer::terminate();
+      XMLPlatformUtils::Terminate();
+   }
+   catch (const xml_schema::exception& e)
+   {
+      AfxMessageBox(CString(e.what()), MB_OK);
+      return FALSE;
+   }
+
+   auto properties = barlist_xml->Properties();
+   barlist->put_Project(CComBSTR(properties.Project().c_str()));
+   barlist->put_JobNumber(CComBSTR(properties.JobNumber().c_str()));
+   barlist->put_Engineer(CComBSTR(properties.Engineer().c_str()));
+   barlist->put_Company(CComBSTR(properties.Company().c_str()));
+   barlist->put_Comments(CComBSTR(properties.Comments().c_str()));
+
+   CComPtr<IGroupCollection> groups;
+   barlist->get_Groups(&groups);
+   int nGroups = 0;
+   auto& grps = barlist_xml->Group();
+   for (auto& grp : grps)
+   {
+      groups->Add(CComBSTR(grp.Name().c_str()));
+
+      CComPtr<IGroup> group;
+      groups->get_Item(CComVariant(nGroups++), &group);
+
+      CComPtr<IBarRecordCollection> barRecords;
+      group->get_BarRecords(&barRecords);
+
+      auto& barrecs = grp.BarRecord();
+      for (auto& barrec : barrecs)
+      {
+         CComPtr<IBarRecord> barRecord;
+         barRecord.CoCreateInstance(CLSID_BarRecord);
+
+         MaterialType material = (MaterialType)(BarRecordType::Material_type::value)barrec.Material();
+
+         CComPtr<IBarCollection> bars;
+         m_BarInfoMgr->get_Bars(material, &bars);
+
+         CComPtr<IBarData> barData;
+         bars->get_Item(CComVariant(barrec.Size().c_str()), &barData);
+         barRecord->put_BarData(barData);
+
+         barRecord->put_Material(material);
+
+         barRecord->put_Mark(CComBSTR(barrec.Mark().c_str()));
+         barRecord->put_Location(CComBSTR(barrec.Location().c_str()));
+         barRecord->put_NumReqd((long)barrec.NoReqd());
+
+         UseType use = (UseType)barrec.Use();
+         barRecord->put_Use(use);
+
+
+         LCID lcid = 0x0409; // US English
+         VARIANT_BOOL vbSubstructure;
+         VarBoolFromStr(CComBSTR(barrec.Substructure().c_str()), lcid, VAR_LOCALBOOL, &vbSubstructure);
+         barRecord->put_Substructure(vbSubstructure);
+
+         VARIANT_BOOL vbEpoxy;
+         VarBoolFromStr(CComBSTR(barrec.Epoxy().c_str()), lcid, VAR_LOCALBOOL, &vbEpoxy);
+         barRecord->put_Epoxy(vbEpoxy);
+
+         CComPtr<IBend> primaryBend;
+         CBendFactory::CreateBend((long)barrec.BendType(), &primaryBend);
+         auto& primaryBendDimensions = barrec.PrimaryBend();
+         primaryBend->put_U(primaryBendDimensions.U());
+         primaryBend->put_W(primaryBendDimensions.W());
+         primaryBend->put_X(primaryBendDimensions.X());
+         primaryBend->put_Y(primaryBendDimensions.Y());
+         primaryBend->put_Z(primaryBendDimensions.Z());
+         primaryBend->put_T1(primaryBendDimensions.T1());
+         primaryBend->put_T2(primaryBendDimensions.T2());
+         barRecord->put_PrimaryBend(primaryBend);
+
+         VARIANT_BOOL vbVaries;
+         VarBoolFromStr(CComBSTR(barrec.Varies().c_str()), 0x0409, VAR_LOCALBOOL, &vbVaries);
+         if (vbVaries == VARIANT_TRUE)
+         {
+            CComPtr<IBend> variesBend;
+            CBendFactory::CreateBend((long)barrec.BendType(), &variesBend);
+            auto& variesBendDimensions = barrec.VariesBend();
+            ATLASSERT(variesBendDimensions.present());
+            variesBend->put_U(variesBendDimensions.get().U());
+            variesBend->put_W(variesBendDimensions.get().W());
+            variesBend->put_X(variesBendDimensions.get().X());
+            variesBend->put_Y(variesBendDimensions.get().Y());
+            variesBend->put_Z(variesBendDimensions.get().Z());
+            variesBend->put_T1(variesBendDimensions.get().T1());
+            variesBend->put_T2(variesBendDimensions.get().T2());
+            barRecord->put_VariesBend(variesBend);
+
+            barRecord->put_NumEach((long)barrec.NoEach());
+         }
+
+
+         barRecords->Add(barRecord);
       }
    }
    return TRUE;
@@ -592,19 +701,7 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
       m_Barlist->get_Comments(&bstr);
       properties.Comments() = OLE2T(bstr);
 
-      // Quantities not included
-      QNIType qni(0, 0, 0);
-      Float64 value;
-      m_Barlist->get_BridgeGrateInletQuantity(&value);
-      qni.Bridge() = value;
-
-      m_Barlist->get_RetainingWallQuantity(&value);
-      qni.Wall() = value;
-
-      m_Barlist->get_TrafficBarrierQuantity(&value);
-      qni.Traffic() = value;
-
-      BarlistType barlist(qni,properties);
+      Barlist barlist(properties);
 
       CComPtr<IGroupCollection> groups;
       m_Barlist->get_Groups(&groups);
@@ -629,6 +726,10 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
             CComPtr<IBarRecord> pBar;
             bars->get_Item(CComVariant(barIdx), &pBar);
 
+            MaterialType material;
+            pBar->get_Material(&material);
+            BarRecordType::Material_type mat((BarRecordType::Material_type::value)material);
+
             pBar->get_Mark(&bstr);
             BarRecordType::Mark_type mark = OLE2T(bstr);
 
@@ -645,13 +746,11 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
             pBar->get_BendType(&lValue);
             BarRecordType::BendType_type bendType = lValue;
 
-            BarRecordType::Use_type use;
-            pBar->get_Use((UseType*)&use);
+            UseType bar_usage;
+            pBar->get_Use(&bar_usage);
+            BarRecordType::Use_type use((BarRecordType::Use_type)bar_usage);
 
             VARIANT_BOOL vb;
-            pBar->get_LumpSum(&vb);
-            BarRecordType::LumpSum_type lumpSum(vb == VARIANT_TRUE ? _T("True") : _T("False"));
-
             pBar->get_Substructure(&vb);
             BarRecordType::Substructure_type substructure(vb == VARIANT_TRUE ? _T("True") : _T("False"));
 
@@ -679,7 +778,7 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
             BarRecordType::PrimaryBend_type primaryBend(u, w, x, y, z, t1, t2);
 
 
-            BarRecordType barRecord(mark, location, size, nReqd, bendType, use, lumpSum, substructure, epoxy, varies, nEach, primaryBend);
+            BarRecordType barRecord(mat, mark, location, size, nReqd, bendType, use, substructure, epoxy, varies, nEach, primaryBend);
 
             if (vbVaries == VARIANT_TRUE)
             {
@@ -704,7 +803,7 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
       // the no_xml_declaration flag prevents the <?xml...?> processing instruction from being written at the top of the
       // file. the processing instruction was not used in version 4 so we will skip it here so previous versions can open files
       // created with this version
-      Barlist(ofile, barlist, xml_schema::namespace_infomap(), _T("UTF-8"), xml_schema::flags::no_xml_declaration);
+      Barlist_(ofile, barlist, xml_schema::namespace_infomap(), _T("UTF-8"), xml_schema::flags::no_xml_declaration);
 
       return TRUE;
    }
@@ -861,23 +960,6 @@ void CBarlistDoc::EditBar(long groupIdx, long barIdx)
    dlg.DoModal();
 }
 
-void CBarlistDoc::OnQNI()
-{
-   AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   CQNIDlg dlg;
-   m_Barlist->get_BridgeGrateInletQuantity(&dlg.m_Bridge);
-   m_Barlist->get_TrafficBarrierQuantity(&dlg.m_Traffic);
-   m_Barlist->get_RetainingWallQuantity(&dlg.m_Wall);
-   if (dlg.DoModal() == IDOK)
-   {
-      m_Barlist->put_BridgeGrateInletQuantity(dlg.m_Bridge);
-      m_Barlist->put_TrafficBarrierQuantity(dlg.m_Traffic);
-      m_Barlist->put_RetainingWallQuantity(dlg.m_Wall);
-      SetModifiedFlag();
-   }
-}
-
-
 void CBarlistDoc::OnProperties()
 {
    bool bUpdate = false;
@@ -1020,30 +1102,30 @@ void CBarlistDoc::CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const
    CComPtr<IBarRecord> clone;
    clone.CoCreateInstance(CLSID_BarRecord);
 
+   MaterialType material;
    CComBSTR bstrMark;
    CComBSTR bstrLocation;
    long nReqd;
    long nEach;
    UseType use;
-   VARIANT_BOOL vbLumpSum;
    VARIANT_BOOL vbSubstructure;
    VARIANT_BOOL vbEpoxy;
    VARIANT_BOOL vbVaries;
+   pSource->get_Material(&material);
    pSource->get_Mark(&bstrMark);
    pSource->get_Location(&bstrLocation);
    pSource->get_NumReqd(&nReqd);
    pSource->get_Use(&use);
-   pSource->get_LumpSum(&vbLumpSum);
    pSource->get_Substructure(&vbSubstructure);
    pSource->get_Epoxy(&vbEpoxy);
    pSource->get_Varies(&vbVaries);
    pSource->get_NumEach(&nEach);
 
+   clone->put_Material(material);
    clone->put_Mark(bstrMark);
    clone->put_Location(bstrLocation);
    clone->put_NumReqd(nReqd);
    clone->put_Use(use);
-   clone->put_LumpSum(vbLumpSum);
    clone->put_Substructure(vbSubstructure);
    clone->put_Epoxy(vbEpoxy);
    clone->put_NumEach(nEach);
@@ -1113,13 +1195,6 @@ CReport& CBarlistDoc::GetReport()
       m_bDirtyReport = false;
    }
    return m_Report;
-}
-
-STDMETHODIMP CBarlistDoc::XEvents::OnNotIncludedQuantitiesChanged()
-{
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   return S_OK;
 }
 
 STDMETHODIMP CBarlistDoc::XEvents::OnGroupAdded(IGroup* pGroup)

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -39,18 +39,18 @@
 class CHookComponent : public CBarComponent  
 {
 public:
-	CHookComponent(double radius,double tail);
+	CHookComponent(Float64 radius,Float64 tail);
 	virtual ~CHookComponent();
 
 protected:
-   double m_Radius;
-   double m_Tail;
+   Float64 m_Radius;
+   Float64 m_Tail;
 };
 
 class CHook90 : public CHookComponent
 {
 public:
-   CHook90(double radius,double tail);
+   CHook90(Float64 radius,Float64 tail);
    ~CHook90();
 
 protected:
@@ -60,7 +60,7 @@ protected:
 class CHook135 : public CHookComponent
 {
 public:
-   CHook135(double radius,double tail);
+   CHook135(Float64 radius,Float64 tail);
    ~CHook135();
 
 protected:
@@ -70,7 +70,7 @@ protected:
 class CHook180 : public CHookComponent
 {
 public:
-   CHook180(double radius,double tail);
+   CHook180(Float64 radius,Float64 tail);
    ~CHook180();
 
 protected:

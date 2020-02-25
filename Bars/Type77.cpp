@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -50,15 +50,15 @@ void CType77::BuildBend()
    // Error check data
 
    // Build the bend
-   double oRadius; // outside radius
-   double cRadius; // centerline radius
-   double hRadius; // radius of hook
-   double tail;
-   double deduct90_1;
-   double deduct90_2;
-   double deductHook_1;
-   double deductHook_2;
-   double u, w, x; // reduced dimensions (wx is the hypotenous)
+   Float64 oRadius; // outside radius
+   Float64 cRadius; // centerline radius
+   Float64 hRadius; // radius of hook
+   Float64 tail;
+   Float64 deduct90_1;
+   Float64 deduct90_2;
+   Float64 deductHook_1;
+   Float64 deductHook_2;
+   Float64 u, w, x; // reduced dimensions (wx is the hypotenous)
 
    oRadius = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
    cRadius = CFabricationConstraints::GetCenterlineBendRadius( pBarData, use );

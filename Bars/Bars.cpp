@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -207,7 +207,7 @@ STDAPI DllRegisterServer(void)
    CATEGORYINFO CatInfo;
    CatInfo.catid = CATID_BarlistAddin;
    CatInfo.lcid = LOCALE_SYSTEM_DEFAULT;
-   wcscpy(CatInfo.szDescription,L"Barlist Addin Component");
+   wcscpy_s(CatInfo.szDescription,_countof(CatInfo.szDescription),L"BarList Addin Component");
 
    // Register the category
    hr = pICatReg->RegisterCategories(1,&CatInfo);

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -48,11 +48,11 @@ private:
    void ReportBarRecord(IBarRecord* pBarRecord);
    CString ReportBend(IBend* pBend, bool bVaries);
    void ReportErrors(IBend* pBend);
-   void ReportQNI(IBarlist* pBarlist);
    void ReportSummary(IBarlist* pBarlist);
 
-   TCHAR CReport::GetUse(UseType use);
+   TCHAR GetUse(UseType use);
    TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c);
+   CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
 
    std::vector<CString> m_vReportLines;
 
@@ -64,9 +64,9 @@ private:
 
    CFont m_Font;
    CFont* m_pOldFont;
-   LONG m_hLine;
-   LONG m_nHeaderLines;
-   LONG m_nLinesPerPage;
+   long m_hLine;
+   long m_nHeaderLines;
+   long m_nLinesPerPage;
    CRect m_Border;
    CRect m_Rect;
 };

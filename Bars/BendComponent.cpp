@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -36,7 +36,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBendComponent::CBendComponent(double radius,double angle) :
+CBendComponent::CBendComponent(Float64 radius,Float64 angle) :
 CBarComponent(),
 m_Radius(radius),
 m_Angle(angle)
@@ -50,14 +50,14 @@ CBendComponent::~CBendComponent()
 
 bool CBendComponent::BuildComponent()
 {
-   double nTurns = m_Angle / TWO_PI;
+   Float64 nTurns = m_Angle / TWO_PI;
 
    AddBarComponent( new CHelixComponent(m_Radius,nTurns) );
    return true;
 }
 
 ///////////////////////////////////////////////////////////////////////
-CBend90::CBend90(double radius) :
+CBend90::CBend90(Float64 radius) :
 CBendComponent(radius, PI_OVER_2 )
 {
 }

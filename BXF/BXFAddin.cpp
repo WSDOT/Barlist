@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // BXF - Barlist Exchange File
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,83 @@
 CBXFApp theApp;
 CComModule _Module;
 CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
+
+inline bool IsA706(MaterialType material) { return (int)A706_Grade60 <= (int)material && (int)material <= (int)A706_Grade80; }
+inline bool IsMMFX(MaterialType material) { return (int)A1035_Grade100 <= (int)material && (int)material <= (int)A1035_Grade120; }
+inline bool IsGalvanized(MaterialType material) { return (int)A767_A1094_Grade60 <= (int)material && (int)material <= (int)A767_A1094_Grade100; }
+inline bool IsStainless(MaterialType material) { return (int)A955_Grade60 <= (int)material && (int)material <= (int)A955_Grade80; }
+inline bool IsGFRP(MaterialType materialType) { return (int)D7957 == (int)materialType; }
+
+CString GetMaterialDesignation(MaterialType material)
+{
+   if (IsA706(material))
+   {
+      return _T("  ");
+   }
+   else if (IsMMFX(material))
+   {
+      return _T("CR");
+   }
+   else if (IsGalvanized(material))
+   {
+      return _T("G ");
+   }
+   else if (IsStainless(material))
+   {
+      return _T("SS");
+   }
+   else if (IsGFRP(material))
+   {
+      return _T("GF");
+   }
+
+   ATLASSERT(false);// is there a new type?
+   return _T("??");
+}
+
+CString GetMaterialGrade(MaterialType material)
+{
+   eafTypes::UnitMode unitMode = EAFGetApp()->GetUnitsMode();
+   CString strGrade;
+   switch (material)
+   {
+   case A706_Grade60:
+   case A767_A1094_Grade60:
+   case A955_Grade60:
+      strGrade = (unitMode == eafTypes::umUS ? _T("  ") : _T("41"));
+      break;
+
+   case A955_Grade75:
+      strGrade = (unitMode == eafTypes::umUS ? _T("75") : _T("52"));
+      break;
+
+   case A706_Grade80:
+   case A767_A1094_Grade80:
+   case A955_Grade80:
+      strGrade = (unitMode == eafTypes::umUS ? _T("80") : _T("55"));
+      break;
+
+   case A1035_Grade100:
+   case A767_A1094_Grade100:
+      strGrade = (unitMode == eafTypes::umUS ? _T("1X") : _T("69"));
+      break;
+
+   case A1035_Grade120:
+      strGrade = (unitMode == eafTypes::umUS ? _T("12") : _T("83"));
+      break;
+
+   case D7957:
+      strGrade = _T("  ");
+      break;
+
+   default:
+      ATLASSERT(false); // is there a new material
+      strGrade = _T("??");
+   }
+
+   return strGrade;
+}
+
 
 BEGIN_OBJECT_MAP(ObjectMap)
    OBJECT_ENTRY(CLSID_BXFAddin, CBXFAddin)
@@ -365,45 +442,32 @@ void CBXFAddin::ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord)
    UseType use;
    pBarRecord->get_Use(&use);
 
-   VARIANT_BOOL vbLumpSum;
-   pBarRecord->get_LumpSum(&vbLumpSum);
-
    VARIANT_BOOL vbSubstructure;
    pBarRecord->get_Substructure(&vbSubstructure);
 
    VARIANT_BOOL vbEpoxy;
    pBarRecord->get_Epoxy(&vbEpoxy);
 
+   MaterialType material;
+   pBarRecord->get_Material(&material);
+
    VARIANT_BOOL vbVaries;
    pBarRecord->get_Varies(&vbVaries);
 
    strBarRecord.Format(_T("%4s %-28s %2s "), OLE2T(bstrMark), OLE2T(bstrLocation), strSize);
    CString strNumReqd;
-   if (vbLumpSum == VARIANT_TRUE)
-   {
-      strNumReqd.Format(_T("%4s "), _T("$"));
-   }
-   else
-   {
-      strNumReqd.Format(_T("%4d "), nReqd);
-   }
+   strNumReqd.Format(_T("%4d "), nReqd);
+
    CString strRestOfBarRecord;
-   strRestOfBarRecord.Format(_T("%2d %c %c %c %c %c "), bendType, GetUse(use), GetFlag(vbLumpSum, 'L'), GetFlag(vbSubstructure, 'S'), GetFlag(vbEpoxy, 'E'), GetFlag(vbVaries, 'V'));
+   strRestOfBarRecord.Format(_T("%2d %c %c %4s %c "), bendType, GetUse(use), GetFlag(vbSubstructure, 'S'), GetMaterial(material, vbEpoxy), GetFlag(vbVaries, 'V'));
    strBarRecord += strNumReqd + strRestOfBarRecord;
 
    if (vbVaries == VARIANT_TRUE)
    {
       CString strEach;
-      if (vbLumpSum == VARIANT_TRUE)
-      {
-         strEach.Format(_T("%2s "), _T("$"));
-      }
-      else
-      {
-         long nEach;
-         pBarRecord->get_NumEach(&nEach);
-         strEach.Format(_T("%2d "), nEach);
-      }
+      long nEach;
+      pBarRecord->get_NumEach(&nEach);
+      strEach.Format(_T("%2d "), nEach);
       strBarRecord += strEach;
    }
    else
@@ -413,7 +477,7 @@ void CBXFAddin::ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord)
 
    CComPtr<IBend> primaryBend;
    pBarRecord->get_PrimaryBend(&primaryBend);
-   strBarRecord += ReportBend(primaryBend, false, vbLumpSum == VARIANT_TRUE ? true : false);
+   strBarRecord += ReportBend(primaryBend, false);
 
    Float64 mass;
    pBarRecord->get_Mass(&mass);
@@ -426,7 +490,7 @@ void CBXFAddin::ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord)
    if (vbVaries == VARIANT_TRUE)
    {
       pBarRecord->get_VariesBend(&variesBend);
-      CString strVariesBend = ReportBend(variesBend, true, vbLumpSum == VARIANT_TRUE ? true : false);
+      CString strVariesBend = ReportBend(variesBend, true);
       strVariesBend += _T("\n");
       pFile->WriteString(strVariesBend);
    }
@@ -435,13 +499,13 @@ void CBXFAddin::ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord)
    ReportErrors(pFile,variesBend);
 }
 
-CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
+CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
 {
    CString strBend;
 
    if (bVaries)
    {
-      strBend.Format(_T("%58s"), _T(" "));
+      strBend.Format(_T("%59s"), _T(" "));
    }
 
    long bendType;
@@ -458,17 +522,11 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
 
    CString strLengthSpace(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("  ") : _T(" "));
    CString strSkipLength(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("       ") : _T("        "));
-   CString strLumpSum(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T(" $     ") : _T(" $    $ "));
-   CString strLumpSumTotalLength(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T(" $   ") : _T(" $  $"));
 
    if (90 <= bendType && bendType <= 99)
    {
       // leave U field blank for Type 90-99 bends
       strBend += strLengthSpace + strSkipLength;
-   }
-   else if (bLumpSum)
-   {
-      strBend += strLengthSpace + strLumpSum;
    }
    else
    {
@@ -478,7 +536,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
 
    VARIANT_BOOL vbSupported;
    pBend->get_SupportsDimension(dimW, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + (bLumpSum ? strLumpSum : FormatLength(w, true, false))) : strLengthSpace + strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + FormatLength(w, true, false)) : strLengthSpace + strSkipLength;
 
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
@@ -486,7 +544,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
    }
 
    pBend->get_SupportsDimension(dimX, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? ((bLumpSum ? strLumpSum : FormatLength(x, true, false))) : strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? FormatLength(x, true, false) : strSkipLength;
 
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
@@ -494,7 +552,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
    }
 
    pBend->get_SupportsDimension(dimY, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? ((bLumpSum ? strLumpSum : FormatLength(y, true, false))) : strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? FormatLength(y, true, false) : strSkipLength;
 
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
@@ -502,7 +560,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
    }
 
    pBend->get_SupportsDimension(dimZ, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? ((bLumpSum ? strLumpSum : FormatLength(z, true, false))) : strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? FormatLength(z, true, false) : strSkipLength;
 
    CEAFApp* pApp = EAFGetApp();
    const auto* pDisplayUnits = pApp->GetDisplayUnits();
@@ -511,14 +569,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
    if (vbSupported == VARIANT_TRUE)
    {
       CString strT1;
-      if (bLumpSum)
-      {
-         strT1.Format(_T(" %3s"), _T("$"));
-      }
-      else
-      {
-         strT1.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t1, pDisplayUnits->Angle.UnitOfMeasure));
-      }
+      strT1.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t1, pDisplayUnits->Angle.UnitOfMeasure));
       strBend += strT1;
    }
    else
@@ -530,14 +581,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
    if (vbSupported == VARIANT_TRUE)
    {
       CString strT2;
-      if (bLumpSum)
-      {
-         strT2.Format(_T(" %3s"), _T("$"));
-      }
-      else
-      {
-         strT2.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t2, pDisplayUnits->Angle.UnitOfMeasure));
-      }
+      strT2.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t2, pDisplayUnits->Angle.UnitOfMeasure));
       strBend += strT2;
    }
    else
@@ -547,7 +591,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries, bool bLumpSum)
 
    Float64 length;
    pBend->get_Length(&length);
-   strBend += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T(" ") : _T("  ")) + (bLumpSum ? strLumpSumTotalLength : FormatLength(length, false, false));
+   strBend += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T(" ") : _T("  ")) + FormatLength(length, false, false);
 
    return strBend;
 }
@@ -575,4 +619,19 @@ void CBXFAddin::ReportErrors(CStdioFile* pFile,IBend* pBend)
          }
       }
    }
+}
+
+CString CBXFAddin::GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy)
+{
+   CString strMaterial;
+   if (vbEpoxy == VARIANT_TRUE)
+   {
+      strMaterial.Format(_T("%2s%2s"), GetMaterialDesignation(material), GetMaterialGrade(material));
+      strMaterial.SetAt(0, _T('E'));
+   }
+   else
+   {
+      strMaterial.Format(_T("%2s%2s"), GetMaterialDesignation(material), GetMaterialGrade(material));
+   }
+   return strMaterial;
 }

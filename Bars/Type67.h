@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -53,31 +53,31 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 //END_COM_MAP()
 
 protected:
-   void BuildBend();
-   void PreValidateBend();
-   void PostValidateBend();
+   virtual void BuildBend() override;
+   virtual void PreValidateBend() override;
+   virtual void PostValidateBend() override;
 
 // IBend
 public:
 	// STDMETHOD(get_BarRecord)(/*[out, retval]*/ IBarRecord* *pVal);
 	// STDMETHOD(put_BarRecord)(/*[in]*/ IBarRecord* newVal);
-   // STDMETHOD(get_U)(/*[out,retval]*/ double* pVal);
-   // STDMETHOD(put_U)(/*[in]*/ double newVal);
-   // STDMETHOD(get_W)(/*[out,retval]*/ double* pVal);
-   // STDMETHOD(put_W)(/*[in]*/ double newVal);
-   // STDMETHOD(get_X)(/*[out,retval]*/ double* pVal);
-   // STDMETHOD(put_X)(/*[in]*/ double newVal);
-   // STDMETHOD(get_Y)(/*[out,retval]*/ double* pVal);
-   // STDMETHOD(put_Y)(/*[in]*/ double newVal);
-   // STDMETHOD(get_Z)(/*[out,retval]*/ double* pVal);
-   // STDMETHOD(put_Z)(/*[in]*/ double newVal);
-   // STDMETHOD(get_T1)(/*[out,retval]*/ double* pVal);
-   // STDMETHOD(put_T1)(/*[in]*/ double newVal);
-   // STDMETHOD(get_T2)(/*[out,retval]*/ double* pVal);
-   // STDMETHOD(put_T2)(/*[in]*/ double newVal);
+   // STDMETHOD(get_U)(/*[out,retval]*/ Float64* pVal);
+   // STDMETHOD(put_U)(/*[in]*/ Float64 newVal);
+   // STDMETHOD(get_W)(/*[out,retval]*/ Float64* pVal);
+   // STDMETHOD(put_W)(/*[in]*/ Float64 newVal);
+   // STDMETHOD(get_X)(/*[out,retval]*/ Float64* pVal);
+   // STDMETHOD(put_X)(/*[in]*/ Float64 newVal);
+   // STDMETHOD(get_Y)(/*[out,retval]*/ Float64* pVal);
+   // STDMETHOD(put_Y)(/*[in]*/ Float64 newVal);
+   // STDMETHOD(get_Z)(/*[out,retval]*/ Float64* pVal);
+   // STDMETHOD(put_Z)(/*[in]*/ Float64 newVal);
+   // STDMETHOD(get_T1)(/*[out,retval]*/ Float64* pVal);
+   // STDMETHOD(put_T1)(/*[in]*/ Float64 newVal);
+   // STDMETHOD(get_T2)(/*[out,retval]*/ Float64* pVal);
+   // STDMETHOD(put_T2)(/*[in]*/ Float64 newVal);
    // STDMETHOD(get_Status)(/*[out,retval]*/ StatusType* pVal);
    // STDMETHOD(get_StatusMsg)(/*[out,retval]*/ BSTR* pVal);
-   // STDMETHOD(get_Length)(/*[out,retval]*/ double* pVal);
+   // STDMETHOD(get_Length)(/*[out,retval]*/ Float64* pVal);
 	// STDMETHOD(get_BendType)(/*[out, retval]*/ long *pVal);
 };
 

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -32,6 +32,7 @@
 #include "BarsCP.h"
 #include <set>
 #include <string>
+#include <array>
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarlist
@@ -51,14 +52,10 @@ public:
    m_Company(""),
    m_Comments("")
 	{
-      m_RetainingWall    = 0;
-      m_BridgeGrateInlet = 0;
-      m_TrafficBarrier   = 0;
-
-      m_SubstructureMass = 0;
-      m_SubstructureMassEpoxy = 0;
-      m_SuperstructureMass = 0;
-      m_SuperstructureMassEpoxy = 0;
+      m_Substructure.fill(0);
+      m_SubstructureEpoxy.fill(0);
+      m_Superstructure.fill(0);
+      m_SuperstructureEpoxy.fill(0);
 
       m_Status = stOK;
 	}
@@ -135,13 +132,13 @@ private:
    CComPtr<IGroupCollection> m_Groups;
    DWORD m_GroupCookie;
 
-   double m_RetainingWall;
-   double m_BridgeGrateInlet;
-   double m_TrafficBarrier;
-   double m_SubstructureMass;
-   double m_SubstructureMassEpoxy;
-   double m_SuperstructureMass;
-   double m_SuperstructureMassEpoxy;
+   // array index is MaterialType
+   // quantities are mass/weight in all cases
+   // except D7957 (GFRP) in which case the quantity is length
+   std::array<Float64, 16> m_Substructure;
+   std::array<Float64, 16> m_SubstructureEpoxy;
+   std::array<Float64, 16> m_Superstructure;
+   std::array<Float64, 16> m_SuperstructureEpoxy;
 
    StatusType m_Status;
 
@@ -159,17 +156,9 @@ private:
 
 // IBarlist
 public:
-	STDMETHOD(get_SubstructureMassEpoxy)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_SubstructureMass)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_SuperstructureMassEpoxy)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_SuperstructureMass)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_RetainingWallQuantity)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(put_RetainingWallQuantity)(/*[in]*/ double newVal);
-	STDMETHOD(get_BridgeGrateInletQuantity)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(put_BridgeGrateInletQuantity)(/*[in]*/ double newVal);
-	STDMETHOD(get_TrafficBarrierQuantity)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(put_TrafficBarrierQuantity)(/*[in]*/ double newVal);
-	STDMETHOD(get_Groups)(/*[out, retval]*/ IGroupCollection* *pVal);
+   STDMETHOD(get_Quantity)(/*[in]*/MaterialType material, /*[in]*/VARIANT_BOOL bEpoxy, /*[in]*/VARIANT_BOOL bSubstructure, /*[out, retval]*/Float64* pVal);
+   STDMETHOD(get_Groups)(/*[out, retval]*/ IGroupCollection* *pVal);
+
 public :
 	STDMETHOD(get_Comments)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_Comments)(/*[in]*/ BSTR newVal);

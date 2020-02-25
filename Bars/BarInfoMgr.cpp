@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -34,18 +34,39 @@
 HRESULT CBarInfoMgr::FinalConstruct()
 {
    // Instantiate the collection of bars
+
+   // Steel Bars
    CComObject<CBarCollection>* pBars;
    HRESULT hr = CComObject<CBarCollection>::CreateInstance(&pBars);
    if ( FAILED(hr) )
       return hr;
 
-   hr = pBars->QueryInterface(&m_pBars);
+   hr = pBars->InitSteelBars();
+   hr = pBars->QueryInterface(&m_pSteelBars);
+
+   // Galvanized Bars
+   pBars = nullptr;
+   hr = CComObject<CBarCollection>::CreateInstance(&pBars);
+   if (FAILED(hr))
+      return hr;
+
+   hr = pBars->InitGalvanizedBars();
+   hr = pBars->QueryInterface(&m_pGalvanizedBars);
+
+   // GFRP Bars
+   pBars = nullptr;
+   hr = CComObject<CBarCollection>::CreateInstance(&pBars);
+   if (FAILED(hr))
+      return hr;
+
+   hr = pBars->InitGFRPBars();
+   hr = pBars->QueryInterface(&m_pGFRPBars);
+
    return hr;
 }
 
 void CBarInfoMgr::FinalRelease()
 {
-   m_pBars = 0;
 }
 
 STDMETHODIMP CBarInfoMgr::InterfaceSupportsErrorInfo(REFIID riid)
@@ -62,16 +83,18 @@ STDMETHODIMP CBarInfoMgr::InterfaceSupportsErrorInfo(REFIID riid)
 	return S_FALSE;
 }
 
-STDMETHODIMP CBarInfoMgr::get_Specification(BSTR *pVal)
+STDMETHODIMP CBarInfoMgr::get_Bars(MaterialType material, IBarCollection **pVal)
 {
-	// TODO: Add your implementation code here
-   *pVal = CComBSTR("AASHTO LRFD Bridge Design Specification, 2nd Edition 1998").Copy();
-
-	return S_OK;
-}
-
-STDMETHODIMP CBarInfoMgr::get_Bars(IBarCollection **pVal)
-{
-	// TODO: Add your implementation code here
-   return m_pBars->QueryInterface(IID_IBarCollection,(void**)pVal);
+   if (material == D7957)
+   {
+      return m_pGFRPBars->QueryInterface(IID_IBarCollection, (void**)pVal);
+   }
+   else if (material == A767_A1094_Grade60 || material == A767_A1094_Grade80 || material == A767_A1094_Grade100)
+   {
+      return m_pGalvanizedBars->QueryInterface(IID_IBarCollection, (void**)pVal);
+   }
+   else
+   {
+      return m_pSteelBars->QueryInterface(IID_IBarCollection, (void**)pVal);
+   }
 }

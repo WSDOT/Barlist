@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -126,7 +126,6 @@ protected:
    afx_msg void OnViewOptions();
    afx_msg void OnAddGroup();
    afx_msg void OnAddBar();
-   afx_msg void OnQNI();
    afx_msg void OnProperties();
    afx_msg void OnAddin(UINT cmd);
    afx_msg void OnViewReport();
@@ -135,7 +134,6 @@ protected:
 
    DECLARE_INTERFACE_MAP()
    BEGIN_INTERFACE_PART(Events,IBarlistEvents)
-      STDMETHOD(OnNotIncludedQuantitiesChanged)();
       STDMETHOD(OnGroupAdded)(IGroup* pGroup);
       STDMETHOD(OnGroupRemoved)(BSTR Name);
       STDMETHOD(OnGroupChanged)(IGroup* pGroup);

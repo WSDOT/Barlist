@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -86,10 +86,10 @@ void CGroup::FinalRelease()
 
 void CGroup::UpdateStatus()
 {
-   m_SuperstructureMass = 0;
-   m_SuperstructureMassEpoxy = 0;
-   m_SubstructureMass = 0;
-   m_SubstructureMassEpoxy = 0;
+   m_Superstructure.fill(0);
+   m_SuperstructureEpoxy.fill(0);
+   m_Substructure.fill(0);
+   m_SubstructureEpoxy.fill(0);
 
    m_Status = stOK;
 
@@ -102,37 +102,71 @@ void CGroup::UpdateStatus()
 
       StatusType status;
       pBar->get_Status( &status );
-      if ( m_Status < status )
+      if (m_Status < status)
+      {
          m_Status = status;
+      }
+
+      MaterialType material;
+      pBar->get_Material(&material);
 
       VARIANT_BOOL bEpoxy;
       VARIANT_BOOL bSubstructure;
+      VARIANT_BOOL bVaries;
       pBar->get_Epoxy( &bEpoxy );
       pBar->get_Substructure( &bSubstructure );
+      pBar->get_Varies(&bVaries);
 
-      double mass;
-      pBar->get_Mass( &mass );
+      Float64 quantity = 0;
+      if (material == D7957)
+      {
+         // the quantity for D7957/GFRP bars is length
+         CComPtr<IBend> primary_bend;
+         pBar->get_PrimaryBend(&primary_bend);
+
+         Float64 length;
+         primary_bend->get_Length(&length);
+
+         if (bVaries == VARIANT_TRUE)
+         {
+            CComPtr<IBend> varies_bend;
+            pBar->get_VariesBend(&varies_bend);
+            Float64 varies_length;
+            varies_bend->get_Length(&varies_length);
+
+            // average length of primary and varies bends
+            length = (length + varies_length) / 2;
+         }
+
+         long nReqd;
+         pBar->get_NumReqd(&nReqd);
+         quantity = nReqd * length;
+      }
+      else
+      {
+         pBar->get_Mass(&quantity);
+      }
 
       if ( bSubstructure == VARIANT_TRUE )
       {
          if ( bEpoxy == VARIANT_TRUE )
          {
-            m_SubstructureMassEpoxy += mass;
+            m_SubstructureEpoxy[material] += quantity;
          }
          else
          {
-            m_SubstructureMass += mass;
+            m_Substructure[material] += quantity;
          }
       }
       else
       {
          if ( bEpoxy == VARIANT_TRUE )
          {
-            m_SuperstructureMassEpoxy += mass;
+            m_SuperstructureEpoxy[material] += quantity;
          }
          else
          {
-            m_SuperstructureMass += mass;
+            m_Superstructure[material] += quantity;
          }
       }
    }
@@ -176,32 +210,32 @@ STDMETHODIMP CGroup::get_BarRecords(IBarRecordCollection **pVal)
 	return S_OK;
 }
 
-STDMETHODIMP CGroup::get_SuperstructureMass(double *pVal)
+STDMETHODIMP CGroup::get_Quantity(MaterialType material, VARIANT_BOOL bEpoxy, VARIANT_BOOL bSubstructure, Float64* pVal)
 {
-	// TODO: Add your implementation code here
-   *pVal = m_SuperstructureMass;
-	return S_OK;
-}
+   if (bSubstructure == VARIANT_TRUE)
+   {
+      if (bEpoxy == VARIANT_TRUE)
+      {
+         *pVal = m_SubstructureEpoxy[material];
+      }
+      else
+      {
+         *pVal = m_Substructure[material];
+      }
+   }
+   else
+   {
+      if (bEpoxy == VARIANT_TRUE)
+      {
+         *pVal = m_SuperstructureEpoxy[material];
+      }
+      else
+      {
+         *pVal = m_Superstructure[material];
+      }
+   }
 
-STDMETHODIMP CGroup::get_SuperstructureMassEpoxy(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_SuperstructureMassEpoxy;
-	return S_OK;
-}
-
-STDMETHODIMP CGroup::get_SubstructureMass(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_SubstructureMass;
-	return S_OK;
-}
-
-STDMETHODIMP CGroup::get_SubstructureMassEpoxy(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_SubstructureMassEpoxy;
-	return S_OK;
+   return S_OK;
 }
 
 STDMETHODIMP CGroup::get_Status(StatusType *pVal)

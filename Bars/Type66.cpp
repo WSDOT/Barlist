@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -66,9 +66,9 @@ void CType66::BuildBend()
       return;
 
    // Build the bend
-   double db;
-   double radius;
-   double nTurns;
+   Float64 db;
+   Float64 radius;
+   Float64 nTurns;
 
    pBarData->get_Diameter(&db);
    radius = (GetU() - db)/2;

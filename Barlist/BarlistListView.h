@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@
 
 class CBarlistDoc;
 class CBarlistTreeView;
+class CBarlistFrame;
 interface IBarRecordCollection;
 interface IBarRecord;
 
@@ -57,6 +58,7 @@ public:
 public:
    CBarlistDoc* GetDocument();
    void SetTreeView(CBarlistTreeView* pTreeView);
+   void SetFrame(CBarlistFrame* pFrame);
 
    void OnGroupSelected(long groupIdx);
    void SelectAll();
@@ -104,6 +106,7 @@ protected:
    long m_GroupIdx;
 
    CBarlistTreeView* m_pTreeView;
+   CBarlistFrame* m_pFrame;
 
    CImageList m_ImageList;
 
@@ -119,7 +122,6 @@ public:
    afx_msg void OnEditCut();
    afx_msg void OnUpdateEditCopy(CCmdUI *pCmdUI);
    afx_msg void OnEditCopy();
-   afx_msg void OnUpdateGenerateMarkNumbers(CCmdUI *pCmdUI);
    afx_msg void OnGenerateMarkNumbers();
    afx_msg void OnDestroy();
    afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);

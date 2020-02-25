@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -51,11 +51,11 @@ void CType89::BuildBend()
 
    // Build the bend
    long nSplices;
-   double barLength;
-   double totalSpliceLength;
+   Float64 barLength;
+   Float64 totalSpliceLength;
 
    pBarData->get_NormalLength( &barLength );
-   nSplices = GetU() / barLength;
+   nSplices = (long)(GetU() / barLength);
    totalSpliceLength = nSplices*GetW();
 
    // Assemble the bend components

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -42,8 +42,9 @@ public:
 	{
 	}
 
-   void SetData(double ID,UseType use)
+   void SetData(BendMeasureType bendMeasure,Float64 ID,UseType use)
    {
+      m_BendMeasure = bendMeasure;
       m_ID  = ID;
       m_Use = use;
    }
@@ -59,12 +60,14 @@ END_COM_MAP()
 
 // IBendData
 public:
-	STDMETHOD(get_InsideDiameter)(/*[out, retval]*/ double *pVal);
+	STDMETHOD(get_InsideDiameter)(/*[out, retval]*/ Float64 *pVal);
+   STDMETHOD(get_BendMeasure)(BendMeasureType* pVal);
 	STDMETHOD(get_Use)(/*[out, retval]*/ UseType *pVal);
 
 private:
    UseType m_Use;
-   double m_ID; // ID/db (inside diameter is this number of bar diameters)
+   Float64 m_ID; // Inside bend diameter or ID/db (inside diameter is this number of bar diameters), depending on value of m_BendMeasure
+   BendMeasureType m_BendMeasure;
 };
 
 #endif //__BENDDATA_H_

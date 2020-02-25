@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -45,7 +45,7 @@ public:
 
    void SetStatusLevel( StatusType status );
    StatusType GetStatusLevel();
-   void AddStatusMsg( BSTR bstrMsg, VARIANT v1, VARIANT v2 );
+   void AddStatusMsg(BSTR bstrMsg, VARIANT v1, VARIANT v2);
    IStatusMessageCollection* CStatusMgr::GetStatusMessages();
    void ResetStatusMsgs();
 

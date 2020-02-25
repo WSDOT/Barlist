@@ -1,24 +1,20 @@
 <?xml version="1.0"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
 
-<xs:complexType name ="BarlistType">
-   <xs:sequence>
-      <xs:element name="QNI" type="QNIType" minOccurs="1" maxOccurs="1" />
-      <xs:element name="Properties" type="PropertiesType" minOccurs="1" maxOccurs="1" />
-      <xs:element name="Group" type="GroupType" minOccurs="0" maxOccurs="unbounded" />
-   </xs:sequence>
-</xs:complexType>
-
-  <xs:element name="Barlist" type="BarlistType"/>
-
-  <xs:complexType name="QNIType">
-  <xs:sequence>
-  <xs:element name="Traffic" type="xs:decimal" />
-<xs:element name="Bridge" type="xs:decimal" />
-<xs:element name="Wall" type="xs:decimal" />
-  </xs:sequence>
-</xs:complexType>
-
+  <xs:element name="Barlist">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation>
+          This is the root element.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Properties" type="PropertiesType" minOccurs="1" maxOccurs="1" />
+        <xs:element name="Group" type="GroupType" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:decimal" use="required" fixed="2"/>
+    </xs:complexType>
+  </xs:element>
 
 <xs:complexType name="PropertiesType">
   <xs:sequence>
@@ -88,6 +84,38 @@
     </xs:restriction>
   </xs:simpleType>
 
+  <xs:simpleType name="Material_type">
+    <xs:restriction base="xs:string">
+      <!-- Plain Carbon --><!--
+      <xs:enumeration value="A615_Grade40"/>
+      <xs:enumeration value="A615_Grade60"/>
+      <xs:enumeration value="A615_Grade80"/>
+      <xs:enumeration value="A615_Grade100"/>-->
+
+      <!-- Plain Low Alloy Carbon -->
+      <xs:enumeration value="A706_Grade60"/>
+      <xs:enumeration value="A706_Grade80"/>
+
+      <!-- Chromium/MMFX -->
+      <xs:enumeration value="A1035_Grade100"/>
+      <xs:enumeration value="A1035_Grade120"/>
+
+      <!-- Galvanized -->
+      <!--<xs:enumeration value="A767_A1094_Grade40"/>-->
+      <xs:enumeration value="A767_A1094_Grade60"/>
+      <xs:enumeration value="A767_A1094_Grade80"/>
+      <xs:enumeration value="A767_A1094_Grade100"/>
+
+      <!-- Stainless Steel -->
+      <xs:enumeration value="A955_Grade60"/>
+      <xs:enumeration value="A955_Grade75"/>
+      <xs:enumeration value="A955_Grade80"/>
+      
+      <!-- GFRP -->
+      <xs:enumeration value="D7957"/>
+    </xs:restriction>
+  </xs:simpleType>
+
   <xs:simpleType name="BendType">
     <xs:restriction base="xs:long">
       <xs:enumeration value="50"/>
@@ -149,13 +177,13 @@
 
   <xs:complexType name="BarRecordType">
   <xs:sequence>
+    <xs:element name="Material" type="Material_type" />
   <xs:element name="Mark" type="MarkType"/>
 <xs:element name="Location" type="LocationType" />
 <xs:element name="Size" type="SizeType" />
 <xs:element name="NoReqd" type="NumRequiredType" />
 <xs:element name="BendType" type="BendType" />
 <xs:element name="Use" type="xs:integer" />
-<xs:element name="LumpSum" type="FlagType" />
 <xs:element name="Substructure" type="FlagType" />
 <xs:element name="Epoxy" type="FlagType" />
 <xs:element name="Varies" type="FlagType" />

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -35,6 +35,7 @@
 #endif // _MSC_VER > 1000
 
 #include <vector>
+#include <MathEx.h>
 #include "BarComponent.h"
 #include "BarsCP.h"
 #include "StatusMgr.h"
@@ -119,13 +120,13 @@ public:
 	   return S_OK;
    }
 
-   STDMETHOD(get_U)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_U)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = m_U;
       return S_OK;
    }
 
-   STDMETHOD(put_U)(/*[in]*/ double newVal)
+   STDMETHOD(put_U)(/*[in]*/ Float64 newVal)
    {
       m_U = newVal;
       m_bIsDirty = true;
@@ -133,13 +134,13 @@ public:
       return S_OK;
    }
 
-   STDMETHOD(get_W)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_W)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = m_W;
       return S_OK;
    }
 
-   STDMETHOD(put_W)(/*[in]*/ double newVal)
+   STDMETHOD(put_W)(/*[in]*/ Float64 newVal)
    {
       m_W = newVal;
       m_bIsDirty = true;
@@ -147,13 +148,13 @@ public:
       return S_OK;
    }
 
-   STDMETHOD(get_X)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_X)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = m_X;
       return S_OK;
    }
 
-   STDMETHOD(put_X)(/*[in]*/ double newVal)
+   STDMETHOD(put_X)(/*[in]*/ Float64 newVal)
    {
       m_X = newVal;
       m_bIsDirty = true;
@@ -161,13 +162,13 @@ public:
       return S_OK;
    }
 
-   STDMETHOD(get_Y)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_Y)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = m_Y;
       return S_OK;
    }
 
-   STDMETHOD(put_Y)(/*[in]*/ double newVal)
+   STDMETHOD(put_Y)(/*[in]*/ Float64 newVal)
    {
       m_Y = newVal;
       m_bIsDirty = true;
@@ -175,13 +176,13 @@ public:
       return S_OK;
    }
 
-   STDMETHOD(get_Z)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_Z)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = m_Z;
       return S_OK;
    }
 
-   STDMETHOD(put_Z)(/*[in]*/ double newVal)
+   STDMETHOD(put_Z)(/*[in]*/ Float64 newVal)
    {
       m_Z = newVal;
       m_bIsDirty = true;
@@ -189,13 +190,13 @@ public:
       return S_OK;
    }
 
-   STDMETHOD(get_T1)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_T1)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = m_T1;
       return S_OK;
    }
 
-   STDMETHOD(put_T1)(/*[in]*/ double newVal)
+   STDMETHOD(put_T1)(/*[in]*/ Float64 newVal)
    {
       m_T1 = newVal;
       m_bIsDirty = true;
@@ -203,13 +204,13 @@ public:
       return S_OK;
    }
 
-   STDMETHOD(get_T2)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_T2)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = m_T2;
       return S_OK;
    }
 
-   STDMETHOD(put_T2)(/*[in]*/ double newVal)
+   STDMETHOD(put_T2)(/*[in]*/ Float64 newVal)
    {
       m_T2 = newVal;
       m_bIsDirty = true;
@@ -230,7 +231,7 @@ public:
       return S_OK;
    }
 
-   STDMETHOD(get_Length)(/*[out,retval]*/ double* pVal)
+   STDMETHOD(get_Length)(/*[out,retval]*/ Float64* pVal)
    {
       *pVal = GetLength();
       return S_OK;
@@ -296,9 +297,14 @@ protected:
       m_StatusMgr.SetStatusLevel( status );
    }
 
-   void AddStatusMsg( BSTR bstrMsg, VARIANT v1, VARIANT v2 )
+   void AddStatusMsg(BSTR bstrMsg, VARIANT v1, VARIANT v2)
    {
-      m_StatusMgr.AddStatusMsg( bstrMsg, v1, v2 );
+      m_StatusMgr.AddStatusMsg(bstrMsg, v1, v2);
+   }
+
+   void AddStatusMsg(BSTR bstrMsg, VARIANT v1, VARIANT v2, VARIANT v3)
+   {
+      m_StatusMgr.AddStatusMsg(bstrMsg, v1, v2, v3);
    }
 
    virtual void PreValidateBend()
@@ -312,12 +318,58 @@ protected:
                        CComVariant("U"),
                        CComVariant(0.0));
       }
+
+      // GFRP Bars can only be bent into Type 50, 51, 54, 57, 66, 67, 71, 80 (w/X=0), and 89.
+      MaterialType material;
+      m_pBarRecord->get_Material(&material);
+      if (material == D7957) // GFRP
+      {
+         int is_bend_type_supported = 1; // 0 = supported, 1 = unsupported, 2 = special case of unsupported for Type 80 bends
+         switch (m_BendType)
+         {
+         case 50:
+         case 51:
+         case 54:
+         case 57:
+         case 66:
+         case 67:
+         case 71:
+         case 89:
+            is_bend_type_supported = 0;
+            break;
+
+         case 80:
+            ATLASSERT(m_bX == true);
+            is_bend_type_supported = (IsZero(m_X) ? 0 : 2);
+            break;
+
+         default:
+            is_bend_type_supported = 1;
+         }
+
+         if (0 < is_bend_type_supported)
+         {
+            SetStatusLevel(stError);
+            CComBSTR msg;
+            if (is_bend_type_supported == 1)
+            {
+               msg.LoadString(ERR_INVALIDGFRPBEND);
+               AddStatusMsg(msg, CComVariant(m_BendType), CComVariant());
+            }
+            else
+            {
+               msg.LoadString(ERR_INVALIDGFRPBEND80);
+               AddStatusMsg(msg, CComVariant(), CComVariant());
+            }
+         }
+      }
    }
 
    void Clear()
    {
-      std::vector<CBarComponent*>::iterator iter;
-      for ( iter = m_Components.begin(); iter != m_Components.end(); iter++ )
+      std::vector<CBarComponent*>::iterator iter = m_Components.begin();
+      std::vector<CBarComponent*>::iterator end = m_Components.end();
+      for ( ; iter != end; iter++ )
       {
          CBarComponent* pComponent = *iter;
          delete pComponent;
@@ -330,34 +382,42 @@ protected:
       Clear();
    }
 
+   void CheckNormalLength()
+   {
+      CComPtr<IBarData> pBarData(GetBarData());
+      Float64 length;
+
+      pBarData->get_NormalLength(&length);
+
+      if (length < m_Length)
+      {
+         SetStatusLevel(stWarning);
+         CComBSTR msg;
+         msg.LoadString(WARN_EXCEEDSNORMAL);
+         AddStatusMsg(msg,CComVariant(m_Length), CComVariant(length));
+      }
+   }
+
+   void CheckMaxLength()
+   {
+      CComPtr<IBarData> pBarData(GetBarData());
+      Float64 maxlength;
+
+      pBarData->get_MaxLength(&maxlength);
+
+      if (0 < maxlength && maxlength < m_Length)
+      {
+         SetStatusLevel(stError);
+         CComBSTR msg;
+         msg.LoadString(ERR_EXCEEDSMAX);
+         AddStatusMsg(msg, CComVariant(m_Length), CComVariant(maxlength));
+      }
+   }
+
    virtual void PostValidateBend()
    {
-      CComPtr<IBarData> pBarData( GetBarData() );
-      double length;
-      double maxlength;
-
-      pBarData->get_NormalLength( &length );
-      pBarData->get_MaxLength( &maxlength );
-
-      if ( length < m_Length )
-      {
-         SetStatusLevel( stWarning );
-         CComBSTR msg;
-         msg.LoadString( WARN_EXCEEDSNORMAL );
-         AddStatusMsg( msg,
-                       CComVariant(length),
-                       CComVariant() );
-      }
-
-      if ( maxlength < m_Length )
-      {
-         SetStatusLevel( stError );
-         CComBSTR msg;
-         msg.LoadString( ERR_EXCEEDSMAX );
-         AddStatusMsg( msg,
-                       CComVariant(maxlength),
-                       CComVariant() );
-      }
+      CheckNormalLength();
+      CheckMaxLength();
    }
 
    void AddBarComponent(CBarComponent* pComponent)
@@ -379,7 +439,7 @@ protected:
       return use;
    }
    
-   double GetLength()
+   Float64 GetLength()
    {
       if ( m_bIsDirty )
          ComputeLength();
@@ -387,37 +447,37 @@ protected:
       return m_Length;
    }
 
-   double GetU()
+   Float64 GetU()
    {
       return m_U;
    }
 
-   double GetW()
+   Float64 GetW()
    {
       return m_W;
    }
 
-   double GetX()
+   Float64 GetX()
    {
       return m_X;
    }
 
-   double GetY()
+   Float64 GetY()
    {
       return m_Y;
    }
 
-   double GetZ()
+   Float64 GetZ()
    {
       return m_Z;
    }
 
-   double GetT1()
+   Float64 GetT1()
    {
       return m_T1;
    }
 
-   double GetT2()
+   Float64 GetT2()
    {
       return m_T2;
    }
@@ -429,18 +489,18 @@ protected:
 
 
 private:
-   double m_U;
-   double m_W;
-   double m_X;
-   double m_Y;
-   double m_Z;
-   double m_T1;
-   double m_T2;
+   Float64 m_U;
+   Float64 m_W;
+   Float64 m_X;
+   Float64 m_Y;
+   Float64 m_Z;
+   Float64 m_T1;
+   Float64 m_T2;
 
    long m_BendType;
 
    bool m_bIsDirty;
-   double m_Length;
+   Float64 m_Length;
 
    std::vector<CBarComponent*> m_Components;
 
@@ -465,14 +525,13 @@ private:
             PreValidateBend();
             BuildBend();
       
-            std::vector<CBarComponent*>::iterator iter;
-            for ( iter = m_Components.begin(); iter != m_Components.end(); iter++ )
+            std::vector<CBarComponent*>::iterator iter = m_Components.begin();
+            std::vector<CBarComponent*>::iterator end = m_Components.end();
+            for( ; iter != end; iter++)
             {
                CBarComponent* pComponent = *iter;
                m_Length += pComponent->Length();
             }
-
-            PostValidateBend();
          }
          catch( CBarException& e)
          {
@@ -481,6 +540,8 @@ private:
          }
 
          m_bIsDirty = false;
+
+         PostValidateBend();
       }
    }
 

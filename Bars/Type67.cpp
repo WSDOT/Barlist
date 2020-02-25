@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -66,10 +66,10 @@ void CType67::BuildBend()
       return;
 
    // Build the bend
-   double db;
-   double radius;
-   double nTurns;
-   double pitch;
+   Float64 db;
+   Float64 radius;
+   Float64 nTurns;
+   Float64 pitch;
 
    pBarData->get_Diameter(&db);
    radius = (GetU() - db)/2;
@@ -79,8 +79,8 @@ void CType67::BuildBend()
    CHelixComponent* pHelix = new CHelixComponent( radius, nTurns, pitch );
    AddBarComponent( pHelix );
 
-   double length = pHelix->Length();
-   double splice_length;
+   Float64 length = pHelix->Length();
+   Float64 splice_length;
    if ( IsZero(GetZ()) )
       splice_length = 0;
    else

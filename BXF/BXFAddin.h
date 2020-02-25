@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // BXF - Barlist Exchange File
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -61,17 +61,18 @@ BEGIN_CATEGORY_MAP(CBXFAddin)
    IMPLEMENTED_CATEGORY(CATID_BarlistAddin)
 END_CATEGORY_MAP()
 
+
 // IBarlistAddin
 public:
    STDMETHOD(Go)(/*[in]*/ IBarlist* pBarlist);
    STDMETHOD(get_MenuItem)(/*[out, retval]*/ BSTR *pVal);
-
 private:
    void CreateBarlistExchangeFile(const CString& strFile, IBarlist* pBarlist);
    void ExchangeBarRecords(CStdioFile* pFile, IGroup* pGroup);
    void ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord);
-   CString ReportBend(IBend* pBend, bool bVaries,bool bLumpSum);
+   CString ReportBend(IBend* pBend, bool bVaries);
    void ReportErrors(CStdioFile* pFile, IBend* pBend);
+   CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
 };
 
 #endif //__BXFADDIN_H_

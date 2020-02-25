@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -39,9 +39,14 @@ STDMETHODIMP CBendData::get_Use(UseType *pVal)
 	return S_OK;
 }
 
-STDMETHODIMP CBendData::get_InsideDiameter(double *pVal)
+STDMETHODIMP CBendData::get_InsideDiameter(Float64 *pVal)
 {
-	// TODO: Add your implementation code here
    *pVal = m_ID;
 	return S_OK;
+}
+
+STDMETHODIMP CBendData::get_BendMeasure(BendMeasureType* pVal)
+{
+   *pVal = m_BendMeasure;
+   return S_OK;
 }

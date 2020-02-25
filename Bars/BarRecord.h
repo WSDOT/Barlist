@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -52,10 +52,10 @@ public:
       m_Mark("")
 #endif
 	{
+      m_Material      = A706_Grade60,
       m_NumEach       = 1;
       m_NumReqd       = 1;
       m_bEpoxy        = VARIANT_FALSE;
-      m_bLumpSum      = VARIANT_FALSE;
       m_bSubstructure = VARIANT_FALSE;
       m_Use           = utLongitudinal;
 
@@ -89,12 +89,12 @@ END_COM_MAP()
 
 private:
    CBarlist* m_pBarlist;
+   MaterialType m_Material;
    CComBSTR m_Mark;
    CComBSTR m_Location;
    long m_NumEach;
    long m_NumReqd;
    VARIANT_BOOL m_bEpoxy;
-   VARIANT_BOOL m_bLumpSum;
    VARIANT_BOOL m_bSubstructure;
    UseType m_Use;
    long m_BendType;
@@ -121,7 +121,7 @@ public:
 public:
 	STDMETHOD(get_BarData)(/*[out, retval]*/ IBarData* *pVal);
 	STDMETHOD(put_BarData)(/*[in]*/ IBarData* newVal);
-	STDMETHOD(get_Mass)(/*[out, retval]*/ double *pVal);
+	STDMETHOD(get_Mass)(/*[out, retval]*/ Float64 *pVal);
 	STDMETHOD(get_Status)(/*[out, retval]*/ StatusType *pVal);
 	STDMETHOD(get_Size)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(get_BendType)(/*[out, retval]*/ long *pVal);
@@ -136,8 +136,6 @@ public:
 	STDMETHOD(put_Epoxy)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_Substructure)(/*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(put_Substructure)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_LumpSum)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_LumpSum)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_Use)(/*[out, retval]*/ UseType *pVal);
 	STDMETHOD(put_Use)(/*[in]*/ UseType newVal);
 	STDMETHOD(get_NumReqd)(/*[out, retval]*/ long *pVal);
@@ -146,7 +144,9 @@ public:
 	STDMETHOD(put_Location)(/*[in]*/ BSTR newVal);
 	STDMETHOD(get_Mark)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_Mark)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_StatusMessages)(/*[out, retval]*/ IStatusMessageCollection* *pVal);
+   STDMETHOD(get_Material)(/*[out, retval]*/ MaterialType *pVal);
+   STDMETHOD(put_Material)(/*[in]*/ MaterialType newVal);
+   STDMETHOD(get_StatusMessages)(/*[out, retval]*/ IStatusMessageCollection* *pVal);
 
 BEGIN_CONNECTION_POINT_MAP(CBarRecord)
 	CONNECTION_POINT_ENTRY(IID_IBarRecordEvents)

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
 ///////////////////////////////////////////////////////////////////////
 #pragma once
 #include "resource.h"
+#include <Bars\Barlst.h>
 
 // CQuantitiesDlg dialog
 
@@ -38,16 +39,26 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
-   bool m_bClosedByParent{ false };
+   bool m_bClosedByParent{ false }; // if true, the parent window is closing the dialog
+
+   CListCtrl m_QuantitiesList;
+
+   int m_cxMin;
+   int m_cyMin;
 
 	DECLARE_MESSAGE_MAP()
 public:
    virtual BOOL OnInitDialog();
 
-   void SetQuantities(BSTR bstrGroup, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy);
+   void SetGroup(BSTR bstrGroup);
+   void SetQuantities(MaterialType material, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy);
+
    void Clear();
    void SaveWindowPosition();
+   void RestoreWindowPosition();
    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
    afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
    afx_msg void OnDestroy();
+   virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
+   afx_msg void OnSize(UINT nType, int cx, int cy);
 };

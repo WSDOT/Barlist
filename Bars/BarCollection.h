@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -34,6 +34,11 @@
 typedef CComEnumOnSTL<IEnumVARIANT,&IID_IEnumVARIANT, VARIANT, _Copy<VARIANT>, std::vector<CComVariant> > VecEnum;
 typedef ICollectionOnSTLImpl<IBarCollection,std::vector<CComVariant>, VARIANT, _Copy<VARIANT>, VecEnum> IBarColl;
 
+struct BarInfo;
+struct BendInfo;
+struct HookInfo;
+
+
 /////////////////////////////////////////////////////////////////////////////
 // CBarCollection
 class ATL_NO_VTABLE CBarCollection : 
@@ -47,7 +52,12 @@ public:
 	{
 	}
 
-   HRESULT FinalConstruct();
+   HRESULT InitSteelBars();
+   HRESULT InitGalvanizedBars();
+   HRESULT InitGFRPBars();
+
+protected:
+   HRESULT Init(const BarInfo barInfo[], int cBars, const BendInfo bendInfo[], int cBends, const HookInfo hookInfo[], int cHooks);
 
 DECLARE_REGISTRY_RESOURCEID(IDR_BARCOLLECTION)
 

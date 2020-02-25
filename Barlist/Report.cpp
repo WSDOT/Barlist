@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -23,13 +23,14 @@
 #include "stdafx.h"
 #include "Report.h"
 #include "BarlistDoc.h"
+#include "Helpers.h"
 
 #include <MfcTools\Text.h>
 #include <MfcTools\VersionInfo.h>
 
 CReport::CReport()
 {
-   m_nHeaderLines = 9;
+   m_nHeaderLines = 11;
 }
 
 
@@ -43,28 +44,30 @@ CString CReport::GetReportHeader()
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
       strHeader =
-         CString("                                             +---------- T = Transverse, S = Seismic\r\n") +
-         CString("                                             | +-------- L = Lump sum\r\n") +
-         CString("                                             | | +------ S = Substructure\r\n") +
-         CString("                                             | | | +---- E = Epoxy\r\n") +
-         CString("                                             | | | | +-- V = Varies\r\n") +
-         CString("                                             | | | | |\r\n") +
-         CString("Mark Description                  Si Num  Be | | | | | #     U        W        X       Y       Z    T1  T2   LENGTH     MASS\r\n") +
-         CString(" #                                ze Reqd nd T L S E V Ea  METER    METER    METER   METER   METER  DEG DEG   METER      KG\r\n") +
-         CString("==== ============================ == ==== == = = = = = == ===.===  ===.===  ===.=== ===.=== ===.=== === ===  ===.===   =====");
+         CString("                                             +-------- T = Transverse, S = Seismic\r\n") +
+         CString("                                             | +------ S = Substructure\r\n") +
+         CString("                                             | |  +--- E = Epoxy Coated, G = Galvanized, SS = Strainless Steel,\r\n") +
+         CString("                                             | |  |    CR = Corrosion Resistant, GF = Glass Fiber Reinf. Polymer,\r\n") +
+         CString("                                             | |  |    41, 52, 55, 69, 83 = Grade 413, 517, 552, 690, 827 MPa\r\n") +
+         CString("                                             | |  |   +-- V = Varies\r\n") +
+         CString("                                             | |  |   |\r\n") +
+         CString("Mark Description                  Si Num  Be | |  |   | #     U        W        X       Y       Z    T1  T2   LENGTH     MASS\r\n") +
+         CString(" #                                ze Reqd nd T S Type V Ea  METER    METER    METER   METER   METER  DEG DEG   METER      KG\r\n") +
+         CString("==== ============================ == ==== == = = ==== = == ===.===  ===.===  ===.=== ===.=== ===.=== === ===  ===.===   =====");
    }
    else
    {
       strHeader =
-         CString("                                             +---------- T = Transverse, S = Seismic\r\n") +
-         CString("                                             | +-------- L = Lump sum\r\n") +
-         CString("                                             | | +------ S = Substructure\r\n") +
-         CString("                                             | | | +---- E = Epoxy\r\n") +
-         CString("                                             | | | | +-- V = Varies\r\n") +
-         CString("                                             | | | | |\r\n") +
-         CString("Mark Description                  Si Num  Be | | | | | #     U        W         X        Y        Z    T1  T2   LENGTH    WEIGHT\r\n") +
-         CString(" #                                ze Reqd nd T L S E V Ea  FT  IN   FT  IN   FT  IN   FT  IN   FT  IN  DEG DEG   FT  IN   LBS\r\n") +
-         CString("==== ============================ == ==== == = = = = = == === ==.= === ==.= === ==.= === ==.= === ==.= === ===  === ==.=  =====");
+         CString("                                             +-------- T = Transverse, S = Seismic\r\n") +
+         CString("                                             | +------ S = Substructure\r\n") +
+         CString("                                             | |  +--- E = Epoxy Coated, G = Galvanized, SS = Strainless Steel,\r\n") +
+         CString("                                             | |  |    CR = Corrosion Resistant, GF = Glass Fiber Reinf. Polymer,\r\n") +
+         CString("                                             | |  |    75, 80, 1X, 12 = Grade 75, 80, 100, 120\r\n") +
+         CString("                                             | |  |   +-- V = Varies\r\n") +
+         CString("                                             | |  |   |\r\n") +
+         CString("Mark Description                  Si Num  Be | |  |   | #     U        W         X        Y        Z    T1  T2   LENGTH    WEIGHT\r\n") +
+         CString(" #                                ze Reqd nd T S Type V Ea  FT  IN   FT  IN   FT  IN   FT  IN   FT  IN  DEG DEG   FT  IN   LBS\r\n") +
+         CString("==== ============================ == ==== == = = ==== = == === ==.= === ==.= === ==.= === ==.= === ==.= === ===  === ==.=  =====");
    }
    return strHeader;
 }
@@ -103,8 +106,6 @@ void CReport::BuildReport(IBarlist* pBarlist)
    m_vReportLines.reserve(1000);
 
    ReportGroups(pBarlist);
-   m_vReportLines.push_back(_T("\n"));
-   ReportQNI(pBarlist);
    m_vReportLines.push_back(_T("\n"));
    ReportSummary(pBarlist);
 }
@@ -177,19 +178,19 @@ void CReport::ReportBarRecord(IBarRecord* pBarRecord)
    UseType use;
    pBarRecord->get_Use(&use);
 
-   VARIANT_BOOL vbLumpSum;
-   pBarRecord->get_LumpSum(&vbLumpSum);
-
    VARIANT_BOOL vbSubstructure;
    pBarRecord->get_Substructure(&vbSubstructure);
 
    VARIANT_BOOL vbEpoxy;
    pBarRecord->get_Epoxy(&vbEpoxy);
 
+   MaterialType material;
+   pBarRecord->get_Material(&material);
+
    VARIANT_BOOL vbVaries;
    pBarRecord->get_Varies(&vbVaries);
 
-   strBarRecord.Format(_T("%4s %-28s %2s %4d %2d %c %c %c %c %c "), OLE2T(bstrMark), OLE2T(bstrLocation), strSize, nReqd, bendType, GetUse(use), GetFlag(vbLumpSum, 'L'), GetFlag(vbSubstructure, 'S'), GetFlag(vbEpoxy, 'E'), GetFlag(vbVaries, 'V'));
+   strBarRecord.Format(_T("%4s %-28s %2s %4d %2d %c %c %4s %c "), OLE2T(bstrMark), OLE2T(bstrLocation), strSize, nReqd, bendType, GetUse(use), GetFlag(vbSubstructure, 'S'), GetMaterial(material,vbEpoxy), GetFlag(vbVaries, 'V'));
 
    if (vbVaries == VARIANT_TRUE)
    {
@@ -234,7 +235,7 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
 
    if (bVaries)
    {
-      strBend.Format(_T("%58s"), _T(" "));
+      strBend.Format(_T("%59s"), _T(" "));
    }
 
    Float64 u, w, x, y, z, t1, t2;
@@ -335,54 +336,78 @@ inline TCHAR CReport::GetFlag(VARIANT_BOOL vbFlag, TCHAR c)
    return vbFlag == VARIANT_TRUE ? c : ' ';
 }
 
-void CReport::ReportQNI(IBarlist* pBarlist)
+CString CReport::GetMaterial(MaterialType material,VARIANT_BOOL vbEpoxy)
 {
-   Float64 traffic, bridge, wall;
-   pBarlist->get_TrafficBarrierQuantity(&traffic);
-   pBarlist->get_BridgeGrateInletQuantity(&bridge);
-   pBarlist->get_RetainingWallQuantity(&wall);
-
-   CString strTraffic;
-   strTraffic.Format(_T("Traffic: %s\n"), FormatMass(traffic));
-
-   CString strBridge;
-   strBridge.Format( _T("Bridge:  %s\n"), FormatMass(bridge));
-
-   CString strWall;
-   strWall.Format(   _T("Wall:    %s\n"), FormatMass(wall));
-
-   m_vReportLines.push_back(_T("Quantities Not Included:\n"));
-   m_vReportLines.push_back(strTraffic);
-   m_vReportLines.push_back(strBridge);
-   m_vReportLines.push_back(strWall);
+   CString strMaterial;
+   if (vbEpoxy == VARIANT_TRUE)
+   {
+      strMaterial.Format(_T("%2s%2s"), GetMaterialDesignation(material), GetMaterialGrade(material));
+      strMaterial.SetAt(0, _T('E'));
+   }
+   else
+   {
+      strMaterial.Format(_T("%2s%2s"), GetMaterialDesignation(material), GetMaterialGrade(material));
+   }
+   return strMaterial;
 }
 
 void CReport::ReportSummary(IBarlist* pBarlist)
 {
-   Float64 sub, subEpoxy, super, superEpoxy;
-   pBarlist->get_SubstructureMass(&sub);
-   pBarlist->get_SubstructureMassEpoxy(&subEpoxy);
-   pBarlist->get_SuperstructureMass(&super);
-   pBarlist->get_SuperstructureMassEpoxy(&superEpoxy);
-   Float64 total = sub + subEpoxy + super + superEpoxy;
-
-   CString strSub;
-   strSub.Format(_T("Substructure Mass:           %s\n"), FormatMass(sub));
-
-   CString strSubEpoxy;
-   strSubEpoxy.Format(_T("Substructure w/Epoxy Mass:   %s\n"), FormatMass(subEpoxy));
-
-   CString strSuper;
-   strSuper.Format(_T("Superstructure Mass:         %s\n"), FormatMass(super));
-
-   CString strSuperEpoxy;
-   strSuperEpoxy.Format(_T("Superstructure w/Epoxy Mass: %s\n"), FormatMass(superEpoxy));
-
    m_vReportLines.push_back(_T("Summary of Quantities:\n"));
-   m_vReportLines.push_back(strSub);
-   m_vReportLines.push_back(strSubEpoxy);
-   m_vReportLines.push_back(strSuper);
-   m_vReportLines.push_back(strSuperEpoxy);
+   for (int i = 0; i < MATERIAL_COUNT; i++)
+   {
+      if (i != 0)
+      {
+         m_vReportLines.push_back(_T("\n"));
+      }
+
+      MaterialType material = (MaterialType)(i);
+
+      CString strMaterial;
+      strMaterial.Format(_T("%s\n"),GetMaterialSpecification(material));
+      m_vReportLines.push_back(strMaterial);
+
+      Float64 sub, subEpoxy, super, superEpoxy;
+      pBarlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
+      pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
+      pBarlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
+      pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+
+      if (material == D7957)
+      {
+         CString strSub;
+         strSub.Format(_T("Substructure:           %s\n"), FormatLength(sub));
+         m_vReportLines.push_back(strSub);
+
+         CString strSuper;
+         strSuper.Format(_T("Superstructure:         %s\n"), FormatLength(super));
+         m_vReportLines.push_back(strSuper);
+      }
+      else
+      {
+         CString strSub;
+         strSub.Format(_T("Substructure:           %s\n"), FormatMass(sub));
+         m_vReportLines.push_back(strSub);
+
+         if (CanBeEpoxyCoated(material))
+         {
+            CString strSubEpoxy;
+            strSubEpoxy.Format(_T("Substructure w/Epoxy:   %s\n"), FormatMass(subEpoxy));
+            m_vReportLines.push_back(strSubEpoxy);
+         }
+
+         CString strSuper;
+         strSuper.Format(_T("Superstructure:         %s\n"), FormatMass(super));
+         m_vReportLines.push_back(strSuper);
+
+         if (CanBeEpoxyCoated(material))
+         {
+            CString strSuperEpoxy;
+            strSuperEpoxy.Format(_T("Superstructure w/Epoxy: %s\n"), FormatMass(superEpoxy));
+            m_vReportLines.push_back(strSuperEpoxy);
+         }
+      }
+   }
 }
 
 void CReport::PrepareForPrinting(CDC* pDC,CPrintInfo* pInfo)
@@ -446,7 +471,7 @@ void CReport::Print(CDC* pDC, CPrintInfo* pInfo)
 
 void CReport::PageHeader(CDC* pDC, CPrintInfo* pInfo)
 {
-   AFX_MANAGE_STATE(AfxGetModuleState());
+   AFX_MANAGE_STATE(AfxGetStaticModuleState());
    
    pDC->Rectangle(m_Border);
 

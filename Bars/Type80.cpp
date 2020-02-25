@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -50,10 +50,10 @@ void CType80::BuildBend()
    // Error check data
 
    // Build the bend
-   double db;
-   double bendDeduct1;
-   double bendDeduct2;
-   double u, w, x, y, z, t1, t2;
+   Float64 db;
+   Float64 bendDeduct1;
+   Float64 bendDeduct2;
+   Float64 u, w, x, y, z, t1, t2;
 
    pBarData->get_Diameter( &db );
 
@@ -70,7 +70,7 @@ void CType80::BuildBend()
    z = IsZero(GetZ()) ? 0.00 : GetZ() - db/2.0;
 
    // Check minimum bend radius
-   double rMin = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
+   Float64 rMin = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
    if ( !IsZero(GetW()) && !IsZero(GetT1()) && (GetY() < rMin-0.01) )
    {
       SetStatusLevel( stWarning );

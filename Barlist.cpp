@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist - Barlist Extensible Application Framework
-// Copyright © 2009-2019  Washington State Department of Transportation
+// Copyright © 1999-2019  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -344,7 +344,7 @@ CString CBarlistApp::GetWsdotUrl()
    CString strDefault(_T("http://www.wsdot.wa.gov"));
 
    HKEY key;
-   LONG result = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Washington State Department of Transportation\\Barlist\\Settings"),0,KEY_QUERY_VALUE,&key);
+   Int32 result = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Washington State Department of Transportation\\Barlist\\Settings"),0,KEY_QUERY_VALUE,&key);
    if ( result != ERROR_SUCCESS )
    {
       return strDefault;
@@ -371,7 +371,7 @@ CString CBarlistApp::GetWsdotBridgeUrl()
    CString strDefault(_T("http://www.wsdot.wa.gov/eesc/bridge"));
 
    HKEY key;
-   LONG result = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Washington State Department of Transportation\\Barlist\\Settings"),0,KEY_QUERY_VALUE,&key);
+   Int32 result = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Washington State Department of Transportation\\Barlist\\Settings"),0,KEY_QUERY_VALUE,&key);
    if ( result != ERROR_SUCCESS )
    {
       return strDefault;
@@ -395,7 +395,7 @@ CString CBarlistApp::GetBarlistUrl()
 {
    CString strDefault(_T("http://www.wsdot.wa.gov/eesc/bridge/software/index.cfm?fuseaction=software_detail&software_id=69"));
    HKEY key;
-   LONG result = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Washington State Department of Transportation\\Barlist\\Settings"),0,KEY_QUERY_VALUE,&key);
+   Int32 result = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,_T("SOFTWARE\\Washington State Department of Transportation\\Barlist\\Settings"),0,KEY_QUERY_VALUE,&key);
    if ( result != ERROR_SUCCESS )
    {
       return strDefault;

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -73,10 +73,10 @@ void CBarlist::FinalRelease()
 
 void CBarlist::Update()
 {
-   m_SuperstructureMass = 0;
-   m_SuperstructureMassEpoxy = 0;
-   m_SubstructureMass = 0;
-   m_SubstructureMassEpoxy = 0;
+   m_Superstructure.fill(0);
+   m_SuperstructureEpoxy.fill(0);
+   m_Substructure.fill(0);
+   m_SubstructureEpoxy.fill(0);
 
    m_Status = stOK;
 
@@ -92,18 +92,23 @@ void CBarlist::Update()
       if ( m_Status < status )
          m_Status = status;
 
-      double mass;
-      pGroup->get_SubstructureMassEpoxy( &mass );
-      m_SubstructureMassEpoxy += mass;
+      auto n = m_Superstructure.size();
+      for (auto i = 0; i < n; i++)
+      {
+         MaterialType material = (MaterialType)i;
+         Float64 quantity;
+         pGroup->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_TRUE /*substructure*/, &quantity);
+         m_SubstructureEpoxy[material] += quantity;
 
-      pGroup->get_SubstructureMass( &mass );
-      m_SubstructureMass += mass;
+         pGroup->get_Quantity(material, VARIANT_FALSE /*epoxy*/, VARIANT_TRUE /*substructure*/, &quantity);
+         m_Substructure[material] += quantity;
 
-      pGroup->get_SuperstructureMassEpoxy( &mass );
-      m_SuperstructureMassEpoxy += mass;
+         pGroup->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_FALSE /*substructure*/, &quantity);
+         m_SuperstructureEpoxy[material] += quantity;
 
-      pGroup->get_SuperstructureMass( &mass );
-      m_SuperstructureMass += mass;
+         pGroup->get_Quantity(material, VARIANT_FALSE /*epoxy*/, VARIANT_FALSE /*substructure*/, &quantity);
+         m_Superstructure[material] += quantity;
+      }
    }
 }
 
@@ -115,77 +120,32 @@ STDMETHODIMP CBarlist::get_Groups(IGroupCollection **pVal)
 	return S_OK;
 }
 
-STDMETHODIMP CBarlist::get_TrafficBarrierQuantity(double *pVal)
+STDMETHODIMP CBarlist::get_Quantity(MaterialType material, VARIANT_BOOL bEpoxy, VARIANT_BOOL bSubstructure, Float64* pVal)
 {
-	// TODO: Add your implementation code here
-   *pVal = m_TrafficBarrier;
-	return S_OK;
-}
+   if (bSubstructure == VARIANT_TRUE)
+   {
+      if (bEpoxy == VARIANT_TRUE)
+      {
+         *pVal = m_SubstructureEpoxy[material];
+      }
+      else
+      {
+         *pVal = m_Substructure[material];
+      }
+   }
+   else
+   {
+      if (bEpoxy == VARIANT_TRUE)
+      {
+         *pVal = m_SuperstructureEpoxy[material];
+      }
+      else
+      {
+         *pVal = m_Superstructure[material];
+      }
+   }
 
-STDMETHODIMP CBarlist::put_TrafficBarrierQuantity(double newVal)
-{
-	// TODO: Add your implementation code here
-   m_TrafficBarrier = newVal;
-	Fire_OnNotIncludedQuantitiesChanged();
    return S_OK;
-}
-
-STDMETHODIMP CBarlist::get_BridgeGrateInletQuantity(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_BridgeGrateInlet;
-	return S_OK;
-}
-
-STDMETHODIMP CBarlist::put_BridgeGrateInletQuantity(double newVal)
-{
-	// TODO: Add your implementation code here
-   m_BridgeGrateInlet = newVal;
-	Fire_OnNotIncludedQuantitiesChanged();
-   return S_OK;
-}
-
-STDMETHODIMP CBarlist::get_RetainingWallQuantity(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_RetainingWall;
-	return S_OK;
-}
-
-STDMETHODIMP CBarlist::put_RetainingWallQuantity(double newVal)
-{
-	// TODO: Add your implementation code here
-   m_RetainingWall = newVal;
-	Fire_OnNotIncludedQuantitiesChanged();
-   return S_OK;
-}
-
-STDMETHODIMP CBarlist::get_SuperstructureMass(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_SuperstructureMass;
-	return S_OK;
-}
-
-STDMETHODIMP CBarlist::get_SuperstructureMassEpoxy(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_SuperstructureMassEpoxy;
-	return S_OK;
-}
-
-STDMETHODIMP CBarlist::get_SubstructureMass(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_SubstructureMass;
-	return S_OK;
-}
-
-STDMETHODIMP CBarlist::get_SubstructureMassEpoxy(double *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_SubstructureMassEpoxy;
-	return S_OK;
 }
 
 STDMETHODIMP CBarlist::get_Status(StatusType *pVal)

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -63,11 +63,12 @@ END_COM_MAP()
 
 // IBarInfoMgr
 public:
-	STDMETHOD(get_Bars)(/*[out, retval]*/ IBarCollection* *pVal);
-	STDMETHOD(get_Specification)(/*[out, retval]*/ BSTR *pVal);
+	STDMETHOD(get_Bars)(/*[in]*/MaterialType material,/*[out, retval]*/ IBarCollection* *pVal);
 
 private:
-   CComPtr<IBarCollection> m_pBars;
+   CComPtr<IBarCollection> m_pSteelBars;
+   CComPtr<IBarCollection> m_pGalvanizedBars;
+   CComPtr<IBarCollection> m_pGFRPBars;
 };
 
 #endif //__BARINFOMGR_H_

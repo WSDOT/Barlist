@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -42,16 +42,13 @@ void CType60::BuildBend()
    if ( GetStatusLevel() == stError )
       return;
 
-   double deduct = 0;
-   double radius = 0;
-
    CComPtr<IBarData> pBarData;
    pBarData.Attach( GetBarData() );
 
    UseType use = GetUseType();
 
-   radius  = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
-   deduct  = CFabricationConstraints::GetBendDeduction( radius, PI_OVER_2 );
+   Float64 radius  = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
+   Float64 deduct  = CFabricationConstraints::GetBendDeduction( radius, PI_OVER_2 );
 
    // Error check data
    if ( (GetX() - deduct) < 0 )
@@ -66,8 +63,8 @@ void CType60::BuildBend()
       return;
    }
 
-   double rHook = CFabricationConstraints::GetHookRadius( pBarData, use );
-   double tail  = CFabricationConstraints::GetTailLength( pBarData, use, ht90 );
+   Float64 rHook = CFabricationConstraints::GetHookRadius( pBarData, use );
+   Float64 tail  = CFabricationConstraints::GetTailLength( pBarData, use, ht90 );
    if ( GetX() < (rHook+tail) )
    {
       SetStatusLevel( stWarning );

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -47,14 +47,14 @@ void CType61::BuildBend()
 
    UseType use = GetUseType();
 
-   double deduct90; // deduction for 90deg bend
-   double deductWY; // deduction for bend WY
-   double deductUW; // dediction for bend UW
-   double deductUX; // deduction for bend UX
-   double deductXZ; // deduction for bend XZ;
-   double oRadius;  // Outside bend radius
-   double cRadius;  // Centerline bend radius
-   double u, w, x, y, z; // adjusted dimensions
+   Float64 deduct90; // deduction for 90deg bend
+   Float64 deductWY; // deduction for bend WY
+   Float64 deductUW; // dediction for bend UW
+   Float64 deductUX; // deduction for bend UX
+   Float64 deductXZ; // deduction for bend XZ;
+   Float64 oRadius;  // Outside bend radius
+   Float64 cRadius;  // Centerline bend radius
+   Float64 u, w, x, y, z; // adjusted dimensions
 
    oRadius = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
    cRadius = CFabricationConstraints::GetCenterlineBendRadius( pBarData, use );

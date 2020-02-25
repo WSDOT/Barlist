@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -31,6 +31,12 @@
 #include "resource.h"       // main symbols
 #include <string>
 
+typedef enum BendMeasure
+{
+   DiameterRatio,
+   Diameter
+} BendMeasure;
+
 /////////////////////////////////////////////////////////////////////////////
 // CBarData
 class ATL_NO_VTABLE CBarData : 
@@ -45,9 +51,9 @@ public:
 
    void FinalRelease();
 
-   void SetBarData(const std::string& name,double db,double mass,double length,double maxLength);
-   void AddBendData(UseType use,double ID);
-   void AddHookData(UseType use,HookType hook,double T,double Tmin);
+   void SetBarData(const std::string& name,Float64 db,Float64 mass,Float64 length,Float64 max_length);
+   void AddBendData(UseType use,Float64 ID, BendMeasureType bendMeasure);
+   void AddHookData(UseType use,HookType hook,Float64 T,BendMeasureType bendMeasure, Float64 Tmin);
 
 DECLARE_REGISTRY_RESOURCEID(IDR_BARDATA)
 
@@ -63,17 +69,17 @@ public:
 	STDMETHOD(get_Name)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(get_HookData)(/*[in]*/ UseType use,/*[in]*/ HookType hook,/*[out, retval]*/ IHookData* *pVal);
 	STDMETHOD(get_BendData)(/*[in]*/ UseType use, /*[out, retval]*/ IBendData* *pVal);
-	STDMETHOD(get_MaxLength)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_NormalLength)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_Mass)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_Diameter)(/*[out, retval]*/ double *pVal);
+   STDMETHOD(get_MaxLength)(/*[out, retval]*/ Float64 *pVal);
+   STDMETHOD(get_NormalLength)(/*[out, retval]*/ Float64 *pVal);
+	STDMETHOD(get_Mass)(/*[out, retval]*/ Float64 *pVal);
+	STDMETHOD(get_Diameter)(/*[out, retval]*/ Float64 *pVal);
 
 private:
    CComBSTR m_Name;
-   double m_db;
-   double m_Mass;
-   double m_Length;
-   double m_MaxLength;
+   Float64 m_db;
+   Float64 m_Mass;
+   Float64 m_Length;
+   Float64 m_MaxLength;
 
    CComPtr<IBendData> m_pBends[3];
    CComPtr<IHookData> m_pHooks[3][3];

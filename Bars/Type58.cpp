@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 2009-2019, Washington State Department of Transportation
-//                     Bridge and Structures Office
+// Copyright © 1999-2020  Washington State Department of Transportation
+//                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
@@ -40,16 +40,16 @@ void CType58::BuildBend()
    if ( GetStatusLevel() == stError )
       return;
 
-   double deduct90  = 0;
-   double deduct135 = 0;
-   double radius    = 0;
-   double tail90    = 0;
-   double tail135   = 0;
-
    CComPtr<IBarData> pBarData;
    pBarData.Attach( GetBarData() );
 
    UseType use = GetUseType();
+
+   Float64 deduct90 = CFabricationConstraints::GetHookDeduction(pBarData, use, ht90);
+   Float64 deduct135 = CFabricationConstraints::GetHookDeduction(pBarData, use, ht135);
+   Float64 radius = CFabricationConstraints::GetHookRadius(pBarData, use);
+   Float64 tail90 = CFabricationConstraints::GetTailLength(pBarData, use, ht90);
+   Float64 tail135 = CFabricationConstraints::GetTailLength(pBarData, use, ht135);
 
    // Error check data
    if ( (GetU() - (deduct90+deduct135)) < 0 )
@@ -57,21 +57,12 @@ void CType58::BuildBend()
       SetStatusLevel( stError );
       CComBSTR msg;
       msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg,
-                    CComVariant("U"),
-                    CComVariant(deduct90+deduct135));
+      AddStatusMsg( msg, CComVariant("U"), CComVariant(deduct90+deduct135));
 
    }
 
    if ( GetStatusLevel() == stError )
       return;
-
-
-   deduct90  = CFabricationConstraints::GetHookDeduction( pBarData, use, ht90 );
-   deduct135 = CFabricationConstraints::GetHookDeduction( pBarData, use, ht135 );
-   radius    = CFabricationConstraints::GetHookRadius( pBarData, use );
-   tail90    = CFabricationConstraints::GetTailLength( pBarData, use, ht90 );
-   tail135   = CFabricationConstraints::GetTailLength( pBarData, use, ht135 );
 
    // Build bend
    AddBarComponent( new CLineComponent( GetU() - (deduct90+deduct135) ) );
