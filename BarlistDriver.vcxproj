@@ -177,7 +177,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>
       <Message>Installing WBFL for $(TargetName)</Message>
-      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) RegFreeCOM</Command>
+      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) $(OutDir)
+</Command>
       <Outputs>RegFreeCOM\$(PlatformName)\$(ConfigurationName)\WBFL*.dll</Outputs>
       <Inputs>
       </Inputs>
@@ -232,7 +233,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CustomBuildStep>
       <Message>Installing WBFL for $(TargetName)</Message>
-      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) RegFreeCOM</Command>
+      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) $(OutDir)
+</Command>
       <Outputs>RegFreeCOM\$(PlatformName)\$(ConfigurationName)\WBFL*.dll</Outputs>
       <Inputs>
       </Inputs>
@@ -285,7 +287,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CustomBuildStep>
       <Message>Installing WBFL for $(TargetName)</Message>
-      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) RegFreeCOM</Command>
+      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) $(OutDir)
+</Command>
       <Outputs>RegFreeCOM\$(PlatformName)\$(ConfigurationName)\WBFL*.dll</Outputs>
       <Inputs>
       </Inputs>
@@ -338,7 +341,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CustomBuildStep>
       <Message>Installing WBFL for $(TargetName)</Message>
-      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) RegFreeCOM</Command>
+      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) $(OutDir)
+</Command>
       <Outputs>RegFreeCOM\$(PlatformName)\$(ConfigurationName)\WBFL*.dll</Outputs>
       <Inputs>
       </Inputs>
@@ -392,7 +396,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
     <CustomBuildStep>
       <Message>Installing WBFL for $(TargetName)</Message>
-      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) RegFreeCOM</Command>
+      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) $(OutDir)
+</Command>
       <Outputs>RegFreeCOM\$(PlatformName)\$(ConfigurationName)\WBFL*.dll</Outputs>
       <Inputs>
       </Inputs>
@@ -446,7 +451,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
     <CustomBuildStep>
       <Message>Installing WBFL for $(TargetName)</Message>
-      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) RegFreeCOM</Command>
+      <Command>$(WBFLDIR)\InstallWBFL.bat $(PlatformName) $(ConfigurationName) $(OutDir)
+</Command>
       <Outputs>RegFreeCOM\$(PlatformName)\$(ConfigurationName)\WBFL*.dll</Outputs>
       <Inputs>
       </Inputs>

@@ -8,7 +8,6 @@ Contents
 * @subpage ug_main_window
 * @subpage ug_groups
 * @subpage ug_bars
-* @subpage ug_qni
 * @subpage ug_quantities
 * @subpage ug_report
 * @subpage ug_collaboration

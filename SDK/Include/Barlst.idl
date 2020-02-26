@@ -28,6 +28,7 @@
 
 import "oaidl.idl";
 import "ocidl.idl";
+import "WBFLTypes.idl";
 
 interface IBarCollection;
 interface IGroupCollection;
@@ -37,7 +38,27 @@ interface IBend;
 interface IGroup;
 interface IStatusMessage;
 interface IStatusMessageCollection;
-   
+
+   typedef [public,uuid(69FF7A31-207C-4A6F-A265-217773380AC0),helpstring("enum MaterialType")]
+   enum MaterialType {
+      //// Plain Carbon
+      //A615_Grade40, A615_Grade60, A615_Grade80, A615_Grade100,
+
+      //  Plain Low Alloy Carbon
+      A706_Grade60, A706_Grade80,
+
+      // Chromium / MMFX
+      A1035_Grade100, A1035_Grade120,
+
+      // Galvanized-
+      /*A767_A1094_Grade40, */A767_A1094_Grade60, A767_A1094_Grade80, A767_A1094_Grade100,
+
+      // Stainless Steel
+      A955_Grade60, A955_Grade75, A955_Grade80,
+
+      // GFRP
+      D7957
+   } MaterialType;
 
    typedef [public,uuid(21A44900-1381-11d3-8933-006097C68A9C),helpstring("enum HookType")]
    enum HookType { ht90, ht135, ht180 } HookType;
@@ -54,6 +75,9 @@ interface IStatusMessageCollection;
    typedef [public,uuid(F220640C-825C-11d3-89D1-006097C68A9C),helpstring("enum MoveType")]
    enum MoveType { mtBefore = 1, mtAfter = 2 } MoveType;
 
+   typedef [public, uuid(0C3DA8A1-A7EA-46AC-AE61-1C17AF635F85), helpstring("enum BendMeasureType")]
+   enum BendMeasureType { BarDiameter, InsideDiameter } BendMeasureType;
+
 	[
 		object,
 		uuid(F1F5C067-12AA-11D3-8932-006097C68A9C),
@@ -63,8 +87,7 @@ interface IStatusMessageCollection;
 	]
 	interface IBarInfoMgr : IDispatch
 	{
-		[propget, id(1), helpstring("property Specification")] HRESULT Specification([out, retval] BSTR *pVal);
-		[propget, id(2), helpstring("property Bars")] HRESULT Bars([out, retval] IBarCollection* *pVal);
+		[propget, id(1), helpstring("property Bars")] HRESULT Bars([in]MaterialType material,[out, retval] IBarCollection* *pVal);
 	};
 
 	[
@@ -78,8 +101,9 @@ interface IStatusMessageCollection;
 	{
 		[propget, id(1), helpstring("property Type")] HRESULT Type([out, retval] HookType *pVal);
 		[propget, id(2), helpstring("property Use")] HRESULT Use([out, retval] UseType *pVal);
-		[propget, id(3), helpstring("property Tail")] HRESULT Tail([out, retval] double *pVal);
-		[propget, id(4), helpstring("property MinTail")] HRESULT MinTail([out, retval] double *pVal);
+		[propget, id(3), helpstring("property Tail")] HRESULT Tail([out, retval] Float64 *pVal);
+      [propget, id(4), helpstring("property BendMeasure")] HRESULT BendMeasure([out, retval]BendMeasureType* pVal);
+		[propget, id(5), helpstring("property MinTail")] HRESULT MinTail([out, retval] Float64 *pVal);
 	};
 	[
 		object,
@@ -91,8 +115,9 @@ interface IStatusMessageCollection;
 	interface IBendData : IDispatch
 	{
 		[propget, id(1), helpstring("property Use")] HRESULT Use([out, retval] UseType *pVal);
-		[propget, id(2), helpstring("property InsideDiameter")] HRESULT InsideDiameter([out, retval] double *pVal);
-	};
+		[propget, id(2), helpstring("property InsideDiameter")] HRESULT InsideDiameter([out, retval] Float64 *pVal);
+      [propget, id(3), helpstring("property BendMeasusre")] HRESULT BendMeasure([out, retval] BendMeasureType* pVal);
+   };
 	[
 		object,
 		uuid(1454C8E5-1380-11D3-8933-006097C68A9C),
@@ -102,14 +127,14 @@ interface IStatusMessageCollection;
 	]
 	interface IBarData : IDispatch
 	{
-		[propget, id(1), helpstring("property Diameter")] HRESULT Diameter([out, retval] double *pVal);
-		[propget, id(2), helpstring("property Mass")] HRESULT Mass([out, retval] double *pVal);
-		[propget, id(3), helpstring("property NormalLength")] HRESULT NormalLength([out, retval] double *pVal);
-		[propget, id(4), helpstring("property MaxLength")] HRESULT MaxLength([out, retval] double *pVal);
-		[propget, id(5), helpstring("property BendData")] HRESULT BendData([in] UseType use, [out, retval] IBendData* *pVal);
-		[propget, id(6), helpstring("property HookData")] HRESULT HookData([in] UseType use,[in] HookType hook,[out, retval] IHookData* *pVal);
-		[propget, id(7), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
-	};
+      [propget, id(1), helpstring("property Diameter")] HRESULT Diameter([out, retval] double *pVal);
+      [propget, id(2), helpstring("property Mass")] HRESULT Mass([out, retval] double *pVal);
+      [propget, id(3), helpstring("property NormalLength")] HRESULT NormalLength([out, retval] double *pVal);
+      [propget, id(4), helpstring("property MaxLength")] HRESULT MaxLength([out, retval] double *pVal);
+      [propget, id(5), helpstring("property BendData")] HRESULT BendData([in] UseType use, [out, retval] IBendData* *pVal);
+      [propget, id(6), helpstring("property HookData")] HRESULT HookData([in] UseType use, [in] HookType hook, [out, retval] IHookData* *pVal);
+      [propget, id(7), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+   };
 	[
 		object,
 		uuid(1454C8E9-1380-11D3-8933-006097C68A9C),
@@ -132,34 +157,34 @@ interface IStatusMessageCollection;
 	]
 	interface IBarRecord : IDispatch
 	{
-		[propget, id(1), helpstring("property Mark")] HRESULT Mark([out, retval] BSTR *pVal);
-		[propput, id(1), helpstring("property Mark")] HRESULT Mark([in] BSTR newVal);
-		[propget, id(2), helpstring("property Location")] HRESULT Location([out, retval] BSTR *pVal);
-		[propput, id(2), helpstring("property Location")] HRESULT Location([in] BSTR newVal);
-		[propget, id(3), helpstring("property NumReqd")] HRESULT NumReqd([out, retval] long *pVal);
-		[propput, id(3), helpstring("property NumReqd")] HRESULT NumReqd([in] long newVal);
-		[propget, id(4), helpstring("property Use")] HRESULT Use([out, retval] UseType *pVal);
-		[propput, id(4), helpstring("property Use")] HRESULT Use([in] UseType newVal);
-		[propget, id(5), helpstring("property LumpSum")] HRESULT LumpSum([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(5), helpstring("property LumpSum")] HRESULT LumpSum([in] VARIANT_BOOL newVal);
-		[propget, id(6), helpstring("property Substructure")] HRESULT Substructure([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(6), helpstring("property Substructure")] HRESULT Substructure([in] VARIANT_BOOL newVal);
-		[propget, id(7), helpstring("property Epoxy")] HRESULT Epoxy([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(7), helpstring("property Epoxy")] HRESULT Epoxy([in] VARIANT_BOOL newVal);
-		[propget, id(8), helpstring("property Varies")] HRESULT Varies([out, retval] VARIANT_BOOL *pVal);
-		[propget, id(9), helpstring("property NumEach")] HRESULT NumEach([out, retval] long *pVal);
-		[propput, id(9), helpstring("property NumEach")] HRESULT NumEach([in] long newVal);
-		[propget, id(10), helpstring("property PrimaryBend")] HRESULT PrimaryBend([out, retval] IBend* *pVal);
-		[propput, id(10), helpstring("property PrimaryBend")] HRESULT PrimaryBend([in] IBend *newVal);
-		[propget, id(11), helpstring("property VariesBend")] HRESULT VariesBend([out, retval] IBend* *pVal);
-		[propput, id(11), helpstring("property VariesBend")] HRESULT VariesBend([in] IBend* newVal);
-		[propget, id(12), helpstring("property BendType")] HRESULT BendType([out, retval] long *pVal);
+      [propget, id(1), helpstring("property Material")] HRESULT Material([out, retval] MaterialType *pVal);
+      [propput, id(1), helpstring("property Material")] HRESULT Material([in] MaterialType newVal);
+      [propget, id(2), helpstring("property Mark")] HRESULT Mark([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property Mark")] HRESULT Mark([in] BSTR newVal);
+		[propget, id(3), helpstring("property Location")] HRESULT Location([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property Location")] HRESULT Location([in] BSTR newVal);
+		[propget, id(4), helpstring("property NumReqd")] HRESULT NumReqd([out, retval] long *pVal);
+		[propput, id(4), helpstring("property NumReqd")] HRESULT NumReqd([in] long newVal);
+		[propget, id(5), helpstring("property Use")] HRESULT Use([out, retval] UseType *pVal);
+		[propput, id(5), helpstring("property Use")] HRESULT Use([in] UseType newVal);
+		[propget, id(7), helpstring("property Substructure")] HRESULT Substructure([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property Substructure")] HRESULT Substructure([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property Epoxy")] HRESULT Epoxy([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property Epoxy")] HRESULT Epoxy([in] VARIANT_BOOL newVal);
+		[propget, id(9), helpstring("property Varies")] HRESULT Varies([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(10), helpstring("property NumEach")] HRESULT NumEach([out, retval] long *pVal);
+		[propput, id(10), helpstring("property NumEach")] HRESULT NumEach([in] long newVal);
+		[propget, id(11), helpstring("property PrimaryBend")] HRESULT PrimaryBend([out, retval] IBend* *pVal);
+		[propput, id(11), helpstring("property PrimaryBend")] HRESULT PrimaryBend([in] IBend *newVal);
+		[propget, id(12), helpstring("property VariesBend")] HRESULT VariesBend([out, retval] IBend* *pVal);
+		[propput, id(12), helpstring("property VariesBend")] HRESULT VariesBend([in] IBend* newVal);
+		[propget, id(13), helpstring("property BendType")] HRESULT BendType([out, retval] long *pVal);
 		[propget, id(14), helpstring("property Size")] HRESULT Size([out, retval] BSTR *pVal);
 		[propget, id(15), helpstring("property Status")] HRESULT Status([out, retval] StatusType *pVal);
-		[propget, id(17), helpstring("property Mass")] HRESULT Mass([out, retval] double *pVal);
-		[propget, id(18), helpstring("property BarData")] HRESULT BarData([out, retval] IBarData* *pVal);
-		[propput, id(18), helpstring("property BarData")] HRESULT BarData([in] IBarData* newVal);
-		[propget, id(19), helpstring("property StatusMessages")] HRESULT StatusMessages([out, retval] IStatusMessageCollection* *pVal);
+		[propget, id(16), helpstring("property Mass")] HRESULT Mass([out, retval] Float64 *pVal);
+		[propget, id(17), helpstring("property BarData")] HRESULT BarData([out, retval] IBarData* *pVal);
+		[propput, id(17), helpstring("property BarData")] HRESULT BarData([in] IBarData* newVal);
+		[propget, id(18), helpstring("property StatusMessages")] HRESULT StatusMessages([out, retval] IStatusMessageCollection* *pVal);
 	};
 	[
 		object,
@@ -183,16 +208,9 @@ interface IStatusMessageCollection;
 	interface IBarlist : IDispatch
 	{
 		[propget, id(1), helpstring("property Groups")] HRESULT Groups([out, retval] IGroupCollection* *pVal);
-		[propget, id(2), helpstring("property TrafficBarrierQuantity")] HRESULT TrafficBarrierQuantity([out, retval] double *pVal);
-		[propput, id(2), helpstring("property TrafficBarrierQuantity")] HRESULT TrafficBarrierQuantity([in] double newVal);
-		[propget, id(3), helpstring("property BridgeGrateInletQuantity")] HRESULT BridgeGrateInletQuantity([out, retval] double *pVal);
-		[propput, id(3), helpstring("property BridgeGrateInletQuantity")] HRESULT BridgeGrateInletQuantity([in] double newVal);
-		[propget, id(4), helpstring("property RetainingWallQuantity")] HRESULT RetainingWallQuantity([out, retval] double *pVal);
-		[propput, id(4), helpstring("property RetainingWallQuantity")] HRESULT RetainingWallQuantity([in] double newVal);
-		[propget, id(5), helpstring("property SuperstructureMass")] HRESULT SuperstructureMass([out, retval] double *pVal);
-		[propget, id(6), helpstring("property SuperstructureMassEpoxy")] HRESULT SuperstructureMassEpoxy([out, retval] double *pVal);
-		[propget, id(7), helpstring("property SubstructureMass")] HRESULT SubstructureMass([out, retval] double *pVal);
-		[propget, id(8), helpstring("property SubstructureMassEpoxy")] HRESULT SubstructureMassEpoxy([out, retval] double *pVal);
+
+      [propget, id(3), helpstring("property Quantity")] HRESULT Quantity([in]MaterialType material, [in]VARIANT_BOOL bEpoxy, [in]VARIANT_BOOL bSubstructure, [out, retval]Float64* pVal);
+
 		[propget, id(9), helpstring("property Status")] HRESULT Status([out, retval] StatusType *pVal);
 		[propget, id(10), helpstring("property Project")] HRESULT Project([out, retval] BSTR *pVal);
 		[propput, id(10), helpstring("property Project")] HRESULT Project([in] BSTR newVal);
@@ -214,7 +232,6 @@ interface IStatusMessageCollection;
 	]
 	interface IBarlistEvents : IUnknown
    {
-		[helpstring("method OnNotIncludedQuantitiesChanged")] HRESULT OnNotIncludedQuantitiesChanged();
 		[helpstring("method OnGroupAdded")] HRESULT OnGroupAdded([in] IGroup* pGroup);
 		[helpstring("method OnGroupRemoved")] HRESULT OnGroupRemoved([in] BSTR Name);
 		[helpstring("method OnGroupChanged")] HRESULT OnGroupChanged([in] IGroup* pGroup);
@@ -238,10 +255,7 @@ interface IStatusMessageCollection;
 		[propget, id(1), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
 		[propput, id(1), helpstring("property Name")] HRESULT Name([in] BSTR newVal);
 		[propget, id(2), helpstring("property BarRecords")] HRESULT BarRecords([out, retval] IBarRecordCollection* *pVal);
-		[propget, id(3), helpstring("property SuperstructureMass")] HRESULT SuperstructureMass([out, retval] double *pVal);
-		[propget, id(4), helpstring("property SubstructureMass")] HRESULT SubstructureMass([out, retval] double *pVal);
-		[propget, id(5), helpstring("property SubstructureMassEpoxy")] HRESULT SubstructureMassEpoxy([out, retval] double *pVal);
-		[propget, id(6), helpstring("property SuperstructureMassEpoxy")] HRESULT SuperstructureMassEpoxy([out, retval] double *pVal);
+      [propget, id(3), helpstring("property Quantity")] HRESULT Quantity([in]MaterialType material, [in]VARIANT_BOOL bEpoxy, [in]VARIANT_BOOL bSubstructure, [out, retval]Float64* pVal);
       [propget, id(7), helpstring("property Status")] HRESULT Status([out,retval] StatusType *pVal);
 	};
 	[
@@ -341,23 +355,23 @@ interface IStatusMessageCollection;
    ]
    interface IBend : IDispatch
    {
-      [propget, id(1), helpstring("property U")] HRESULT U([out,retval] double* pVal);
-      [propput, id(1), helpstring("property U")] HRESULT U([in] double newVal);
-      [propget, id(2), helpstring("property W")] HRESULT W([out,retval] double* pVal);
-      [propput, id(2), helpstring("property W")] HRESULT W([in] double newVal);
-      [propget, id(3), helpstring("property X")] HRESULT X([out,retval] double* pVal);
-      [propput, id(3), helpstring("property X")] HRESULT X([in] double newVal);
-      [propget, id(4), helpstring("property Y")] HRESULT Y([out,retval] double* pVal);
-      [propput, id(4), helpstring("property Y")] HRESULT Y([in] double newVal);
-      [propget, id(5), helpstring("property Z")] HRESULT Z([out,retval] double* pVal);
-      [propput, id(5), helpstring("property Z")] HRESULT Z([in] double newVal);
-      [propget, id(6), helpstring("property T1")] HRESULT T1([out,retval] double* pVal);
-      [propput, id(6), helpstring("property T1")] HRESULT T1([in] double newVal);
-      [propget, id(7), helpstring("property T2")] HRESULT T2([out,retval] double* pVal);
-      [propput, id(7), helpstring("property T2")] HRESULT T2([in] double newVal);
+      [propget, id(1), helpstring("property U")] HRESULT U([out,retval] Float64* pVal);
+      [propput, id(1), helpstring("property U")] HRESULT U([in] Float64 newVal);
+      [propget, id(2), helpstring("property W")] HRESULT W([out,retval] Float64* pVal);
+      [propput, id(2), helpstring("property W")] HRESULT W([in] Float64 newVal);
+      [propget, id(3), helpstring("property X")] HRESULT X([out,retval] Float64* pVal);
+      [propput, id(3), helpstring("property X")] HRESULT X([in] Float64 newVal);
+      [propget, id(4), helpstring("property Y")] HRESULT Y([out,retval] Float64* pVal);
+      [propput, id(4), helpstring("property Y")] HRESULT Y([in] Float64 newVal);
+      [propget, id(5), helpstring("property Z")] HRESULT Z([out,retval] Float64* pVal);
+      [propput, id(5), helpstring("property Z")] HRESULT Z([in] Float64 newVal);
+      [propget, id(6), helpstring("property T1")] HRESULT T1([out,retval] Float64* pVal);
+      [propput, id(6), helpstring("property T1")] HRESULT T1([in] Float64 newVal);
+      [propget, id(7), helpstring("property T2")] HRESULT T2([out,retval] Float64* pVal);
+      [propput, id(7), helpstring("property T2")] HRESULT T2([in] Float64 newVal);
       [propget, id(8), helpstring("property Status")] HRESULT Status([out,retval] StatusType* pVal);
       [propget, id(9), helpstring("property StatusMessages")] HRESULT StatusMessages([out,retval] IStatusMessageCollection** pVal);
-      [propget, id(10), helpstring("property Length")] HRESULT Length([out,retval] double* pVal);
+      [propget, id(10), helpstring("property Length")] HRESULT Length([out,retval] Float64* pVal);
 		[propget, id(11), helpstring("property BendType")] HRESULT BendType([out, retval] long *pVal);
 		[propget, id(12), helpstring("property BarRecord")] HRESULT BarRecord([out, retval] IBarRecord* *pVal);
 		[propput, id(12), helpstring("property BarRecord")] HRESULT BarRecord([in] IBarRecord* newVal);
@@ -385,8 +399,8 @@ interface IStatusMessageCollection;
 	{
 		[propget, id(1), helpstring("property Text")] HRESULT Text([out, retval] BSTR *pVal);
 		[propget, id(2), helpstring("property Val1")] HRESULT Val1([out, retval] VARIANT *pVal);
-		[propget, id(3), helpstring("property Val2")] HRESULT Val2([out, retval] VARIANT *pVal);
-	};
+      [propget, id(3), helpstring("property Val2")] HRESULT Val2([out, retval] VARIANT *pVal);
+   };
 	[
 		object,
 		uuid(9DE5701C-1919-11D3-893C-006097C68A9C),

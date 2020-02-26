@@ -42,19 +42,19 @@ public:
 	CFabricationConstraints();
 	virtual ~CFabricationConstraints();
 
-   static double GetBendDeduction(double OR, // outside radius
-                                  double angle);
-   static double GetBendDeduction(IBarData* pBarData,UseType use);
-   static double GetHookDeduction(IBarData* pBarData,UseType use,HookType hook);
-   static double GetHookRadius(IBarData* pBarData,UseType use);
-   static double GetTailLength(IBarData* pBarData,UseType use,HookType hook);
+   static Float64 GetBendDeduction(Float64 OR, // outside radius
+                                  Float64 angle);
+   static Float64 GetBendDeduction(IBarData* pBarData,UseType use);
+   static Float64 GetHookDeduction(IBarData* pBarData,UseType use,HookType hook);
+   static Float64 GetHookRadius(IBarData* pBarData,UseType use);
+   static Float64 GetTailLength(IBarData* pBarData,UseType use,HookType hook);
 
-   static double GetInsideBendDiameter(IBarData* pBarData,UseType use);
-   static double GetOutsideBendDiameter(IBarData* pBarData,UseType use);
-   static double GetCenterlineBendDiameter(IBarData* pBarData,UseType use);
-   static double GetInsideBendRadius(IBarData* pBarData,UseType use);
-   static double GetOutsideBendRadius(IBarData* pBarData,UseType use);
-   static double GetCenterlineBendRadius(IBarData* pBarData,UseType use);
+   static Float64 GetInsideBendDiameter(IBarData* pBarData,UseType use);
+   static Float64 GetOutsideBendDiameter(IBarData* pBarData,UseType use);
+   static Float64 GetCenterlineBendDiameter(IBarData* pBarData,UseType use);
+   static Float64 GetInsideBendRadius(IBarData* pBarData,UseType use);
+   static Float64 GetOutsideBendRadius(IBarData* pBarData,UseType use);
+   static Float64 GetCenterlineBendRadius(IBarData* pBarData,UseType use);
 };
 
 #endif // !defined(AFX_FABRICATIONCONSTRAINTS_H__D6F6D557_1514_11D3_8937_006097C68A9C__INCLUDED_)

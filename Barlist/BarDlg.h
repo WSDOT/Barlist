@@ -24,6 +24,7 @@
 #include "resource.h"
 #include "BarDlgStateMachine.h"
 #include <MfcTools\CacheEdit.h>
+#include <MfcTools\CacheCheckBox.h>
 #include <MfcTools\MetaFileStatic.h>
 
 interface IBarInfoMgr;
@@ -61,6 +62,8 @@ public:
 #endif
 
 protected:
+   bool m_bIsCollaboration;
+
    CComPtr<IBarInfoMgr> m_BarInfoMgr;
    CComPtr<IBarlist> m_Barlist;
 
@@ -69,6 +72,8 @@ protected:
 
    CBendTypeComboBox m_cbBendType;
    friend CBendTypeComboBox;
+
+   CCacheCheckBox m_cbEpoxy;
 
    CMetaFileStatic m_BendGuide;
    CCacheEdit m_ctrlNumEach;
@@ -125,4 +130,5 @@ public:
    afx_msg void OnChange();
    afx_msg void OnBnClickedCancel();
    afx_msg void OnBnClickedHelp();
+   afx_msg void OnCbnSelchangeMaterials();
 };

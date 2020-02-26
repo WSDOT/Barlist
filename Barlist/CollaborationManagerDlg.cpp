@@ -84,6 +84,8 @@ BEGIN_MESSAGE_MAP(CCollaborationManagerDlg, CDialog)
    ON_LBN_SELCHANGE(IDC_FILES, &CCollaborationManagerDlg::OnSelchangeFiles)
    ON_BN_CLICKED(IDC_ADD, &CCollaborationManagerDlg::OnBnClickedAdd)
    ON_BN_CLICKED(IDCHELP, &CCollaborationManagerDlg::OnBnClickedChelp)
+   ON_WM_DESTROY()
+   ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 
@@ -94,6 +96,11 @@ BOOL CCollaborationManagerDlg::OnInitDialog()
 {
    USES_CONVERSION;
    CDialog::OnInitDialog();
+
+   CRect rect;
+   GetWindowRect(&rect);
+   m_cxMin = rect.Width();
+   m_cyMin = rect.Height();
 
    DragAcceptFiles();
    m_lbFiles.DragAcceptFiles();
@@ -228,4 +235,84 @@ void CCollaborationManagerDlg::OnBnClickedAdd()
 void CCollaborationManagerDlg::OnBnClickedChelp()
 {
    EAFHelp(EAFGetDocument()->GetDocumentationSetName(), IDH_COLLABORATION);
+}
+
+
+LRESULT CCollaborationManagerDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+   // prevent the dialog from getting smaller than the original size
+   if (message == WM_SIZING)
+   {
+      LPRECT rect = (LPRECT)lParam;
+      int cx = rect->right - rect->left;
+      int cy = rect->bottom - rect->top;
+
+      if (cx < m_cxMin || cy < m_cyMin)
+      {
+         // prevent the dialog from moving right or down
+         if (wParam == WMSZ_BOTTOMLEFT ||
+            wParam == WMSZ_LEFT ||
+            wParam == WMSZ_TOP ||
+            wParam == WMSZ_TOPLEFT ||
+            wParam == WMSZ_TOPRIGHT)
+         {
+            CRect r;
+            GetWindowRect(&r);
+            rect->left = r.left;
+            rect->top = r.top;
+         }
+
+         if (cx < m_cxMin)
+         {
+            rect->right = rect->left + m_cxMin;
+         }
+
+         if (cy < m_cyMin)
+         {
+            rect->bottom = rect->top + m_cyMin;
+         }
+
+         return TRUE;
+      }
+   }
+
+   return CDialog::WindowProc(message, wParam, lParam);
+}
+
+void CCollaborationManagerDlg::OnDestroy()
+{
+   // Save the layout of the application window
+   CEAFApp* pApp = EAFGetApp();
+   WINDOWPLACEMENT wp;
+   wp.length = sizeof wp;
+   if (GetWindowPlacement(&wp))
+   {
+      pApp->WriteWindowPlacement(_T("Window Positions"), _T("CollaborationManager"), &wp);
+   }
+
+   CDialog::OnDestroy();
+}
+
+void CCollaborationManagerDlg::OnShowWindow(BOOL bShow, UINT nStatus)
+{
+   CDialog::OnShowWindow(bShow, nStatus);
+
+   // Restore the layout of the application window
+   if (bShow)
+   {
+      WINDOWPLACEMENT wp;
+      if (EAFGetApp()->ReadWindowPlacement(_T("Window Positions"), _T("CollaborationManager"), &wp))
+      {
+         CWnd* pDesktop = GetDesktopWindow();
+         //CRect rDesktop;
+         //pDesktop->GetWindowRect(&rDesktop); // this is the size of one monitor.... use GetSystemMetrics to get the entire desktop
+         CRect rDesktop(0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN));
+         CRect rDlg(wp.rcNormalPosition);
+         if (rDesktop.PtInRect(rDlg.TopLeft()) && rDesktop.PtInRect(rDlg.BottomRight()))
+         {
+            // if dialog is within the desktop area, set its position... otherwise the default position will be sued
+            SetWindowPos(NULL, wp.rcNormalPosition.left, wp.rcNormalPosition.top, wp.rcNormalPosition.right - wp.rcNormalPosition.left, wp.rcNormalPosition.bottom - wp.rcNormalPosition.top, 0);
+         }
+      }
+   }
 }

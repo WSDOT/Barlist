@@ -42,7 +42,7 @@ public:
 	{
 	}
 
-   void SetData(HookType hook,UseType use,double T,double Tmin);
+   void SetData(HookType hook,UseType use,Float64 T,BendMeasureType bm,Float64 Tmin);
 
 DECLARE_REGISTRY_RESOURCEID(IDR_HOOKDATA)
 
@@ -55,16 +55,18 @@ END_COM_MAP()
 
 // IHookData
 public:
-	STDMETHOD(get_MinTail)(/*[out, retval]*/ double *pVal);
-	STDMETHOD(get_Tail)(/*[out, retval]*/ double *pVal);
+	STDMETHOD(get_MinTail)(/*[out, retval]*/ Float64 *pVal);
+   STDMETHOD(get_BendMeasure)(/*[out, retval]*/BendMeasureType* pVal);
+   STDMETHOD(get_Tail)(/*[out, retval]*/ Float64 *pVal);
 	STDMETHOD(get_Use)(/*[out, retval]*/ UseType *pVal);
 	STDMETHOD(get_Type)(/*[out, retval]*/ HookType *pVal);
 
 private:
    HookType m_HookType;
    UseType  m_UseType;
-   double   m_Tail;
-   double   m_MinTail;
+   Float64   m_Tail;
+   BendMeasureType m_BendMeasure;
+   Float64   m_MinTail;
 };
 
 #endif //__HOOKDATA_H_

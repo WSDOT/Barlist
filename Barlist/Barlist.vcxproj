@@ -185,7 +185,7 @@
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -249,7 +249,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\Include;$(WBFLDIR)\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -276,7 +276,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3.lib;mfcs140u.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3.lib;$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1.lib;mfcs140u.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -308,7 +308,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRI
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -369,7 +369,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\Include;$(WBFLDIR)\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -399,7 +399,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3D.lib;mfcs140ud.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3D.lib;$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1D.lib;mfcs140ud.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -430,7 +430,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -480,7 +480,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -565,11 +565,11 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
     <ClCompile Include="CollaborationManagerDlg.cpp" />
     <ClCompile Include="ComponentInfo.cpp" />
     <ClCompile Include="GenerateMarkNumbersDlg.cpp" />
+    <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="mfcdual.cpp" />
     <ClCompile Include="OptionsDlg.cpp" />
     <ClCompile Include="Plugin.cpp" />
     <ClCompile Include="PropertiesDlg.cpp" />
-    <ClCompile Include="QNIDlg.cpp" />
     <ClCompile Include="QuantitiesDlg.cpp" />
     <ClCompile Include="Report.cpp" />
     <ClCompile Include="ReportDlg.cpp" />
@@ -683,11 +683,11 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
     <ClInclude Include="ComponentInfo.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="GenerateMarkNumbersDlg.h" />
+    <ClInclude Include="Helpers.h" />
     <ClInclude Include="mfcdual.h" />
     <ClInclude Include="OptionsDlg.h" />
     <ClInclude Include="Plugin.h" />
     <ClInclude Include="PropertiesDlg.h" />
-    <ClInclude Include="QNIDlg.h" />
     <ClInclude Include="QuantitiesDlg.h" />
     <ClInclude Include="Report.h" />
     <ClInclude Include="ReportDlg.h" />
@@ -722,6 +722,9 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
       <RootElement Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
       </RootElement>
     </CXX_Tree_Mapping_Rule>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Schema\Barlist_Version_1.0_to_Vesion_2.0.xslt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

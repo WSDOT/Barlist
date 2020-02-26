@@ -10,11 +10,10 @@ Barlist has an intuitive iterface making bar entry fast and simple. Barlist can 
 
 Getting Started
 ---------------
-* @subpage download_and_installation
 * @subpage support
 
 
 Manuals
 ----------
-* [User Guide](http://www.wsdot.wa.gov/eesc/bridge/software/Documentation/Barlist/Barlist/5.0/user_guide.html) - Get more in-depth information
+* [User Guide](http://www.wsdot.wa.gov/eesc/bridge/software/Documentation/Barlist/Barlist/5.2/user_guide.html) - Get more in-depth information
 

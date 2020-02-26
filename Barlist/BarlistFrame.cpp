@@ -25,6 +25,7 @@
 
 #include "stdafx.h"
 #include "BarlistFrame.h"
+#include "Helpers.h"
 #include "resource.h"
 
 #ifdef _DEBUG
@@ -48,6 +49,9 @@ BEGIN_MESSAGE_MAP(CBarlistFrame, CMDIChildWnd)
    ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, &CBarlistFrame::OnUpdateEditPaste)
    ON_COMMAND(ID_EDIT_PASTE, &CBarlistFrame::OnEditPaste)
    ON_COMMAND(ID_HELP_FINDER, OnHelpFinder)
+   ON_COMMAND(IDC_QUANTITIES, &CBarlistFrame::OnQuantnties)
+   ON_UPDATE_COMMAND_UI(IDC_QUANTITIES, &CBarlistFrame::OnUpdateQuantities)
+   ON_WM_NCDESTROY()
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -101,9 +105,21 @@ BOOL CBarlistFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext
       return FALSE;
    }
 
+
+   {
+      AFX_MANAGE_STATE(AfxGetStaticModuleState());
+      m_pQuantitiesDlg = std::make_unique<CQuantitiesDlg>(this);
+      if (!m_pQuantitiesDlg->Create(CQuantitiesDlg::IDD))
+      {
+         m_pQuantitiesDlg = nullptr;
+      }
+   }
+
    // introduce the views to each oterh
    GetTreeView()->SetListView(GetListView());
+   GetTreeView()->SetFrame(this);
    GetListView()->SetTreeView(GetTreeView());
+   GetListView()->SetFrame(this);
 
    // Activate the tree view
    SetActiveView(GetTreeView());
@@ -195,7 +211,7 @@ void CBarlistFrame::OnEditPaste()
       HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cFormat);
       CBarlistClipboardData* pCBD = (CBarlistClipboardData*)::GlobalLock(hGlobal);
 
-      CBarlistDoc* pDoc = GetTreeView()->GetDocument();
+      CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
       CComPtr<IBarlist> barlist;
       pDoc->GetBarlist(&barlist);
 
@@ -232,6 +248,105 @@ void CBarlistFrame::OnEditPaste()
       }
 
       ::GlobalUnlock(hGlobal);
+   }
+}
+
+void CBarlistFrame::OnQuantnties()
+{
+   if (m_pQuantitiesDlg)
+   {
+      m_pQuantitiesDlg->ShowWindow(m_pQuantitiesDlg->IsWindowVisible() ? SW_HIDE : SW_SHOW);
+   }
+}
+
+void CBarlistFrame::OnUpdateQuantities(CCmdUI *pCmdUI)
+{
+   // TODO: Add your command update UI handler code here
+   if (m_pQuantitiesDlg)
+   {
+      CString str;
+      str.Format(_T("%s Quantities"), m_pQuantitiesDlg->IsWindowVisible() ? _T("Hide") : _T("Show"));
+      pCmdUI->SetText(str);
+      pCmdUI->SetRadio(m_pQuantitiesDlg->IsWindowVisible());
+   }
+}
+
+void CBarlistFrame::OnNcDestroy()
+{
+   if (m_pQuantitiesDlg)
+   {
+      AFX_MANAGE_STATE(AfxGetStaticModuleState());
+      m_pQuantitiesDlg->DestroyWindow();
+      m_pQuantitiesDlg = nullptr;
+   }
+   __super::OnNcDestroy();
+}
+
+void CBarlistFrame::ClearQuantities()
+{
+   if (m_pQuantitiesDlg)
+   {
+      m_pQuantitiesDlg->Clear();
+   }
+}
+
+void CBarlistFrame::UpdateQuantities(long grpIdx)
+{
+   CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+   CComPtr<IBarlist> barlist;
+   pDoc->GetBarlist(&barlist);
+
+   CComPtr<IGroupCollection> groups;
+   barlist->get_Groups(&groups);
+
+   CComPtr<IGroup> group;
+   groups->get_Item(CComVariant(grpIdx), &group);
+
+   UpdateQuantities(group);
+}
+
+void CBarlistFrame::UpdateQuantities(IGroup* pGroup)
+{
+   if (m_pQuantitiesDlg)
+   {
+      CComBSTR bstrName;
+      Float64 sub, subEpoxy, super, superEpoxy;
+      if (pGroup == nullptr)
+      {
+         CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+         CComPtr<IBarlist> barlist;
+         pDoc->GetBarlist(&barlist);
+
+         barlist->get_Project(&bstrName);
+
+         m_pQuantitiesDlg->SetGroup(bstrName);
+         for (int i = 0; i < MATERIAL_COUNT; i++)
+         {
+            MaterialType material = (MaterialType)(i);
+            barlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
+            barlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
+            barlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
+            barlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+
+            m_pQuantitiesDlg->SetQuantities(material, sub, subEpoxy, super, superEpoxy);
+         }
+      }
+      else
+      {
+         pGroup->get_Name(&bstrName);
+
+         m_pQuantitiesDlg->SetGroup(bstrName);
+         for (int i = 0; i < MATERIAL_COUNT; i++)
+         {
+            MaterialType material = (MaterialType)(i);
+            pGroup->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
+            pGroup->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
+            pGroup->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
+            pGroup->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+
+            m_pQuantitiesDlg->SetQuantities(material, sub, subEpoxy, super, superEpoxy);
+         }
+      }
    }
 }
 

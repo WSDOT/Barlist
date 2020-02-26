@@ -46,7 +46,7 @@ CStatusMgr::~CStatusMgr()
 
 void CStatusMgr::SetStatusLevel( StatusType status )
 {
-   if ( status > m_Status )
+   if ( m_Status < status )
       m_Status = status;
 }
 

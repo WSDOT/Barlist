@@ -27,8 +27,10 @@
 #include "resource.h"
 #include "BarlistListView.h"
 #include "BarlistTreeView.h"
+#include "BarlistFrame.h"
 #include "CollaborationDoc.h"
 #include "Events.h"
+#include "Helpers.h"
 
 #include "GenerateMarkNumbersDlg.h"
 
@@ -49,6 +51,7 @@ CBarlistListView::CBarlistListView()
 {
    m_GroupIdx = -1;
    m_pTreeView = nullptr;
+   m_pFrame = nullptr;
 }
 
 CBarlistListView::~CBarlistListView()
@@ -77,7 +80,6 @@ BEGIN_MESSAGE_MAP(CBarlistListView, CListView)
    ON_COMMAND(ID_EDIT_CUT, &CBarlistListView::OnEditCut)
    ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CBarlistListView::OnUpdateEditCopy)
    ON_COMMAND(ID_EDIT_COPY, &CBarlistListView::OnEditCopy)
-   ON_UPDATE_COMMAND_UI(ID_GENERATE_MARK_NUMBERS, &CBarlistListView::OnUpdateGenerateMarkNumbers)
    ON_COMMAND(ID_GENERATE_MARK_NUMBERS, &CBarlistListView::OnGenerateMarkNumbers)
    ON_WM_DESTROY()
    ON_NOTIFY_REFLECT(NM_RCLICK, &CBarlistListView::OnNMRClick)
@@ -152,7 +154,7 @@ void CBarlistListView::OnInitialUpdate()
    list.InsertColumn(col++, _T("No. Reqd"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Bend Type"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Use"), LVCFMT_LEFT, width);
-   list.InsertColumn(col++, _T("Lump Sum"), LVCFMT_LEFT, width);
+   list.InsertColumn(col++, _T("Material"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Substructure"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Epoxy"), LVCFMT_LEFT, width);
    list.InsertColumn(col++, _T("Varies"), LVCFMT_LEFT, width);
@@ -221,6 +223,11 @@ CBarlistDoc* CBarlistListView::GetDocument()
 void CBarlistListView::SetTreeView(CBarlistTreeView* pTreeView)
 {
    m_pTreeView = pTreeView;
+}
+
+void CBarlistListView::SetFrame(CBarlistFrame* pFrame)
+{
+   m_pFrame = pFrame;
 }
 
 void CBarlistListView::SelectAll()
@@ -341,10 +348,12 @@ void CBarlistListView::SetBarRecord(int row, IBarRecord* pBarRecord)
    }
    list.SetItemText(row, subItem++, strUse);
 
-   VARIANT_BOOL vbFlag;
-   pBarRecord->get_LumpSum(&vbFlag);
-   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("L") : _T("")));
+   MaterialType material;
+   pBarRecord->get_Material(&material);
+   CString strMaterial = GetMaterialSpecification(material);
+   list.SetItemText(row, subItem++, strMaterial);
 
+   VARIANT_BOOL vbFlag;
    pBarRecord->get_Substructure(&vbFlag);
    list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("S") : _T("")));
 
@@ -357,15 +366,18 @@ void CBarlistListView::SetBarRecord(int row, IBarRecord* pBarRecord)
    // length
    CComPtr<IBend> primaryBend;
    pBarRecord->get_PrimaryBend(&primaryBend);
-   double length;
+   Float64 length;
    primaryBend->get_Length(&length);
    CString strLength = FormatLength(length);
    list.SetItemText(row, subItem++, strLength);
 
-   double mass;
-   pBarRecord->get_Mass(&mass);
-   CString strMass = FormatMass(mass);
-   list.SetItemText(row, subItem++, strMass);
+   if (material != D7957)
+   {
+      Float64 mass;
+      pBarRecord->get_Mass(&mass);
+      CString strMass = FormatMass(mass);
+      list.SetItemText(row, subItem++, strMass);
+   }
 }
 
 
@@ -614,7 +626,7 @@ void CBarlistListView::CacheBarlistClipboardData(COleDataSource& dataSource)
 
 void CBarlistListView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-   // if we begin the drag and drop on left button down, left button double click messages
+   // if we begin the drag and drop on left button down, left button Float64 click messages
    // never get through
 
    // Drag and drop will only occur if the mouse is on the icon in the list view
@@ -730,14 +742,6 @@ void CBarlistListView::OnEditCopy()
    pDataSource->SetClipboard();
 }
 
-
-void CBarlistListView::OnUpdateGenerateMarkNumbers(CCmdUI *pCmdUI)
-{
-   CListCtrl& list = GetListCtrl();
-   pCmdUI->Enable(1 < list.GetSelectedCount());
-}
-
-
 void CBarlistListView::OnGenerateMarkNumbers()
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -756,6 +760,12 @@ void CBarlistListView::OnGenerateMarkNumbers()
 
       CListCtrl& list = GetListCtrl();
       int n = list.GetSelectedCount();
+      if (n == 0)
+      {
+         SelectAll();
+         n = list.GetSelectedCount();
+      }
+
       POSITION pos = list.GetFirstSelectedItemPosition();
       long mark = dlg.m_First;
       while (pos)

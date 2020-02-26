@@ -66,13 +66,14 @@ void CBarComponent::AddBarComponent(CBarComponent* pComponent)
    m_Components.push_back(pComponent);
 }
 
-double CBarComponent::Length()
+Float64 CBarComponent::Length()
 {
    Build();
 
-   double length = 0;
-   std::vector<CBarComponent*>::iterator iter;
-   for ( iter = m_Components.begin(); iter != m_Components.end(); iter++ )
+   Float64 length = 0;
+   std::vector<CBarComponent*>::iterator iter = m_Components.begin();
+   std::vector<CBarComponent*>::iterator end = m_Components.end();
+   for ( ; iter != end; iter++)
    {
       CBarComponent* pComponent = *iter;
       length += pComponent->Length();

@@ -47,9 +47,9 @@ CFabricationConstraints::~CFabricationConstraints()
 
 }
 
-double CFabricationConstraints::GetBendDeduction(double OR, double angle)
+Float64 CFabricationConstraints::GetBendDeduction(Float64 OR, Float64 angle)
 {
-   double deduction = 0;
+   Float64 deduction = 0;
    if ( IsEqual(angle,M_PI) )
       deduction = OR;
    else
@@ -58,23 +58,23 @@ double CFabricationConstraints::GetBendDeduction(double OR, double angle)
    return deduction;
 }
 
-double CFabricationConstraints::GetBendDeduction(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetBendDeduction(IBarData* pBarData,UseType use)
 {
-   double OR = GetOutsideBendRadius(pBarData,use);
+   Float64 OR = GetOutsideBendRadius(pBarData,use);
    return GetBendDeduction(OR,PI_OVER_2);
 }
 
-double CFabricationConstraints::GetHookDeduction(IBarData* pBarData,UseType use,HookType hook)
+Float64 CFabricationConstraints::GetHookDeduction(IBarData* pBarData,UseType use,HookType hook)
 {
-   double OR = GetOutsideBendRadius(pBarData,use);
-   double angle = (hook == ht90 || hook == ht135) ? PI_OVER_2 : M_PI;
+   Float64 OR = GetOutsideBendRadius(pBarData,use);
+   Float64 angle = (hook == ht90 || hook == ht135) ? PI_OVER_2 : M_PI;
 
    return GetBendDeduction(OR,angle);
 }
 
-double CFabricationConstraints::GetHookRadius(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetHookRadius(IBarData* pBarData,UseType use)
 {
-   double CR = GetCenterlineBendRadius(pBarData,use);
+   Float64 CR = GetCenterlineBendRadius(pBarData,use);
    return CR;
 }
 
@@ -89,9 +89,9 @@ void format_msg(std::string& strMsg,const std::string& strKey,const std::string&
    }
 }
 
-double CFabricationConstraints::GetTailLength(IBarData* pBarData,UseType use,HookType hook)
+Float64 CFabricationConstraints::GetTailLength(IBarData* pBarData,UseType use,HookType hook)
 {
-   double db;
+   Float64 db;
    pBarData->get_Diameter(&db);
 
    CComPtr<IHookData> pHookData;
@@ -99,7 +99,7 @@ double CFabricationConstraints::GetTailLength(IBarData* pBarData,UseType use,Hoo
 
    if ( pHookData == NULL )
    {
-      std::string strMsg( "ERROR : Bend cannot be designated %use.  %use %hook hooks are not defined per LRFD %spec");
+      std::string strMsg( "ERROR : Bend cannot be designated %use.  %use %hook hooks are not defined per LRFD %spec and/or BDM 5.1.2");
       std::string strUse( use == utLongitudinal ? "Longitudinal" :
                           use == utTransverse   ? "Transverse"   :
                        /* use == utSeismic */     "Seismic" );
@@ -115,21 +115,21 @@ double CFabricationConstraints::GetTailLength(IBarData* pBarData,UseType use,Hoo
       throw CBarException(strMsg.c_str());
    }
 
-   double T;
+   Float64 T;
    pHookData->get_Tail(&T);
 
-   double Tmin;
+   Float64 Tmin;
    pHookData->get_MinTail(&Tmin);
 
-   double length =  T*db;
+   Float64 length =  T*db;
    length = max(length,Tmin);
 
    return length;
 }
 
-double CFabricationConstraints::GetInsideBendDiameter(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetInsideBendDiameter(IBarData* pBarData,UseType use)
 {
-   double db;
+   Float64 db;
    pBarData->get_Diameter(&db);
 
    CComPtr<IBendData> pBendData;
@@ -147,50 +147,63 @@ double CFabricationConstraints::GetInsideBendDiameter(IBarData* pBarData,UseType
       throw CBarException(strMsg.c_str());
    }
 
-   double id;
-   pBendData->get_InsideDiameter(&id);  // this is ID/db
+   Float64 id;
+   pBendData->get_InsideDiameter(&id);
 
-   double ID = db * id;
+   BendMeasureType bendMeasure;
+   pBendData->get_BendMeasure(&bendMeasure);
+
+   Float64 ID;
+   if (bendMeasure == BarDiameter)
+   {
+      // this is ID/db
+      ID = db * id;
+   }
+   else
+   {
+      ID = id;
+   }
+
    return ID;
 }
 
-double CFabricationConstraints::GetOutsideBendDiameter(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetOutsideBendDiameter(IBarData* pBarData,UseType use)
 {
-   double db;
+   Float64 db;
    pBarData->get_Diameter(&db);
 
-   double ID = GetInsideBendDiameter(pBarData,use);
-   double OD = ID + 2*db;
+   Float64 ID = GetInsideBendDiameter(pBarData,use);
+   Float64 OD = ID + 2*db;
 
    return OD;
 }
 
-double CFabricationConstraints::GetCenterlineBendDiameter(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetCenterlineBendDiameter(IBarData* pBarData,UseType use)
 {
-   double db;
+   Float64 db;
    pBarData->get_Diameter(&db);
 
-   double ID = GetInsideBendDiameter(pBarData,use);
-   double CD = ID + db;
+   Float64 ID = GetInsideBendDiameter(pBarData,use);
+   Float64 CD = ID + db;
 
    return CD;
 }
 
-double CFabricationConstraints::GetInsideBendRadius(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetInsideBendRadius(IBarData* pBarData,UseType use)
 {
-   double ID = GetInsideBendDiameter(pBarData,use);
+   Float64 ID = GetInsideBendDiameter(pBarData,use);
    return ID/2;
 }
 
-double CFabricationConstraints::GetOutsideBendRadius(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetOutsideBendRadius(IBarData* pBarData,UseType use)
 {
-   double OD = GetOutsideBendDiameter(pBarData,use);
+   Float64 OD = GetOutsideBendDiameter(pBarData,use);
    return OD/2;
 }
 
-double CFabricationConstraints::GetCenterlineBendRadius(IBarData* pBarData,UseType use)
+Float64 CFabricationConstraints::GetCenterlineBendRadius(IBarData* pBarData,UseType use)
 {
-   double CD = GetCenterlineBendDiameter(pBarData,use);
+   Float64 CD = GetCenterlineBendDiameter(pBarData,use);
    return CD/2;
 }
 

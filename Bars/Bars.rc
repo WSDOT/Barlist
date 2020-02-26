@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 5,1,6,0
- PRODUCTVERSION 5,1,6,0
+ FILEVERSION 5,2,0,9
+ PRODUCTVERSION 5,2,0,9
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
             VALUE "Comments", "A member of the Alternate Route Project"
             VALUE "CompanyName", "Washington State Department of Transportation"
             VALUE "FileDescription", "Bars Module"
-            VALUE "FileVersion", "5.1.6.0"
+            VALUE "FileVersion", "5.2.0.9"
             VALUE "InternalName", "Bars"
             VALUE "LegalCopyright", "Copyright © 1999-2020, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Bars.DLL"
             VALUE "ProductName", "Bars Module"
-            VALUE "ProductVersion", "5.1.6.0"
+            VALUE "ProductVersion", "5.2.0.9"
         END
     END
     BLOCK "VarFileInfo"
@@ -217,7 +217,7 @@ END
 
 STRINGTABLE
 BEGIN
-    WARN_EXCEEDSNORMAL      "WARNING : Exceeds normal bar length of %1"
+    WARN_EXCEEDSNORMAL      "WARNING : Bar Length %1, Exceeds normal bar length of %2"
     WARN_MINRADIUS          "WARNING : %1 is less then the minimum bend radius of %2"
     WARN_DIMLESSTHANHOOK    "WARNING : %1 is smaller than standard hook %2"
     WARN_DUPMARKNUMBER      "WARNING : Mark Number %1 is currently in use"
@@ -226,7 +226,7 @@ END
 
 STRINGTABLE
 BEGIN
-    ERR_EXCEEDSMAX          "ERROR : Exceeds maximum bar length of %1"
+    ERR_EXCEEDSMAX          "ERROR : Bar Length %1, Exceeds maximum bar length of %2"
     ERR_NOTLONGITUDINAL     "ERROR : Bend must be designated as Transverse or Seismic"
     ERR_NOTTRANSVERSE       "ERROR : Bend cannot be designated as Transverse"
     ERR_NOTSEISMIC          "ERROR : Bend cannot be designated as Seismic"
@@ -242,6 +242,8 @@ BEGIN
     ERR_NOEACHNOTMULTIPLEOFNOREQD 
                             "ERROR : # Each must be an even multiple of Num Reqd"
     ERR_NUMREQDISZERO       "ERROR : Number Req'd cannot be zero"
+    ERR_INVALIDGFRPBEND     "ERROR: Type %1 bend cannot be used for D7957 - GFRP bars"
+    ERR_INVALIDGFRPBEND80   "ERROR: Type 80 bend cannot be used for D7957 - GFRP bars unless X is 0"
 END
 
 STRINGTABLE

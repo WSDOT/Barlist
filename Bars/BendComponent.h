@@ -39,19 +39,19 @@
 class CBendComponent : public CBarComponent
 {
 public:
-	CBendComponent(double radius,double angle);
+	CBendComponent(Float64 radius,Float64 angle);
 	virtual ~CBendComponent();
 
 protected:
-   double m_Radius;
-   double m_Angle;
+   Float64 m_Radius;
+   Float64 m_Angle;
    virtual bool BuildComponent();
 };
 
 class CBend90 : public CBendComponent
 {
 public:
-   CBend90(double radius);
+   CBend90(Float64 radius);
    ~CBend90();
 };
 

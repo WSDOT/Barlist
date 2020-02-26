@@ -40,14 +40,14 @@ void CType51::BuildBend()
    if ( GetStatusLevel() == stError )
       return;
 
-   double deduct = 0;
-   double radius = 0;
-   double tail = 0;
-
    CComPtr<IBarData> pBarData;
    pBarData.Attach( GetBarData() );
 
    UseType use = GetUseType();
+
+   Float64 deduct = CFabricationConstraints::GetHookDeduction(pBarData, use, ht180);
+   Float64 radius = CFabricationConstraints::GetHookRadius(pBarData, use);
+   Float64 tail = CFabricationConstraints::GetTailLength(pBarData, use, ht180);
 
    // Error check the data
    if ( (GetU() - deduct) < 0 )
@@ -60,10 +60,6 @@ void CType51::BuildBend()
                     CComVariant(deduct));
       return;
    }
-
-   deduct = CFabricationConstraints::GetHookDeduction( pBarData, use, ht180 );
-   radius = CFabricationConstraints::GetHookRadius( pBarData, use );
-   tail   = CFabricationConstraints::GetTailLength( pBarData, use, ht180 );
 
    // Build the bend
    AddBarComponent( new CLineComponent( GetU() - deduct ) );

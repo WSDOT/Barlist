@@ -50,13 +50,13 @@ void CType83::BuildBend()
    // Error check data
 
    // Build the bend
-   double oRadius; // outside radius;
-   double cRadius; // centerline radius;
-   double hRadius; // radius of hook
-   double tail;
-   double deduct90;
-   double deduct135;
-   double u1, u2, w1, w2;
+   Float64 oRadius; // outside radius;
+   Float64 cRadius; // centerline radius;
+   Float64 hRadius; // radius of hook
+   Float64 tail;
+   Float64 deduct90;
+   Float64 deduct135;
+   Float64 u1, u2, w1, w2;
 
    oRadius   = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
    cRadius   = CFabricationConstraints::GetCenterlineBendRadius( pBarData, use );

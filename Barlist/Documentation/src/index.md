@@ -10,7 +10,6 @@ Barlist has an intuitive iterface making bar entry fast and simple. Barlist can 
 
 Getting Started
 ---------------
-* @subpage download_and_installation
 * @subpage support
 
 Manuals
