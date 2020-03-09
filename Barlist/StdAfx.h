@@ -31,10 +31,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#define STRICT
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0600
-#endif
 #define _ATL_APARTMENT_THREADED
 
 #include <afxwin.h>
