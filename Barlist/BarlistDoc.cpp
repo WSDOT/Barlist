@@ -283,7 +283,7 @@ BOOL LoadXMLResource(int name, int type, DWORD& size, const char*& data)
 
 CBarlistDoc::CBarlistDoc()
 {
-   UIHints(FALSE); // not using UIHints feature
+   EnableUIHints(FALSE); // not using UIHints feature
 
    // Reserve command IDs for document plug ins
    UINT nCommands = GetPluginCommandManager()->ReserveCommandIDRange(PLUGIN_COMMAND_COUNT);
