@@ -320,6 +320,7 @@ protected:
       }
 
       // GFRP Bars can only be bent into Type 50, 51, 54, 57, 66, 67, 71, 80 (w/X=0), and 89.
+      // Type 74 was added 3/25/2020 for Satus Creek Project per project requirements with concurence from THE concrete specialist
       MaterialType material;
       m_pBarRecord->get_Material(&material);
       if (material == D7957) // GFRP
@@ -334,6 +335,7 @@ protected:
          case 66:
          case 67:
          case 71:
+         case 74:
          case 89:
             is_bend_type_supported = 0;
             break;
