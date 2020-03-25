@@ -368,14 +368,14 @@ void CBarlistListView::SetBarRecord(int row, IBarRecord* pBarRecord)
    pBarRecord->get_PrimaryBend(&primaryBend);
    Float64 length;
    primaryBend->get_Length(&length);
-   CString strLength = FormatLength(length);
+   CString strLength = Formatter::FormatLength(length);
    list.SetItemText(row, subItem++, strLength);
 
    if (material != D7957)
    {
       Float64 mass;
       pBarRecord->get_Mass(&mass);
-      CString strMass = FormatMass(mass);
+      CString strMass = Formatter::FormatMass(mass);
       list.SetItemText(row, subItem++, strMass);
    }
 }
