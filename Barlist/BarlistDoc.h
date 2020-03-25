@@ -38,12 +38,7 @@
 #include <UnitMgt\IndirectMeasure.h>
 
 #include "Report.h"
-
-CString FormatMass(Float64 mass, bool bUnits = true);
-CString FormatLength(Float64 length,bool bUnits=true);
-bool ParseLength(const CString& strValue,Float64* pValue);
-
-CString FormatStatusMessage(IStatusMessage* pStatusMessage);
+#include "..\Common\Formatter.h"
 
 class CBarlistDoc : public CEAFDocument
 {

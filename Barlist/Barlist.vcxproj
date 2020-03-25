@@ -525,6 +525,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\Formatter.cpp" />
     <ClCompile Include="BarDlg.cpp" />
     <ClCompile Include="BarDlgStateMachine.cpp" />
     <ClCompile Include=".\Schema\Barlist.cxx">
@@ -663,6 +664,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Formatter.h" />
     <ClInclude Include="..\Include\BarlistVersion.h" />
     <ClInclude Include="..\SDK\Include\BarlistAddinCatid.h" />
     <ClInclude Include="BarDlg.h" />

@@ -211,7 +211,7 @@ void CReport::ReportBarRecord(IBarRecord* pBarRecord)
 
    Float64 mass;
    pBarRecord->get_Mass(&mass);
-   strBarRecord += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("   ") : _T("  ")) + FormatMass(mass, false);
+   strBarRecord += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("   ") : _T("  ")) + Formatter::FormatMass(mass, false);
    strBarRecord += _T("\n");
 
    m_vReportLines.push_back(strBarRecord);
@@ -247,23 +247,23 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
    pBend->get_T1(&t1);
    pBend->get_T2(&t2);
 
-   strBend += FormatLength(u, false);
+   strBend += Formatter::FormatLength(u, false);
 
    CString strLengthSpace(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("  ") : _T(" "));
    CString strSkipLength(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("       ") : _T("        "));
 
    VARIANT_BOOL vbSupported;
    pBend->get_SupportsDimension(dimW, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + FormatLength(w, false)) : strLengthSpace + strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + Formatter::FormatLength(w, false)) : strLengthSpace + strSkipLength;
 
    pBend->get_SupportsDimension(dimX, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + FormatLength(x, false)) : strLengthSpace + strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + Formatter::FormatLength(x, false)) : strLengthSpace + strSkipLength;
 
    pBend->get_SupportsDimension(dimY, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (_T(" ") + FormatLength(y, false)) : _T(" ") + strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? (_T(" ") + Formatter::FormatLength(y, false)) : _T(" ") + strSkipLength;
 
    pBend->get_SupportsDimension(dimZ, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (_T(" ") + FormatLength(z, false)) : _T(" ") + strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? (_T(" ") + Formatter::FormatLength(z, false)) : _T(" ") + strSkipLength;
 
    CEAFApp* pApp = EAFGetApp();
    const auto* pDisplayUnits = pApp->GetDisplayUnits();
@@ -294,7 +294,7 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
 
    Float64 length;
    pBend->get_Length(&length);
-   strBend += _T("  ") + FormatLength(length, false);
+   strBend += _T("  ") + Formatter::FormatLength(length, false);
 
    return strBend;
 }
@@ -312,7 +312,7 @@ void CReport::ReportErrors(IBend* pBend)
          CComPtr<IStatusMessage> statusMessage;
          statusMessages->get_Item(i, &statusMessage);
 
-         CString strStatusMessage = FormatStatusMessage(statusMessage);
+         CString strStatusMessage = Formatter::FormatStatusMessage(statusMessage);
          strStatusMessage += _T("\n");
          m_vReportLines.push_back(strStatusMessage);
       }
@@ -376,34 +376,34 @@ void CReport::ReportSummary(IBarlist* pBarlist)
       if (material == D7957)
       {
          CString strSub;
-         strSub.Format(_T("Substructure:           %s\n"), FormatLength(sub));
+         strSub.Format(_T("Substructure:           %s\n"), Formatter::FormatLength(sub));
          m_vReportLines.push_back(strSub);
 
          CString strSuper;
-         strSuper.Format(_T("Superstructure:         %s\n"), FormatLength(super));
+         strSuper.Format(_T("Superstructure:         %s\n"), Formatter::FormatLength(super));
          m_vReportLines.push_back(strSuper);
       }
       else
       {
          CString strSub;
-         strSub.Format(_T("Substructure:           %s\n"), FormatMass(sub));
+         strSub.Format(_T("Substructure:           %s\n"), Formatter::FormatMass(sub));
          m_vReportLines.push_back(strSub);
 
          if (CanBeEpoxyCoated(material))
          {
             CString strSubEpoxy;
-            strSubEpoxy.Format(_T("Substructure w/Epoxy:   %s\n"), FormatMass(subEpoxy));
+            strSubEpoxy.Format(_T("Substructure w/Epoxy:   %s\n"), Formatter::FormatMass(subEpoxy));
             m_vReportLines.push_back(strSubEpoxy);
          }
 
          CString strSuper;
-         strSuper.Format(_T("Superstructure:         %s\n"), FormatMass(super));
+         strSuper.Format(_T("Superstructure:         %s\n"), Formatter::FormatMass(super));
          m_vReportLines.push_back(strSuper);
 
          if (CanBeEpoxyCoated(material))
          {
             CString strSuperEpoxy;
-            strSuperEpoxy.Format(_T("Superstructure w/Epoxy: %s\n"), FormatMass(superEpoxy));
+            strSuperEpoxy.Format(_T("Superstructure w/Epoxy: %s\n"), Formatter::FormatMass(superEpoxy));
             m_vReportLines.push_back(strSuperEpoxy);
          }
       }

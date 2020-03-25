@@ -318,6 +318,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\Formatter.cpp" />
     <ClCompile Include="BXF.cpp" />
     <ClCompile Include="BXFAddin.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -358,6 +359,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Formatter.h" />
     <ClInclude Include="BXFAddin.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />

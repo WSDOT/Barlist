@@ -163,7 +163,7 @@ void DDX_LengthValue(CDataExchange* pDX, int nIDC, Float64& data)
       {
          CString strValue;
          DDX_Text(pDX, nIDC, strValue);
-         if (!ParseLength(strValue, &data))
+         if (!Formatter::ParseLength(strValue, &data))
          {
             pDX->PrepareEditCtrl(nIDC);
             AfxMessageBox(_T("Invalid format"), MB_OK);
@@ -180,7 +180,7 @@ void DDX_LengthValue(CDataExchange* pDX, int nIDC, Float64& data)
       CString strValue;
       if (data != Float64_Inf || pDX->m_pDlgWnd->GetDlgItem(nIDC)->IsWindowEnabled()) // Infinite values create a blank line
       {
-         strValue = FormatLength(data,false);
+         strValue = Formatter::FormatLength(data,false);
          strValue.TrimLeft();
       }
       DDX_Text(pDX, nIDC, strValue);
@@ -986,7 +986,7 @@ void CBarDlg::UpdateMessages(IBarRecord* pBarRecord)
       pBarRecord->get_PrimaryBend(&primaryBend);
       Float64 length;
       primaryBend->get_Length(&length);
-      CString strLength = FormatLength(length);
+      CString strLength = Formatter::FormatLength(length);
       strMsgs += _T("Primary bend length: ") + strLength + _T("\r\n");
 
       VARIANT_BOOL vbVaries;
@@ -997,7 +997,7 @@ void CBarDlg::UpdateMessages(IBarRecord* pBarRecord)
          pBarRecord->get_VariesBend(&variesBend);
          Float64 length;
          variesBend->get_Length(&length);
-         CString strLength = FormatLength(length);
+         CString strLength = Formatter::FormatLength(length);
          strMsgs += _T("Varies bend length: ") + strLength + _T("\r\n");
       }
 
@@ -1041,7 +1041,7 @@ void CBarDlg::GetStatusMessages(LPCTSTR lpszMsgGroup,CString& strMsgs, IStatusMe
       CComPtr<IStatusMessage> statusMessage;
       pMessages->get_Item(i, &statusMessage);
 
-      CString strMsg = FormatStatusMessage(statusMessage);
+      CString strMsg = Formatter::FormatStatusMessage(statusMessage);
 
       if (i != 0)
       {

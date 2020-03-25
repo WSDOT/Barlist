@@ -29,6 +29,8 @@
 #include <EAF\EAFApp.h>
 #include <WBFLUnitServer.h>
 
+#include "..\Common\Formatter.h"
+
 CBXFApp theApp;
 CComModule _Module;
 CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
@@ -119,20 +121,9 @@ BOOL CBXFApp::InitInstance()
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    _Module.Init(ObjectMap, m_hInstance);
 
-   if (g_formatter == nullptr)
+   if (!Formatter::Init())
    {
-      HRESULT hr = g_formatter.CoCreateInstance(CLSID_AnnotatedDisplayUnitFormatter);
-      if (FAILED(hr))
-      {
-         CString strMessage;
-         strMessage.Format(_T("Failed to initialize unit system (%0#x)"), hr);
-         AfxMessageBox(strMessage);
-         return FALSE;
-      }
-      g_formatter->put_Annotation(_T("'-,\""));
-      g_formatter->put_Multiplier(12.0);
-      g_formatter->put_OffsetDigits(0);
-      g_formatter->FormatSpecifiers(7, 1, tjRight, nftFixed, 0.0001);
+      return FALSE;
    }
 
    return CWinApp::InitInstance();
@@ -142,184 +133,6 @@ int CBXFApp::ExitInstance()
 {
    _Module.Term();
    return CWinApp::ExitInstance();
-}
-
-//////////////////////////////////////////////////////////////////////
-#include <array>
-#include <UnitMgt\IndirectMeasure.h>
-#include <MfcTools\Format.h>
-
-static std::array<unitmgtMassData, 2> gs_WeightUnit{ unitmgtMassData(unitMeasure::Kilogram,0.001,9,0),unitmgtMassData(unitMeasure::PoundMass,0.001,9,0) };
-static std::array<unitmgtLengthData, 2> gs_LengthUnit{ unitmgtLengthData(unitMeasure::Meter,0.001,9,0),unitmgtLengthData(unitMeasure::Feet,0.001,9,0) };
-
-CString FormatMass(Float64 mass, bool bUnits=true)
-{
-   CString strMass;
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
-   {
-      if (bUnits)
-      {
-         strMass.Format(_T("%5.0f %s"), ConvertFromSysUnits(mass, gs_WeightUnit[0].UnitOfMeasure), gs_WeightUnit[0].UnitOfMeasure.UnitTag().c_str());
-      }
-      else
-      {
-         strMass.Format(_T("%5.0f"), ConvertFromSysUnits(mass, gs_WeightUnit[0].UnitOfMeasure));
-      }
-   }
-   else
-   {
-      if (bUnits)
-      {
-         strMass.Format(_T("%5.0f %s"), ConvertFromSysUnits(mass, gs_WeightUnit[1].UnitOfMeasure), gs_WeightUnit[1].UnitOfMeasure.UnitTag().c_str());
-      }
-      else
-      {
-         strMass.Format(_T("%5.0f"), ConvertFromSysUnits(mass, gs_WeightUnit[1].UnitOfMeasure));
-      }
-   }
-   return strMass;
-}
-
-CString FormatLength(Float64 length,bool bFractionInches=true,bool bUnits=true)
-{
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
-   {
-      CString strLength;
-      if (bUnits)
-      {
-         strLength.Format(_T("%7.3f %s"), ConvertFromSysUnits(length, gs_LengthUnit[0].UnitOfMeasure), gs_LengthUnit[0].UnitOfMeasure.UnitTag().c_str());
-      }
-      else
-      {
-         strLength.Format(_T("%7.3f"), ConvertFromSysUnits(length, gs_LengthUnit[0].UnitOfMeasure));
-      }
-      return strLength;
-   }
-   else
-   {
-      if (bUnits)
-      {
-         USES_CONVERSION;
-         CComBSTR bstr;
-         g_formatter->Format(::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
-         return OLE2T(bstr);
-      }
-      else
-      {
-         // convert from system units
-         length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
-         int sign = BinarySign(length);
-         length = fabs(length);
-         long feet = (long)floor(length);
-         double inches = (length - feet) * 12;
-         if (IsEqual(inches, 12.0))
-         {
-            // don't want 6'-12"... make it 7'-0"
-            feet++;
-            inches = 0;
-         }
-
-         CString strBuffer;
-         if (bFractionInches)
-         {
-            strBuffer.Format(_T("%s%3d %4.1f"), sign < 0 ? _T("-") : _T(""), feet, inches);
-         }
-         else
-         {
-            strBuffer.Format(_T("%s%3d %2.0f"), sign < 0 ? _T("-") : _T(""), feet, inches);
-         }
-
-         CString strLength;
-         strLength.Format(_T("%-s"), strBuffer);
-         return strLength;
-      }
-   }
-}
-
-bool IsValidLength(const CString& strValue, Float64* pValue)
-{
-   sysTokenizer tokenizer(_T(" "));
-   tokenizer.push_back(strValue);
-   auto size = tokenizer.size();
-   if (size == 1)
-   {
-      // there is only one token so strValue must be decimal length
-      return sysTokenizer::ParseDouble(tokenizer[0].c_str(), pValue);
-   }
-   else if (size == 2)
-   {
-      // there are 2 tokens... feet inch
-      Float64 ft, in;
-      if (!sysTokenizer::ParseDouble(tokenizer[0].c_str(), &ft))
-      {
-         return false;
-      }
-
-      if (!sysTokenizer::ParseDouble(tokenizer[1].c_str(), &in))
-      {
-         return false;
-      }
-
-      *pValue = ft + in / 12.0;
-      return true;
-   }
-   return false;
-}
-
-bool ParseLength(const CString& strValue, Float64* pValue)
-{
-   Float64 value;
-   if (!IsValidLength(strValue, &value))
-   {
-      return false;
-   }
-
-   unitmgtLengthData* pLength;
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
-   {
-      pLength = &gs_LengthUnit[0];
-   }
-   else
-   {
-      pLength = &gs_LengthUnit[1];
-   }
-
-   *pValue = ::ConvertToSysUnits(value, pLength->UnitOfMeasure);
-   return true;
-}
-
-CString FormatStatusValue(CComVariant& var)
-{
-   CString strValue;
-   if (var.vt == VT_R8)
-   {
-      strValue.Format(_T("%s"), FormatLength(var.dblVal));
-   }
-   else
-   {
-      USES_CONVERSION;
-      var.ChangeType(VT_BSTR);
-      strValue.Format(_T("%s"), OLE2T(var.bstrVal));
-   }
-   return strValue;
-}
-
-CString FormatStatusMessage(IStatusMessage* pStatusMessage)
-{
-   CComBSTR bstrText;
-   pStatusMessage->get_Text(&bstrText);
-   CString strMsg(bstrText);
-
-   CComVariant val1, val2;
-   pStatusMessage->get_Val1(&val1);
-   pStatusMessage->get_Val2(&val2);
-   CString strVal1 = FormatStatusValue(val1);
-   CString strVal2 = FormatStatusValue(val2);
-
-   strMsg.Replace(_T("%1"), strVal1);
-   strMsg.Replace(_T("%2"), strVal2);
-
-   return strMsg;
 }
 
 TCHAR GetUse(UseType use)
@@ -481,7 +294,7 @@ void CBXFAddin::ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord)
 
    Float64 mass;
    pBarRecord->get_Mass(&mass);
-   strBarRecord += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("   ") : _T("   ")) + FormatMass(mass, false);
+   strBarRecord += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("   ") : _T("   ")) + Formatter::FormatMass(mass, false);
    strBarRecord += _T("\n");
 
    pFile->WriteString(strBarRecord);
@@ -530,13 +343,13 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    }
    else
    {
-      strBend += FormatLength(u, true, false);
+      strBend += Formatter::FormatLength(u, true, false);
    }
 
 
    VARIANT_BOOL vbSupported;
    pBend->get_SupportsDimension(dimW, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + FormatLength(w, true, false)) : strLengthSpace + strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + Formatter::FormatLength(w, true, false)) : strLengthSpace + strSkipLength;
 
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
@@ -544,7 +357,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    }
 
    pBend->get_SupportsDimension(dimX, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? FormatLength(x, true, false) : strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? Formatter::FormatLength(x, true, false) : strSkipLength;
 
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
@@ -552,7 +365,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    }
 
    pBend->get_SupportsDimension(dimY, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? FormatLength(y, true, false) : strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? Formatter::FormatLength(y, true, false) : strSkipLength;
 
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
@@ -560,7 +373,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    }
 
    pBend->get_SupportsDimension(dimZ, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? FormatLength(z, true, false) : strSkipLength;
+   strBend += (vbSupported == VARIANT_TRUE) ? Formatter::FormatLength(z, true, false) : strSkipLength;
 
    CEAFApp* pApp = EAFGetApp();
    const auto* pDisplayUnits = pApp->GetDisplayUnits();
@@ -591,7 +404,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
 
    Float64 length;
    pBend->get_Length(&length);
-   strBend += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T(" ") : _T("  ")) + FormatLength(length, false, false);
+   strBend += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T(" ") : _T("  ")) + Formatter::FormatLength(length, false, false);
 
    return strBend;
 }
@@ -609,7 +422,7 @@ void CBXFAddin::ReportErrors(CStdioFile* pFile,IBend* pBend)
          CComPtr<IStatusMessage> statusMessage;
          statusMessages->get_Item(i, &statusMessage);
 
-         CString strStatusMessage = FormatStatusMessage(statusMessage);
+         CString strStatusMessage = Formatter::FormatStatusMessage(statusMessage);
          strStatusMessage += _T("\n");
 
          if (strStatusMessage.Left(5).CompareNoCase(_T("Error")) == 0)

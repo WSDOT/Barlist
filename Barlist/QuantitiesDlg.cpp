@@ -111,17 +111,17 @@ void CQuantitiesDlg::SetQuantities(MaterialType material, Float64 sub, Float64 s
    if (material == D7957)
    {
       // GFRP
-      strSub = FormatLength(sub);
+      strSub = Formatter::FormatLength(sub);
       strSubEpoxy = _T("-");
-      strSuper = FormatLength(super);
+      strSuper = Formatter::FormatLength(super);
       strSuperEpoxy = _T("-");
    }
    else
    {
-      strSub = FormatMass(sub);
-      strSubEpoxy = CanBeEpoxyCoated(material) ? FormatMass(subEpoxy) : _T("-");
-      strSuper = FormatMass(super);
-      strSuperEpoxy = CanBeEpoxyCoated(material) ? FormatMass(superEpoxy) : _T("-");
+      strSub = Formatter::FormatMass(sub);
+      strSubEpoxy = CanBeEpoxyCoated(material) ? Formatter::FormatMass(subEpoxy) : _T("-");
+      strSuper = Formatter::FormatMass(super);
+      strSuperEpoxy = CanBeEpoxyCoated(material) ? Formatter::FormatMass(superEpoxy) : _T("-");
    }
 
    int row = (int)(material)-(int)A706_Grade60;
