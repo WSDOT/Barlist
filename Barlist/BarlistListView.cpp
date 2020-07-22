@@ -626,7 +626,7 @@ void CBarlistListView::CacheBarlistClipboardData(COleDataSource& dataSource)
 
 void CBarlistListView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-   // if we begin the drag and drop on left button down, left button Float64 click messages
+   // if we begin the drag and drop on left button down, left button dbl click messages
    // never get through
 
    // Drag and drop will only occur if the mouse is on the icon in the list view
