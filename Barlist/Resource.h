@@ -99,10 +99,6 @@
 #define IDC_QUANTITIES_LIST             273
 #define IDC_COMBO1                      274
 #define IDC_MATERIALS                   274
-#define EAF_RESERVED_COMMAND_BASE       0x8000
-#define EAFID_UNITS_SI                  32772
-#define EAFID_UNITS_US                  32773
-#define EAFID_HELP_SOURCE               32782
 #define ID_NEW_VIEW                     33029
 #define ID_VIEW_OPTIONS                 33032
 #define IDC_MOVE_UP                     33035
