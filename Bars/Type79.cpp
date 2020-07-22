@@ -43,7 +43,7 @@ void CType79::BuildBend()
       return;
 
    CComPtr<IBarData> pBarData;
-   pBarData.Attach( GetBarData() );
+   GetBarData(&pBarData);
 
    UseType use = GetUseType();
 

@@ -40,8 +40,7 @@ HRESULT CBarlist::FinalConstruct()
 
    pGroups->SetBarlist( this );
 
-   pGroups->AddRef();
-   m_Groups.Attach(pGroups);
+   m_Groups = pGroups;
    m_Groups.Advise( GetUnknown(), IID_IGroupCollectionEvents, &m_GroupCookie );
 
    // Because of the connection point, there is a circular reference between
@@ -56,14 +55,15 @@ HRESULT CBarlist::FinalConstruct()
 
 void CBarlist::FinalRelease()
 {
-   long dwOldRef = m_dwRef;
-   InternalAddRef();
-   CComQIPtr<IConnectionPointContainer> pCPC( m_Groups );
-   CComPtr<IConnectionPoint> pCP;
-   pCPC->FindConnectionPoint( IID_IGroupCollectionEvents,  &pCP );
-   pCP->Unadvise( m_GroupCookie ); // decrements RefCount
-
-   ATLASSERT( dwOldRef == m_dwRef );
+   {
+      long dwOldRef = m_dwRef;
+      InternalAddRef();
+      CComQIPtr<IConnectionPointContainer> pCPC(m_Groups);
+      CComPtr<IConnectionPoint> pCP;
+      pCPC->FindConnectionPoint(IID_IGroupCollectionEvents, &pCP);
+      pCP->Unadvise(m_GroupCookie); // decrements RefCount
+      ATLASSERT(dwOldRef == m_dwRef);
+   }
 
    m_Groups.Release();
 

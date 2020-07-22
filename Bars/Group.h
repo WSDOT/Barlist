@@ -38,6 +38,7 @@
 // CGroup
 class ATL_NO_VTABLE CGroup : 
 	public CComObjectRootEx<CComSingleThreadModel>,
+   //public CComRefCountTracer<CGroup, CComObjectRootEx<CComSingleThreadModel>>,
 	public CComCoClass<CGroup, &CLSID_Group>,
 	public IDispatchImpl<IGroup, &IID_IGroup, &LIBID_BARSLib>,
 	public CProxyIGroupEvents< CGroup >,

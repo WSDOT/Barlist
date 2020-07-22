@@ -60,26 +60,28 @@ HRESULT CGroup::FinalConstruct()
    if ( FAILED(hr) )
       return hr;
 
-   pBars->AddRef();
-   m_Bars.Attach(pBars);
+   m_Bars = pBars;
    m_Bars.Advise( GetUnknown(), IID_IBarRecordCollectionEvents, &m_BarsCookie );
+   InternalRelease();
 
    return S_OK;
 }
 
 void CGroup::FinalRelease()
 {
-   // Increment the reference count so Unadvacing from the connection point doesn't
-   // call this destructor again.
-   long dwOldRef = m_dwRef;
-   InternalAddRef();
+   {
+      // Increment the reference count so Unadvacing from the connection point doesn't
+      // call this destructor again.
+      long dwOldRef = m_dwRef;
+      InternalAddRef();
 
-   CComQIPtr<IConnectionPointContainer> pCPC( m_Bars );
-   CComPtr<IConnectionPoint> pCP;
-   pCPC->FindConnectionPoint( IID_IBarRecordCollectionEvents,  &pCP );
-   pCP->Unadvise( m_BarsCookie );
+      CComQIPtr<IConnectionPointContainer> pCPC(m_Bars);
+      CComPtr<IConnectionPoint> pCP;
+      pCPC->FindConnectionPoint(IID_IBarRecordCollectionEvents, &pCP);
+      pCP->Unadvise(m_BarsCookie);
 
-   ATLASSERT( dwOldRef == m_dwRef );
+      ATLASSERT(dwOldRef == m_dwRef);
+   }
 
    m_Bars.Release();
 }

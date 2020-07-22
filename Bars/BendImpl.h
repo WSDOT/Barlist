@@ -386,9 +386,10 @@ protected:
 
    void CheckNormalLength()
    {
-      CComPtr<IBarData> pBarData(GetBarData());
-      Float64 length;
+      CComPtr<IBarData> pBarData;
+      GetBarData(&pBarData);
 
+      Float64 length;
       pBarData->get_NormalLength(&length);
 
       if (length < m_Length)
@@ -402,9 +403,10 @@ protected:
 
    void CheckMaxLength()
    {
-      CComPtr<IBarData> pBarData(GetBarData());
+      CComPtr<IBarData> pBarData;
+      GetBarData(&pBarData);
+      
       Float64 maxlength;
-
       pBarData->get_MaxLength(&maxlength);
 
       if (0 < maxlength && maxlength < m_Length)
@@ -427,11 +429,9 @@ protected:
       m_Components.push_back( pComponent );
    }
 
-   IBarData* GetBarData()
+   HRESULT GetBarData(IBarData** ppBarData)
    {
-      IBarData* pBarData = 0;
-      m_pBarRecord->get_BarData(&pBarData);
-      return pBarData;
+      return m_pBarRecord->get_BarData(ppBarData);
    }
 
    UseType GetUseType()

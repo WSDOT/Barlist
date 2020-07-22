@@ -51,28 +51,33 @@ STDMETHODIMP CBarRecordCollection::InterfaceSupportsErrorInfo(REFIID riid)
 
 void CBarRecordCollection::FinalRelease()
 {
+   USES_CONVERSION;
    long dwOldRef = m_dwRef;
 
    // Release all the connection points
-   long index = 0;
-   std::multimap<std::string,DWORD>::iterator iter;
-   for ( iter = m_Cookies.begin(); iter != m_Cookies.end(); iter++ )
+   for (auto& item : m_coll)
    {
-      DWORD cookie = (*iter).second; 
-      CComQIPtr<IBarRecord> pBarRecord( m_coll[index++].pdispVal );
+      CComQIPtr<IBarRecord> pBarRecord(item.pdispVal);
 
-      CComQIPtr<IConnectionPointContainer> pCPC( pBarRecord );
+      CComQIPtr<IConnectionPointContainer> pCPC(pBarRecord);
       CComPtr<IConnectionPoint> pCP;
-      HRESULT hr = pCPC->FindConnectionPoint( IID_IBarRecordEvents, &pCP );
+      HRESULT hr = pCPC->FindConnectionPoint(IID_IBarRecordEvents, &pCP);
       ATLASSERT(SUCCEEDED(hr));
 
+      CComBSTR bstrMark;
+      pBarRecord->get_Mark(&bstrMark);
+      auto found = m_Cookies.find(std::string(OLE2A(bstrMark)));
+      ATLASSERT(found != m_Cookies.end());
+      DWORD cookie = found->second;
+
       InternalAddRef();
-      hr = pCP->Unadvise( cookie );  // decrements RefCount
+      hr = pCP->Unadvise(cookie);  // decrements RefCount
       ATLASSERT(SUCCEEDED(hr));
 
       pBarRecord.Release();
       pCPC.Release();
       pCP.Release();
+
    }
 
    ATLASSERT( dwOldRef == m_dwRef );

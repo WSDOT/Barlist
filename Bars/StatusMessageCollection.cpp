@@ -54,7 +54,7 @@ STDMETHODIMP CStatusMessageCollection::get_Item(long index, IStatusMessage* *pVa
    CComVariant& var = m_coll[index];
    IDispatch* pDisp = var.pdispVal;
    CComQIPtr<IStatusMessage> pMsg( pDisp );
-   *pVal = pMsg.Detach();
+   pMsg.CopyTo(pVal);
 	return S_OK;
 }
 
@@ -63,7 +63,7 @@ STDMETHODIMP CStatusMessageCollection::Add(IStatusMessage* pVal)
 {
 	// TODO: Add your implementation code here
    CComQIPtr<IDispatch> pDisp(pVal);
-   CComVariant var(pDisp.Detach());
+   CComVariant var(pDisp);
    m_coll.push_back( var );
 	return S_OK;
 }

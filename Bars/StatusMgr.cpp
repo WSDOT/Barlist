@@ -83,6 +83,5 @@ void CStatusMgr::ResetStatusMsgs()
    CComObject<CStatusMessageCollection>* pColl;
    CComObject<CStatusMessageCollection>::CreateInstance( &pColl );
    
-   pColl->AddRef();
-   m_pStatusMsgs.Attach( pColl );
+   m_pStatusMsgs = pColl;
 }
