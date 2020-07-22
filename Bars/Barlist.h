@@ -38,6 +38,7 @@
 // CBarlist
 class ATL_NO_VTABLE CBarlist : 
 	public CComObjectRootEx<CComSingleThreadModel>,
+   //public CComRefCountTracer<CBarlist,CComObjectRootEx<CComSingleThreadModel>>,
 	public CComCoClass<CBarlist, &CLSID_Barlist>,
 	public IDispatchImpl<IBarlist, &IID_IBarlist, &LIBID_BARSLib>,
 	public CProxyIBarlistEvents< CBarlist >,

@@ -32,7 +32,7 @@
 #include <vector>
 
 typedef CComEnumOnSTL<IEnumVARIANT,&IID_IEnumVARIANT, VARIANT, _Copy<VARIANT>, std::vector<CComVariant> > VecEnum;
-typedef ICollectionOnSTLImpl<IBarCollection,std::vector<CComVariant>, VARIANT, _Copy<VARIANT>, VecEnum> IBarColl;
+typedef ICollectionOnSTLImpl<IBarCollection,std::vector<CComVariant>, CComVariant, _Copy<CComVariant>, VecEnum> IBarColl;
 
 struct BarInfo;
 struct BendInfo;

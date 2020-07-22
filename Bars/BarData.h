@@ -41,7 +41,8 @@ typedef enum BendMeasure
 // CBarData
 class ATL_NO_VTABLE CBarData : 
 	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CBarData, &CLSID_BarData>,
+   //public CComRefCountTracer<CBarData, CComObjectRootEx<CComSingleThreadModel>>,
+   public CComCoClass<CBarData, &CLSID_BarData>,
 	public IDispatchImpl<IBarData, &IID_IBarData, &LIBID_BARSLib>
 {
 public:

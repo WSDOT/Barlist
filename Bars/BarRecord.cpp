@@ -73,6 +73,10 @@ void CBarRecord::FinalRelease()
    Disconnect( m_pVariesBend, m_VariesBendCookie );
 
    ATLASSERT( m_dwRef == dwOldRef );
+
+   m_pPrimaryBend.Release();
+   m_pVariesBend.Release();
+   m_pBarData.Release();
 }
 
 void CBarRecord::Disconnect(IBend* pBend,DWORD dwCookie)
@@ -239,8 +243,7 @@ STDMETHODIMP CBarRecord::put_PrimaryBend(IBend *newVal)
    Disconnect( m_pPrimaryBend, m_PrimaryBendCookie );
 
    // Attach to the interface
-   m_pPrimaryBend.Attach(newVal);
-   newVal->AddRef();
+   m_pPrimaryBend = newVal;
    m_pPrimaryBend->put_BarRecord(this);
 
    // Attach to the connection point
@@ -285,8 +288,7 @@ STDMETHODIMP CBarRecord::put_VariesBend(IBend *newVal)
    }
 
    // Attach to the interface
-   m_pVariesBend.Attach(newVal);
-   newVal->AddRef();
+   m_pVariesBend = newVal;
    m_pVariesBend->put_BarRecord(this);
 
    // Attach to the connection point.
@@ -367,17 +369,12 @@ STDMETHODIMP CBarRecord::get_Mass(Float64 *pVal)
 
 STDMETHODIMP CBarRecord::get_BarData(IBarData **pVal)
 {
-	// TODO: Add your implementation code here
-   (*pVal) = m_pBarData;
-   (*pVal)->AddRef();
-	return S_OK;
+   return m_pBarData.CopyTo(pVal);
 }
 
 STDMETHODIMP CBarRecord::put_BarData(IBarData *newVal)
 {
-	// TODO: Add your implementation code here
-   m_pBarData.Attach( newVal );
-   newVal->AddRef();
+   m_pBarData = newVal;
    Fire_OnBarRecordChanged(this);
    return S_OK;
 }

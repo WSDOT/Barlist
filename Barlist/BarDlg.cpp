@@ -45,7 +45,14 @@
 // CBarDlg dialog
 
 #include <afxpriv.h> // for AfxSetWindowText
-void DDX_Text(CDataExchange* pDX, int nIDC, BSTR& bstr)
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+void DDX_Text(CDataExchange* pDX, int nIDC, CComBSTR& bstr)
 {
    USES_CONVERSION;
    HWND hWndCtrl = pDX->PrepareEditCtrl(nIDC);
@@ -63,16 +70,14 @@ void DDX_Text(CDataExchange* pDX, int nIDC, BSTR& bstr)
    }
 }
 
-void DDV_NonEmptyString(CDataExchange* pDX, LPCTSTR name,BSTR& bstr)
+void DDV_NonEmptyString(CDataExchange* pDX, LPCTSTR name, CComBSTR& bstrText)
 {
    bool bError = false;
-   CComBSTR bstrText;
-   bstrText.Attach(bstr);
    if (bstrText.Length() == 0 || bstrText == _T(""))
    {
       bError = true;
    }
-   bstrText.Detach();
+
    if (bError)
    {
       CString str;
@@ -110,7 +115,7 @@ void DDX_CacheEditText(CDataExchange* pDX, int nIDC, T& value)
    }
 }
 
-void DDX_CBString(CDataExchange* pDX, int nIDC, BSTR& bstr)
+void DDX_CBString(CDataExchange* pDX, int nIDC, CComBSTR& bstr)
 {
    USES_CONVERSION;
    std::_tstring str;
@@ -193,7 +198,7 @@ void DDX_Check_VariantBool(CDataExchange* pDX, int nIDC, VARIANT_BOOL& value)
    if (pDX->m_bSaveAndValidate)
    {
       int val = (int)::SendMessage(hWndCtrl, BM_GETCHECK, 0, 0L);
-      ASSERT(val >= 0 && val <= 2);
+      ASSERT(0 <= val && val <= 2);
       value = (val == BST_CHECKED ? VARIANT_TRUE : VARIANT_FALSE);
    }
    else
@@ -569,6 +574,8 @@ void CBarDlg::UpdateBarSizes()
       // not all materials have the all the bar sizes. look at gfrp bars
       // put this name in the combo box
       pCB->AddString(OLE2T(bstrSize));
+
+      variant.Clear();
    }
 
    // Restore the selection if possible... even though different materials
@@ -873,14 +880,14 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
 
    DDX_CBItemData(pDX, IDC_MATERIALS, material);
 
-   DDX_Text(pDX, IDC_MARK, bstrMark.m_str);
-   DDV_NonEmptyString(pDX, _T("Mark No."), bstrMark.m_str);
+   DDX_Text(pDX, IDC_MARK, bstrMark);
+   DDV_NonEmptyString(pDX, _T("Mark No."), bstrMark);
 
-   DDX_Text(pDX, IDC_LOCATION, bstrLocation.m_str);
-   DDV_NonEmptyString(pDX, _T("Location"), bstrLocation.m_str);
+   DDX_Text(pDX, IDC_LOCATION, bstrLocation);
+   DDV_NonEmptyString(pDX, _T("Location"), bstrLocation);
 
    DDX_CBItemData(pDX, IDC_TYPE, bendType);
-   DDX_CBString(pDX, IDC_BAR_SIZE, bstrSize.m_str);
+   DDX_CBString(pDX, IDC_BAR_SIZE, bstrSize);
    DDX_Text(pDX, IDC_NUM_REQUIRED, nReqd);
    DDV_MinMaxLong(pDX, nReqd, 1, 9999);
 

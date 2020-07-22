@@ -37,12 +37,11 @@ void CGroupCollection::FinalRelease()
    long dwOldRef = m_dwRef;
 
    // Release all the connection points
-   long index = 0;
-   std::map<std::string,DWORD>::iterator iter;
-   for ( iter = m_Cookies.begin(); iter != m_Cookies.end(); iter++ )
+   for(const auto& pair : m_Cookies)
    {
-      DWORD cookie = (*iter).second; 
-      CComQIPtr<IGroup> pGroup( m_coll[index++].pdispVal );
+      long index = GetIndex(CComBSTR(pair.first.c_str()));
+      DWORD cookie = pair.second; 
+      CComQIPtr<IGroup> pGroup( m_coll[index].pdispVal );
 
       CComQIPtr<IConnectionPointContainer> pCPC( pGroup );
       CComPtr<IConnectionPoint> pCP;
@@ -57,6 +56,7 @@ void CGroupCollection::FinalRelease()
    }
 
    ATLASSERT( dwOldRef == m_dwRef );
+   m_coll.clear();
 }
 
 STDMETHODIMP CGroupCollection::InterfaceSupportsErrorInfo(REFIID riid)
@@ -130,7 +130,7 @@ STDMETHODIMP CGroupCollection::get_Item(VARIANT varIndex, IGroup **pVal)
    return E_INVALIDARG;
 }
 
-STDMETHODIMP CGroupCollection::Add(BSTR group)
+STDMETHODIMP CGroupCollection::Add(BSTR bstrGroup)
 {
 	// TODO: Add your implementation code here
    USES_CONVERSION;
@@ -138,7 +138,7 @@ STDMETHODIMP CGroupCollection::Add(BSTR group)
    // You forgot to set the barlist.
    ATLASSERT(m_pBarlist != 0 );
 
-   if ( m_pBarlist->DoesGroupExist( OLE2A(group) ) )
+   if ( m_pBarlist->DoesGroupExist( OLE2A(bstrGroup) ) )
    {
       // This group already exists.  There can't be duplicate groups
       return Error(IDS_E_DUPGROUP,IID_IGroupCollection);
@@ -149,7 +149,9 @@ STDMETHODIMP CGroupCollection::Add(BSTR group)
    if ( FAILED(hr) )
       return hr;
 
-   pGroup->put_Name(group);
+   CComPtr<IGroup> group = pGroup;
+
+   group->put_Name(bstrGroup);
 
    // Must set barlist after put_Name.  If the groups isn't part of the
    // barlist yet.
@@ -162,17 +164,15 @@ STDMETHODIMP CGroupCollection::Add(BSTR group)
    m_coll.push_back(var);
 
    // Hookup to the connection point
-   std::string strName = ConvertName(group);
+   std::string strName = ConvertName(bstrGroup);
    DWORD dwCookie;
-   CComPtr<IGroup> grp;
-   grp.Attach( pGroup );
-   grp.Advise( GetUnknown(), IID_IGroupEvents, &dwCookie );
+   group.Advise( GetUnknown(), IID_IGroupEvents, &dwCookie );
    m_Cookies.insert( std::make_pair(strName,dwCookie) );
 
    // Avoid circular reference. Decrement RefCount in a thread safe way
    InternalRelease();
 
-	Fire_OnGroupAdded(pGroup);
+	Fire_OnGroupAdded(group);
    return S_OK;
 }
 

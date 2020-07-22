@@ -35,7 +35,7 @@ interface IStatusMessageCollection;
 
 enum StatusType;
 
-void DDX_Text(CDataExchange* pDX, int nIDC, BSTR& bstr);
+void DDX_Text(CDataExchange* pDX, int nIDC, CComBSTR& bstr);
 
 // Want to be able to update the bend image as the user scrolls
 // over the list of bend... the only way to do this is with

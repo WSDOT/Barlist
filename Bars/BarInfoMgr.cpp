@@ -29,6 +29,12 @@
 #include "BarInfoMgr.h"
 #include "BarCollection.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 /////////////////////////////////////////////////////////////////////////////
 // CBarInfoMgr
 HRESULT CBarInfoMgr::FinalConstruct()
@@ -67,6 +73,9 @@ HRESULT CBarInfoMgr::FinalConstruct()
 
 void CBarInfoMgr::FinalRelease()
 {
+   m_pSteelBars.Release();
+   m_pGalvanizedBars.Release();
+   m_pGFRPBars.Release();
 }
 
 STDMETHODIMP CBarInfoMgr::InterfaceSupportsErrorInfo(REFIID riid)

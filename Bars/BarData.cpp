@@ -36,10 +36,10 @@ void CBarData::FinalRelease()
 {
    for ( short i = 0; i < 3; i++ )
    {
-      m_pBends[i] = 0;
+      m_pBends[i].Release();
       for ( short j = 0; j < 3; j++ )
       {
-         m_pHooks[i][j] = 0;
+         m_pHooks[i][j].Release();
       }
    }
 }
@@ -58,9 +58,8 @@ void CBarData::AddBendData(UseType use,Float64 ID,BendMeasureType bendMeasure)
 	// TODO: Add your implementation code here
    CComObject<CBendData>* pBendData;
    CComObject<CBendData>::CreateInstance( &pBendData );
-   pBendData->AddRef();
    pBendData->SetData(bendMeasure,ID,use);
-   m_pBends[use].Attach(pBendData);
+   m_pBends[use] = pBendData;
 }
 
 void CBarData::AddHookData(UseType use,HookType hook,Float64 T,BendMeasureType bendMeasure,Float64 Tmin)
@@ -68,9 +67,8 @@ void CBarData::AddHookData(UseType use,HookType hook,Float64 T,BendMeasureType b
 	// TODO: Add your implementation code here
    CComObject<CHookData>* pHookData;
    CComObject<CHookData>::CreateInstance( &pHookData );
-   pHookData->AddRef();
    pHookData->SetData(hook,use,T,bendMeasure,Tmin);
-   m_pHooks[use][hook].Attach(pHookData);
+   m_pHooks[use][hook] = pHookData;
 }
 
 STDMETHODIMP CBarData::get_Diameter(Float64 *pVal)

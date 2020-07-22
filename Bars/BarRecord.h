@@ -37,7 +37,8 @@
 // CBarRecord
 class ATL_NO_VTABLE CBarRecord : 
 	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CBarRecord, &CLSID_BarRecord>,
+   //public CComRefCountTracer<CBarRecord, CComObjectRootEx<CComSingleThreadModel>>,
+   public CComCoClass<CBarRecord, &CLSID_BarRecord>,
 	public IDispatchImpl<IBarRecord, &IID_IBarRecord, &LIBID_BARSLib>,
 	public CProxyIBarRecordEvents< CBarRecord >,
 	public IConnectionPointContainerImpl<CBarRecord>,

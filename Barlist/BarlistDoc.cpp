@@ -141,6 +141,8 @@ CBarlistDoc::CBarlistDoc()
 
 CBarlistDoc::~CBarlistDoc()
 {
+   m_BarInfoMgr.Release();
+   m_AddinMgr.Release();
 }
 
 BOOL CBarlistDoc::Init()
@@ -458,7 +460,7 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
          barRecord->put_PrimaryBend(primaryBend);
 
          VARIANT_BOOL vbVaries;
-         VarBoolFromStr(CComBSTR(barrec.Varies().c_str()), 0x0409, VAR_LOCALBOOL, &vbVaries);
+         VarBoolFromStr(CComBSTR(barrec.Varies().c_str()), lcid, VAR_LOCALBOOL, &vbVaries);
          if (vbVaries == VARIANT_TRUE)
          {
             CComPtr<IBend> variesBend;
@@ -476,7 +478,6 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
 
             barRecord->put_NumEach((long)barrec.NoEach());
          }
-
 
          barRecords->Add(barRecord);
       }

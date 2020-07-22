@@ -36,7 +36,8 @@ interface IBarCollection;
 // CBarInfoMgr
 class ATL_NO_VTABLE CBarInfoMgr : 
 	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CBarInfoMgr, &CLSID_BarInfoMgr>,
+   //public CComRefCountTracer<CBarInfoMgr, CComObjectRootEx<CComSingleThreadModel>>,
+   public CComCoClass<CBarInfoMgr, &CLSID_BarInfoMgr>,
 	public ISupportErrorInfo,
 	public IDispatchImpl<IBarInfoMgr, &IID_IBarInfoMgr, &LIBID_BARSLib>
 {

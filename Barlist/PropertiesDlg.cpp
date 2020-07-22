@@ -48,7 +48,7 @@ void CPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 
-   DDX_Text(pDX, IDC_PROJECT_NAME, m_Project.m_str);
+   DDX_Text(pDX, IDC_PROJECT_NAME, m_Project);
    if (pDX->m_bSaveAndValidate)
    {
       if (m_Project.Length() == 0 || m_Project == CComBSTR(_T("")))
@@ -59,10 +59,10 @@ void CPropertiesDlg::DoDataExchange(CDataExchange* pDX)
       }
    }
 
-   DDX_Text(pDX, IDC_JOB_NUMBER, m_JobNumber.m_str);
-   DDX_Text(pDX, IDC_ENGINEER, m_Engineer.m_str);
-   DDX_Text(pDX, IDC_COMPANY, m_Company.m_str);
-   DDX_Text(pDX, IDC_COMMENTS, m_Comments.m_str);
+   DDX_Text(pDX, IDC_JOB_NUMBER, m_JobNumber);
+   DDX_Text(pDX, IDC_ENGINEER, m_Engineer);
+   DDX_Text(pDX, IDC_COMPANY, m_Company);
+   DDX_Text(pDX, IDC_COMMENTS, m_Comments);
 }
 
 
