@@ -54,6 +54,7 @@
 #define IDD_COLLABORATION_MANAGER       227
 #define IDC_W                           228
 #define IDC_X                           229
+#define IDR_DROP                        229
 #define IDC_Y                           230
 #define IDC_Z                           231
 #define IDC_T1                          232
@@ -121,13 +122,17 @@
 #define ID_VIEW_REPORT                  33064
 #define IDC_FILE_PRINT                  33066
 #define IDC_COLLABORATION_MANAGER       33067
+#define ID_TREEVIEWCONTEXT_CUT          33068
+#define ID_CUT_ID                       33069
+#define IDC_EDIT_COPY                   33070
+#define ID_EDIT_MOVE                    33071
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        229
-#define _APS_NEXT_COMMAND_VALUE         33068
+#define _APS_NEXT_RESOURCE_VALUE        231
+#define _APS_NEXT_COMMAND_VALUE         33072
 #define _APS_NEXT_CONTROL_VALUE         275
 #define _APS_NEXT_SYMED_VALUE           104
 #endif

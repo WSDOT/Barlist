@@ -141,47 +141,7 @@ STDMETHODIMP CBarRecordCollection::get_Item(VARIANT varIndex, IBarRecord **pVal)
 
 STDMETHODIMP CBarRecordCollection::Add(IBarRecord *pBarRecord)
 {
-	// TODO: Add your implementation code here
-   CComVariant var;
-   var.vt = VT_DISPATCH;
-   pBarRecord->QueryInterface( &var.pdispVal );
-
-   // Get the mark number
-   CComBSTR bstrMark;
-   pBarRecord->get_Mark( &bstrMark );
-   std::string strMark = ConvertMark(bstrMark);
-
-// Reducing duplicate mark records to a warning.
-// Don't check for duplicates here. Check them in the bar record
-//   if ( m_pBarlist->DoesBarRecordExist( strMark ) )
-//   {
-//      // This mark already exists.  There can't be duplicate marks
-//      return Error(IDS_E_DUPMARK,IID_IBarRecordCollection);
-//   }
-
-   // We have to do a little back door implementation here.
-   // If the bar record object is from our implementation, then
-   // we should be able to cast to the C++ class.
-   CBarRecord* pBR = dynamic_cast<CBarRecord*>( pBarRecord );
-   if ( pBR != 0 )
-   {
-      pBR->SetBarlist( m_pBarlist );
-   }
-
-   m_coll.push_back(var);
-
-   // Hookup to the connection point
-   DWORD dwCookie;
-   CComVariant real_var = m_coll.back();
-   CComQIPtr<IBarRecord> rec(real_var.pdispVal);
-   rec.Advise( GetUnknown(), IID_IBarRecordEvents, &dwCookie );
-   m_Cookies.insert( std::make_pair(strMark,dwCookie) );
-
-   // Avoid circular reference. Decrement RefCount in a thread safe way
-   InternalRelease();
-
-   Fire_OnBarRecordAdded( pBarRecord );
-   return S_OK;
+   return Insert(CComVariant(-1), pBarRecord); // add means insert at end
 }
 
 long CBarRecordCollection::GetIndex(BSTR bstrMark)
@@ -208,6 +168,40 @@ long CBarRecordCollection::GetIndex(BSTR bstrMark)
    }
 
    return -1;
+}
+
+HRESULT CBarRecordCollection::GetIndex(VARIANT varIndex,long* pIndex)
+{
+   // varIndex can be:
+   // 1.  The index of the bar record
+   // 2.  The mark number
+   // 3.  The IDispatch pointer for a bar record
+   // 4.  The IUnknown pointer for a bar record
+
+   long index = -1;
+
+   if (varIndex.vt == VT_BSTR)
+   {
+      index = GetIndex(varIndex.bstrVal);
+   }
+   else if (varIndex.vt == VT_I2 || varIndex.vt == VT_I4)
+   {
+      index = (varIndex.vt == VT_I2 ? varIndex.iVal : varIndex.lVal);
+   }
+   else if (varIndex.vt == VT_DISPATCH || varIndex.vt == VT_UNKNOWN)
+   {
+      CComQIPtr<IBarRecord> pOldRecord(varIndex.vt == VT_DISPATCH ? varIndex.pdispVal : varIndex.punkVal);
+      CComBSTR bstrMark;
+      pOldRecord->get_Mark(&bstrMark);
+      index = GetIndex(bstrMark);
+   }
+   else
+   {
+      return E_INVALIDARG;
+   }
+
+   *pIndex = index;
+   return S_OK;
 }
 
 STDMETHODIMP CBarRecordCollection::Remove(VARIANT varIndex)
@@ -398,6 +392,7 @@ std::string CBarRecordCollection::ConvertMark(BSTR bstrMark)
    USES_CONVERSION;
    return OLE2A(bstrMark);
 }
+
 HRESULT CBarRecordCollection::GetBarRecord(VARIANT key,IBarRecord** ppBarRec)
 {
    HRESULT hr;
@@ -504,37 +499,74 @@ STDMETHODIMP CBarRecordCollection::Sort()
 	return S_OK;
 }
 
-STDMETHODIMP CBarRecordCollection::Replace(VARIANT varIndex, IBarRecord *pBarRecord)
+STDMETHODIMP CBarRecordCollection::Insert(VARIANT varIdx, IBarRecord* pBarRecord)
 {
-   // varIndex can be:
-   // 1.  The index of the bar record
-   // 2.  The mark number
-   // 3.  The IDispatch pointer for a bar record
-   // 4.  The IUnknown pointer for a bar record
+   long index;
+   HRESULT hr = GetIndex(varIdx, &index);
+   if (FAILED(hr))
+      return hr;
 
-   long index = -1;
+   CComVariant var;
+   var.vt = VT_DISPATCH;
+   pBarRecord->QueryInterface(&var.pdispVal);
 
-   if ( varIndex.vt == VT_BSTR )
+   // Get the mark number
+   CComBSTR bstrMark;
+   pBarRecord->get_Mark(&bstrMark);
+   std::string strMark = ConvertMark(bstrMark);
+
+   // Reducing duplicate mark records to a warning.
+   // Don't check for duplicates here. Check them in the bar record
+   //   if ( m_pBarlist->DoesBarRecordExist( strMark ) )
+   //   {
+   //      // This mark already exists.  There can't be duplicate marks
+   //      return Error(IDS_E_DUPMARK,IID_IBarRecordCollection);
+   //   }
+
+   // We have to do a little back door implementation here.
+   // If the bar record object is from our implementation, then
+   // we should be able to cast to the C++ class.
+   CBarRecord* pBR = dynamic_cast<CBarRecord*>(pBarRecord);
+   if (pBR != 0)
    {
-      index = GetIndex( varIndex.bstrVal );
+      pBR->SetBarlist(m_pBarlist);
    }
-   else if ( varIndex.vt == VT_I2 || varIndex.vt == VT_I4 )
+
+   if (index < 0)
    {
-      index = (varIndex.vt == VT_I2 ? varIndex.iVal : varIndex.lVal);
-   }
-   else if ( varIndex.vt == VT_DISPATCH || varIndex.vt == VT_UNKNOWN )
-   {
-      CComQIPtr<IBarRecord> pOldRecord( varIndex.vt == VT_DISPATCH ? varIndex.pdispVal : varIndex.punkVal );
-      CComBSTR bstrMark;
-      pOldRecord->get_Mark( &bstrMark );
-      index = GetIndex( bstrMark );
+      m_coll.emplace_back(var);
+      index = (long)m_coll.size() - 1;
    }
    else
    {
-      return E_INVALIDARG;
+      if (m_coll.size() < index)
+         index = (long)m_coll.size();
+
+      m_coll.emplace(m_coll.begin() + index, var);
    }
 
-   if ( index == -1 )
+   // Hookup to the connection point
+   DWORD dwCookie;
+   CComVariant real_var = m_coll.at(index);
+   CComQIPtr<IBarRecord> rec(real_var.pdispVal);
+   rec.Advise(GetUnknown(), IID_IBarRecordEvents, &dwCookie);
+   m_Cookies.insert(std::make_pair(strMark, dwCookie));
+
+   // Avoid circular reference. Decrement RefCount in a thread safe way
+   InternalRelease();
+
+   Fire_OnBarRecordAdded(pBarRecord);
+   return S_OK;
+}
+
+STDMETHODIMP CBarRecordCollection::Replace(VARIANT varIndex, IBarRecord *pBarRecord)
+{
+   long index;
+   HRESULT hr = GetIndex(varIndex, &index);
+   if (FAILED(hr))
+      return hr;
+
+   if (index == -1)
       return E_INVALIDARG;
    
    // Get old mark number

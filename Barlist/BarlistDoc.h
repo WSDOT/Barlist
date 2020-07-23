@@ -65,6 +65,10 @@ public:
 
    virtual BOOL Init() override;
 
+   Barlist CreateXML(IBarlist* pBarlist);
+   BOOL CreateBarlist(LPCSTR strXML, IBarlist** ppBarlist);
+   BOOL CreateBarlist(Barlist& barlistXML, IBarlist** ppBarlist);
+
    virtual BOOL OpenTheDocument(LPCTSTR lpszPathName) override;
    virtual BOOL SaveTheDocument(LPCTSTR lpszPathName) override;
 

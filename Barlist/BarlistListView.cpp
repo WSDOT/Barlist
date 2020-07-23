@@ -34,13 +34,17 @@
 
 #include "GenerateMarkNumbersDlg.h"
 
+#include "Barlist.hxx"
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
 
-CLIPFORMAT CBarlistListView::ms_cFormat = ::RegisterClipboardFormat(_T("Barlist.Bars"));
+CLIPFORMAT CBarlistListView::ms_cBarFormat = ::RegisterClipboardFormat(_T("Barlist.Bars"));
+CLIPFORMAT CBarlistListView::ms_cGroupFormat = ::RegisterClipboardFormat(_T("Barlist.Group"));
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarlistListView
@@ -76,6 +80,7 @@ BEGIN_MESSAGE_MAP(CBarlistListView, CListView)
    ON_COMMAND(IDC_RENAME, &CBarlistListView::OnRename)
    ON_NOTIFY_REFLECT(NM_DBLCLK, &CBarlistListView::OnNMDblclk)
    ON_WM_LBUTTONDOWN()
+   ON_WM_RBUTTONDOWN()
    ON_UPDATE_COMMAND_UI(ID_EDIT_CUT, &CBarlistListView::OnUpdateEditCut)
    ON_COMMAND(ID_EDIT_CUT, &CBarlistListView::OnEditCut)
    ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CBarlistListView::OnUpdateEditCopy)
@@ -131,6 +136,8 @@ int CBarlistListView::OnCreate(LPCREATESTRUCT lpCreateStruct)
    // TODO:  Add your specialized creation code here
    CListCtrl& list = GetListCtrl();
    list.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+
+   m_DropTarget.Register(this);
 
    return 0;
 }
@@ -586,15 +593,6 @@ void CBarlistListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CBarlistListView::CacheBarlistClipboardData(COleDataSource& dataSource)
 {
-   FreeBarlistClipboardData();
-
-   // cache the selected data for use in clipboard and drag/drop operations
-   HGLOBAL hGlobal = ::GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, sizeof(CBarlistClipboardData));
-   CBarlistClipboardData* pCBD = (CBarlistClipboardData*)::GlobalLock(hGlobal);
-   pCBD->nThreadID = AfxGetThread()->m_nThreadID;
-   pCBD->sourceGroupIdx = m_GroupIdx;
-   pCBD->bars.CoCreateInstance(CLSID_BarRecordCollection);
-
    CBarlistDoc* pDoc = GetDocument();
    CComPtr<IBarlist> barlist;
    pDoc->GetBarlist(&barlist);
@@ -604,6 +602,19 @@ void CBarlistListView::CacheBarlistClipboardData(COleDataSource& dataSource)
    groups->get_Item(CComVariant(m_GroupIdx), &group);
    CComPtr<IBarRecordCollection> bars;
    group->get_BarRecords(&bars);
+
+   CComBSTR bstrName;
+   group->get_Name(&bstrName);
+
+   CComPtr<IBarlist> source_barlist;
+   source_barlist.CoCreateInstance(CLSID_Barlist);
+   CComPtr<IGroupCollection> source_groups;
+   source_barlist->get_Groups(&source_groups);
+   source_groups->Add(bstrName);
+   CComPtr<IGroup> source_group;
+   source_groups->get_Item(CComVariant(0), &source_group);
+   CComPtr<IBarRecordCollection> source_bars;
+   source_group->get_BarRecords(&source_bars);
 
    CListCtrl& list = GetListCtrl();
    POSITION pos = list.GetFirstSelectedItemPosition();
@@ -617,83 +628,223 @@ void CBarlistListView::CacheBarlistClipboardData(COleDataSource& dataSource)
 
       CComPtr<IBarRecord> clone;
       pDoc->CopyBar(bar, &clone);
-      pCBD->bars->Add(clone);
+
+      source_bars->Add(clone);
    }
 
+   Barlist barlist_xml = pDoc->CreateXML(source_barlist);
+   std::ostringstream os;
+   Barlist_(os, barlist_xml, xml_schema::namespace_infomap(), _T("UTF-8"));
+
+   size_t size = os.str().size();
+   size++;
+   HGLOBAL hGlobal = ::GlobalAlloc(GHND, size);
+   LPSTR strXML = (LPSTR)::GlobalLock(hGlobal);
+   ::strcpy_s(strXML, os.str().size()+1, os.str().c_str());
+   strXML[os.str().size()] = 0; // null terminate the string
    ::GlobalUnlock(hGlobal);
-   dataSource.CacheGlobalData(CBarlistListView::ms_cFormat, hGlobal);
+   dataSource.CacheGlobalData(CBarlistListView::ms_cBarFormat, hGlobal);
+}
+
+BOOL CBarlistListView::MouseButtonDrag(UINT nFlags, CPoint point)
+{
+   // if we begin the drag and drop on left button down, left button dbl click messages
+   // never get through
+   CBarlistDoc* pDoc = GetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
+   {
+      return FALSE;
+   }
+   else
+   {
+      // Drag and drop will only occur if the mouse is on the icon in the list view
+      CListCtrl& list = GetListCtrl();
+      int idx = list.HitTest(point);
+      if (idx != -1)
+      {
+         CRect rect;
+         list.GetItemRect(idx, &rect, LVIR_ICON);
+         if (rect.PtInRect(point))
+         {
+            list.SetItemState(idx, LVIS_SELECTED, LVIS_SELECTED);
+
+            COleDataSource dataSource;
+            CacheBarlistClipboardData(dataSource);
+
+            if (dataSource.DoDragDrop(DROPEFFECT_COPY | DROPEFFECT_MOVE) == DROPEFFECT_MOVE)
+            {
+               // the bars were moved, so remove them from their current location
+               LPDATAOBJECT lpDataObject = (LPDATAOBJECT)dataSource.GetInterface(&IID_IDataObject);
+               COleDataObject dataObj;
+               dataObj.Attach(lpDataObject, FALSE);
+               HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cBarFormat);
+
+               // reconstitute the source barlist data from the XML string
+               LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
+               CComPtr<IBarlist> source_barlist;
+               pDoc->CreateBarlist(strXML, &source_barlist);
+               ::GlobalUnlock(hGlobal);
+
+               // get the collection of bar records to paste
+               CComPtr<IGroupCollection> source_groups;
+               source_barlist->get_Groups(&source_groups);
+               CComPtr<IGroup> source_group;
+               source_groups->get_Item(CComVariant(0), &source_group);
+               CComPtr<IBarRecordCollection> source_bars;
+               source_group->get_BarRecords(&source_bars);
+
+               CComBSTR bstrName;
+               source_group->get_Name(&bstrName);
+
+               CComPtr<IBarlist> barlist;
+               pDoc->GetBarlist(&barlist);
+               CComPtr<IGroupCollection> groups;
+               barlist->get_Groups(&groups);
+               CComPtr<IGroup> group;
+               groups->get_Item(CComVariant(bstrName), &group);
+               CComPtr<IBarRecordCollection> bars;
+               group->get_BarRecords(&bars);
+
+
+               long nBars;
+               source_bars->get_Count(&nBars);
+               for (long barIdx = 0; barIdx < nBars; barIdx++)
+               {
+                  CComPtr<IBarRecord> bar;
+                  source_bars->get_Item(CComVariant(barIdx), &bar);
+
+                  CComBSTR bstrMark;
+                  bar->get_Mark(&bstrMark);
+                  bars->Remove(CComVariant(bstrMark));
+               }
+            }
+         }
+      }
+      return TRUE;
+   }
+}
+
+void CBarlistListView::OnRButtonDown(UINT nFlags, CPoint point)
+{
+   if ( !MouseButtonDrag(nFlags, point) )
+      CListView::OnRButtonDown(nFlags, point);
 }
 
 void CBarlistListView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-   // if we begin the drag and drop on left button down, left button dbl click messages
-   // never get through
+   if ( !MouseButtonDrag(nFlags, point) )
+      CListView::OnLButtonDown(nFlags, point);
+}
 
-   // Drag and drop will only occur if the mouse is on the icon in the list view
-   CListCtrl& list = GetListCtrl();
-   int idx = list.HitTest(point);
-   if (idx != -1)
+DROPEFFECT CBarlistListView::OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+   m_bRMouse = (dwKeyState == VK_RBUTTON);
+   return CListView::OnDragEnter(pDataObject, dwKeyState, point);
+}
+
+void CBarlistListView::OnDragLeave()
+{
+   m_bRMouse = false;
+   CListView::OnDragLeave();
+}
+
+DROPEFFECT CBarlistListView::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+   CBarlistDoc* pDoc = GetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
    {
-      CRect rect;
-      list.GetItemRect(idx, &rect, LVIR_ICON);
-      if (rect.PtInRect(point))
-      {
-         COleDataSource dataSource;
-         CacheBarlistClipboardData(dataSource);
-
-         if (dataSource.DoDragDrop() == DROPEFFECT_MOVE)
-         {
-            // the bars were moved, so remove them from their current location
-            LPDATAOBJECT lpDataObject = (LPDATAOBJECT)dataSource.GetInterface(&IID_IDataObject);
-            COleDataObject dataObj;
-            dataObj.Attach(lpDataObject, FALSE);
-            HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cFormat);
-            CBarlistClipboardData* pCBD = (CBarlistClipboardData*)::GlobalLock(hGlobal);
-
-            CBarlistDoc* pDoc = GetDocument();
-            CComPtr<IBarlist> barlist;
-            pDoc->GetBarlist(&barlist);
-            CComPtr<IGroupCollection> groups;
-            barlist->get_Groups(&groups);
-            CComPtr<IGroup> group;
-            groups->get_Item(CComVariant(pCBD->sourceGroupIdx), &group);
-            CComPtr<IBarRecordCollection> bars;
-            group->get_BarRecords(&bars);
-
-            long nBars;
-            pCBD->bars->get_Count(&nBars);
-            for (long barIdx = 0; barIdx < nBars; barIdx++)
-            {
-               CComPtr<IBarRecord> bar;
-               pCBD->bars->get_Item(CComVariant(barIdx), &bar);
-
-               CComBSTR bstrMark;
-               bar->get_Mark(&bstrMark);
-               bars->Remove(CComVariant(bstrMark));
-            }
-
-            ::GlobalUnlock(hGlobal);
-         }
-      }
+      // can't drop onto a collaboration document
+      return DROPEFFECT_NONE;
    }
 
-   CListView::OnLButtonDown(nFlags, point);
+   if (pDataObject->IsDataAvailable(CBarlistListView::ms_cBarFormat))
+   {
+      return m_GroupIdx == -1 ? DROPEFFECT_NONE : ((dwKeyState & MK_CONTROL) ? DROPEFFECT_COPY : DROPEFFECT_MOVE);
+   }
+
+   return CListView::OnDragOver(pDataObject, dwKeyState, point);
+}
+
+DROPEFFECT CBarlistListView::OnDropEx(COleDataObject* pDataObject, DROPEFFECT dropDefault, DROPEFFECT dropList, CPoint point)
+{
+   if (pDataObject->IsDataAvailable(CBarlistListView::ms_cBarFormat))
+   {
+      DROPEFFECT deResult = dropDefault;
+
+      if (m_bRMouse)
+      {
+         AFX_MANAGE_STATE(AfxGetStaticModuleState());
+         ClientToScreen(&point);
+         CMenu menu;
+         VERIFY(menu.LoadMenu(IDR_DROP));
+
+         CMenu* pPopup = menu.GetSubMenu(0);
+         ASSERT(pPopup != nullptr);
+
+         pPopup->SetDefaultItem(dropDefault == DROPEFFECT_COPY ? 0 : 1,MF_BYPOSITION);
+         BOOL nCmd = pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, point.x, point.y, this);
+         if (nCmd == 0)
+         {
+            // user cancelled the menu
+            return DROPEFFECT_NONE;
+         }
+
+         deResult = (nCmd == ID_EDIT_COPY ? DROPEFFECT_COPY : DROPEFFECT_MOVE);
+      }
+
+      CBarlistDoc* pDoc = GetDocument();
+      CComPtr<IBarlist> barlist;
+      pDoc->GetBarlist(&barlist);
+
+      CComPtr<IGroupCollection> groups;
+      barlist->get_Groups(&groups);
+
+      CComPtr<IGroup> targetGroup;
+      groups->get_Item(CComVariant(m_GroupIdx), &targetGroup);
+
+      CComPtr<IBarRecordCollection> targetBars;
+      targetGroup->get_BarRecords(&targetBars);
+
+      // reconstitute the source barlist data from the XML string
+      HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cBarFormat);
+      LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
+      CComPtr<IBarlist> source_barlist;
+      pDoc->CreateBarlist(strXML, &source_barlist);
+      ::GlobalUnlock(hGlobal);
+
+      // get the collection of bar records to paste
+      CComPtr<IGroupCollection> source_groups;
+      source_barlist->get_Groups(&source_groups);
+      CComPtr<IGroup> source_group;
+      source_groups->get_Item(CComVariant(0), &source_group);
+      CComPtr<IBarRecordCollection> source_bars;
+      source_group->get_BarRecords(&source_bars);
+
+      long nBars;
+      source_bars->get_Count(&nBars);
+      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      {
+         CComPtr<IBarRecord> bar;
+         source_bars->get_Item(CComVariant(barIdx), &bar);
+         targetBars->Add(bar);
+      }
+
+      return deResult;
+   }
+
+   return CListView::OnDropEx(pDataObject, dropDefault, dropList, point);
 }
 
 
 void CBarlistListView::OnUpdateEditCut(CCmdUI *pCmdUI)
 {
-   CListCtrl& list = GetListCtrl();
-   pCmdUI->Enable(0 < list.GetSelectedCount());
+   OnUpdateEditCopy(pCmdUI);
 }
 
 
 void CBarlistListView::OnEditCut()
 {
-   // cache the data that is being cut
-   COleDataSource* pDataSource = new COleDataSource;
-   CacheBarlistClipboardData(*pDataSource);
-   pDataSource->SetClipboard();
+   OnEditCopy();
 
    // do the cut
    CBarlistDoc* pDoc = GetDocument();
@@ -785,26 +936,6 @@ void CBarlistListView::OnGenerateMarkNumbers()
       }
    }
 }
-
-void CBarlistListView::FreeBarlistClipboardData()
-{
-   COleDataObject dataObj;
-   if (dataObj.AttachClipboard() && dataObj.IsDataAvailable(CBarlistListView::ms_cFormat))
-   {
-      HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cFormat);
-      ::GlobalFree(hGlobal);
-   }
-}
-
-void CBarlistListView::OnDestroy()
-{
-   FreeBarlistClipboardData();
-
-   CListView::OnDestroy();
-
-   // TODO: Add your message handler code here
-}
-
 
 void CBarlistListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 {

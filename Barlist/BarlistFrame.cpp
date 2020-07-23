@@ -28,6 +28,8 @@
 #include "Helpers.h"
 #include "resource.h"
 
+#include "Barlist.hxx"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -186,19 +188,19 @@ void CBarlistFrame::OnUpdateEditPaste(CCmdUI *pCmdUI)
 {
    COleDataObject dataObj;
    BOOL bEnable = FALSE;
-   if (dataObj.AttachClipboard() && dataObj.IsDataAvailable(CBarlistListView::ms_cFormat))
+   if (dataObj.AttachClipboard())
    {
-      bEnable = TRUE; // its our kind of data
-
-      HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cFormat);
-      CBarlistClipboardData* pCBD = (CBarlistClipboardData*)::GlobalLock(hGlobal);
-      if (pCBD->nThreadID != AfxGetThread()->m_nThreadID)
+      if (dataObj.IsDataAvailable(CBarlistListView::ms_cBarFormat))
       {
-         // can't paste into the source group or
-         // the data is coming from a different thread
-         bEnable = FALSE;
+         bEnable = TRUE; // can always paste bars into a group
       }
-      ::GlobalUnlock(hGlobal);
+      else if(dataObj.IsDataAvailable(CBarlistListView::ms_cGroupFormat))
+      {
+         HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cGroupFormat);
+         DWORD* pThreadID = (DWORD*)::GlobalLock(hGlobal);
+         bEnable = (*pThreadID == AfxGetApp()->m_nThreadID) ? FALSE : TRUE; // can only paste groups from other threads
+         ::GlobalUnlock(hGlobal);
+      }
    }
    pCmdUI->Enable(bEnable);
 }
@@ -206,48 +208,135 @@ void CBarlistFrame::OnUpdateEditPaste(CCmdUI *pCmdUI)
 void CBarlistFrame::OnEditPaste()
 {
    COleDataObject dataObj;
-   if (dataObj.AttachClipboard() && dataObj.IsDataAvailable(CBarlistListView::ms_cFormat))
+   if (dataObj.AttachClipboard())
    {
-      HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cFormat);
-      CBarlistClipboardData* pCBD = (CBarlistClipboardData*)::GlobalLock(hGlobal);
-
-      CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-
-      long targetGroupIdx = GetTreeView()->GetSelectedGroup();
-
-      CComPtr<IGroup> targetGroup;
-      groups->get_Item(CComVariant(targetGroupIdx), &targetGroup);
-
-      CComPtr<IBarRecordCollection> targetBars;
-      targetGroup->get_BarRecords(&targetBars);
-
-      CComPtr<IGroup> sourceGroup;
-      groups->get_Item(CComVariant(pCBD->sourceGroupIdx), &sourceGroup);
-      CComPtr<IBarRecordCollection> sourceBars;
-      sourceGroup->get_BarRecords(&sourceBars);
-
-      long nBars;
-      pCBD->bars->get_Count(&nBars);
-      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      if (dataObj.IsDataAvailable(CBarlistListView::ms_cBarFormat))
       {
-         CComPtr<IBarRecord> bar;
-         pCBD->bars->get_Item(CComVariant(barIdx), &bar);
+         CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
 
-         // even though we've already made a copy of the bar when the clipboard operation started
-         // we have to copy again because of multiple paste operations... each paste must
-         // result in a new bar... a bar cannot be added to multiple groups or multiple times in the 
-         // same group
-         CComPtr<IBarRecord> clone;
-         pDoc->CopyBar(bar, &clone);
-         targetBars->Add(clone);
+         // reconstitute the source barlist data from the XML string
+         HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cBarFormat);
+         LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
+         CComPtr<IBarlist> source_barlist;
+         pDoc->CreateBarlist(strXML, &source_barlist);
+         ::GlobalUnlock(hGlobal);
+
+         // get the index of the currently selected group because this
+         // is where we are going to paste the bar records into
+         long targetGroupIdx = GetTreeView()->GetSelectedGroup();
+
+         // get the target group and its bar record collection
+         CComPtr<IBarlist> barlist;
+         pDoc->GetBarlist(&barlist);
+
+         CComPtr<IGroupCollection> groups;
+         barlist->get_Groups(&groups);
+
+         CComPtr<IGroup> targetGroup;
+         groups->get_Item(CComVariant(targetGroupIdx), &targetGroup);
+
+         CComPtr<IBarRecordCollection> targetBars;
+         targetGroup->get_BarRecords(&targetBars);
+
+         // get the current selection information so we can paste at the selection point
+         CListCtrl& list = GetListView()->GetListCtrl();
+         POSITION pos = list.GetFirstSelectedItemPosition();
+         std::vector<int> vSelectedItems;
+         while (pos)
+         {
+            vSelectedItems.push_back(list.GetNextSelectedItem(pos));
+         }
+         int insertIdx = (vSelectedItems.size() == 0 ? -1 : vSelectedItems.back() + 1);
+
+
+         // get the collection of bar records to paste
+         CComPtr<IGroupCollection> source_groups;
+         source_barlist->get_Groups(&source_groups);
+         CComPtr<IGroup> source_group;
+         source_groups->get_Item(CComVariant(0), &source_group);
+         CComPtr<IBarRecordCollection> source_bars;
+         source_group->get_BarRecords(&source_bars);
+
+         // paste the bar records
+         long nBars;
+         source_bars->get_Count(&nBars);
+         for (long barIdx = 0; barIdx < nBars; barIdx++)
+         {
+            CComPtr<IBarRecord> bar;
+            source_bars->get_Item(CComVariant(barIdx), &bar);
+            targetBars->Insert(CComVariant(insertIdx + (insertIdx < 0 ? 0 : barIdx)), bar);
+         }
+
+         // inserting bars changes the selection state
+         // re-instate the list control selection
+         for (auto idx : vSelectedItems)
+         {
+            list.SetItemState(idx, LVIS_SELECTED, LVIS_SELECTED);
+         }
       }
+      else if (dataObj.IsDataAvailable(CBarlistListView::ms_cGroupFormat))
+      {
+         HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cGroupFormat);
+         DWORD* pThreadID = (DWORD*)::GlobalLock(hGlobal);
+         ATLASSERT(*pThreadID != AfxGetApp()->m_nThreadID);
+         pThreadID++; // advance the pointer to the start of the xml string
+         LPCSTR strXML = LPCSTR(pThreadID); // cast the pointer
+         CComPtr<IBarlist> source_barlist;
+         CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+         pDoc->CreateBarlist(strXML, &source_barlist);
+         ::GlobalUnlock(hGlobal);
 
-      ::GlobalUnlock(hGlobal);
+         CComPtr<IBarlist> target_barlist;
+         pDoc->GetBarlist(&target_barlist);
+
+         CComPtr<IGroupCollection> target_groups;
+         target_barlist->get_Groups(&target_groups);
+
+         CComPtr<IGroupCollection> source_groups;
+         source_barlist->get_Groups(&source_groups);
+         long nGroups;
+         source_groups->get_Count(&nGroups);
+         for (long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+         {
+            CComPtr<IGroup> source_group;
+            source_groups->get_Item(CComVariant(groupIdx), &source_group);
+
+            // create a new group
+            CComBSTR bstrGroup;
+            source_group->get_Name(&bstrGroup);
+            CString strTargetGroupName(bstrGroup);
+            int trial = 0;
+            while (FAILED(target_groups->Add(CComBSTR(strTargetGroupName))))
+            {
+               if (trial == 0)
+               {
+                  strTargetGroupName.Format(_T("%s_Copy"), OLE2T(bstrGroup));
+               }
+               else
+               {
+                  strTargetGroupName.Format(_T("%s_Copy(%d)"), OLE2T(bstrGroup), trial);
+               }
+               trial++;
+            }
+
+            CComPtr<IGroup> target_group;
+            target_groups->get_Item(CComVariant(CComBSTR(strTargetGroupName)), &target_group);
+            CComPtr<IBarRecordCollection> target_bars;
+            target_group->get_BarRecords(&target_bars);
+
+            CComPtr<IBarRecordCollection> source_bars;
+            source_group->get_BarRecords(&source_bars);
+
+            long nBars;
+            source_bars->get_Count(&nBars);
+            for (long barIdx = 0; barIdx < nBars; barIdx++)
+            {
+               CComPtr<IBarRecord> bar;
+               source_bars->get_Item(CComVariant(barIdx), &bar);
+               target_bars->Add(bar);
+            }
+         }
+      }
    }
 }
 

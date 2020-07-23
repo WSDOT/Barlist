@@ -330,6 +330,7 @@ interface IStatusMessageCollection;
 		[id(8), helpstring("method Move")] HRESULT Move([in] VARIANT rec, [in] MoveType mt, [in] VARIANT target);
 		[id(9), helpstring("method MoveUp")] HRESULT MoveUp([in] VARIANT rec);
 		[id(10), helpstring("method MoveDown")] HRESULT MoveDown([in] VARIANT rec);
+      [id(11), helpstring("method Insert")] HRESULT Insert([in]VARIANT varIdx, [in]IBarRecord* pBarRecord);
 	};
 	[
 		object,

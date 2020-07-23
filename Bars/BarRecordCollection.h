@@ -83,6 +83,7 @@ BEGIN_COM_MAP(CBarRecordCollection)
 END_COM_MAP()
 
 private:
+   HRESULT GetIndex(VARIANT varIndex,long* pIndex);
    long GetIndex(BSTR bstrMark);
    std::string ConvertMark(BSTR bstrMark);
    std::multimap<std::string,DWORD> m_Cookies;
@@ -95,6 +96,7 @@ public:
 
 // IBarRecordCollection
 public:
+   STDMETHOD(Insert)(/*[in]*/VARIANT varIdx, /*[in]*/IBarRecord* pBarRecord);
 	STDMETHOD(Move)(/*[in]*/ VARIANT rec, /*[in]*/ MoveType mt, /*[in]*/ VARIANT target);
 	STDMETHOD(MoveUp)(/*[in]*/ VARIANT rec);
 	STDMETHOD(MoveDown)(/*[in]*/ VARIANT rec);

@@ -34,13 +34,6 @@ class CBarlistFrame;
 interface IBarRecordCollection;
 interface IBarRecord;
 
-struct CBarlistClipboardData
-{
-   DWORD nThreadID; // ID of the thread where the clipboard or drag and drop starts (can't move data between instances of applications)
-   long sourceGroupIdx; // index of the group that is the source of the bar records
-   CComPtr<IBarRecordCollection> bars; // the bar records
-};
-
 /////////////////////////////////////////////////////////////////////////////
 // CBarlistListView view
 
@@ -52,7 +45,8 @@ protected:
 
 // Attributes
 public:
-   static CLIPFORMAT ms_cFormat;
+   static CLIPFORMAT ms_cBarFormat;
+   static CLIPFORMAT ms_cGroupFormat;
 
 // Operations
 public:
@@ -110,20 +104,27 @@ protected:
 
    CImageList m_ImageList;
 
+   COleDropTarget m_DropTarget;
+   BOOL m_bRMouse;
+
    void CacheBarlistClipboardData(COleDataSource& dataSource);
-   void FreeBarlistClipboardData();
    void SetBarRecord(int row, IBarRecord* pBarRecord);
+   BOOL MouseButtonDrag(UINT nFlags, CPoint point);
 
 public:
    afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
    afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
+   afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+   virtual DROPEFFECT OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
+   virtual void OnDragLeave();
+   virtual DROPEFFECT OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
+   virtual DROPEFFECT OnDropEx(COleDataObject* pDataObject, DROPEFFECT dropDefault, DROPEFFECT dropList, CPoint point);
    afx_msg void OnUpdateEditCut(CCmdUI *pCmdUI);
    afx_msg void OnEditCut();
    afx_msg void OnUpdateEditCopy(CCmdUI *pCmdUI);
    afx_msg void OnEditCopy();
    afx_msg void OnGenerateMarkNumbers();
-   afx_msg void OnDestroy();
    afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
 };
 

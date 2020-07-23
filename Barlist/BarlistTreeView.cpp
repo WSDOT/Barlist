@@ -33,6 +33,8 @@
 
 #include "BarlistPrintDialog.h"
 
+#include "Barlist.hxx"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -66,9 +68,14 @@ BEGIN_MESSAGE_MAP(CBarlistTreeView, CTreeView)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, CView::OnFilePrintPreview)
    ON_WM_MOUSEMOVE()
-//   ON_WM_CLOSE()
-ON_NOTIFY_REFLECT(NM_DBLCLK, &CBarlistTreeView::OnNMDblclk)
-ON_NOTIFY_REFLECT(NM_RCLICK, &CBarlistTreeView::OnNMRClick)
+   ON_NOTIFY_REFLECT(NM_DBLCLK, &CBarlistTreeView::OnNMDblclk)
+   ON_NOTIFY_REFLECT(NM_RCLICK, &CBarlistTreeView::OnNMRClick)
+   ON_WM_LBUTTONDOWN()
+   ON_WM_RBUTTONDOWN()
+   ON_UPDATE_COMMAND_UI(ID_EDIT_CUT, &CBarlistTreeView::OnUpdateEditCut)
+   ON_COMMAND(ID_EDIT_CUT, &CBarlistTreeView::OnEditCut)
+   ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CBarlistTreeView::OnUpdateEditCopy)
+   ON_COMMAND(ID_EDIT_COPY, &CBarlistTreeView::OnEditCopy)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -269,9 +276,11 @@ void CBarlistTreeView::OnSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
    // tell the entry list view to update itself.
    CTreeCtrl& tree = GetTreeCtrl();
    HTREEITEM hItem = tree.GetSelectedItem();
-   DWORD_PTR itemData = tree.GetItemData(hItem);
-
-   m_pListView->OnGroupSelected((long)itemData);
+   if (hItem)
+   {
+      DWORD_PTR itemData = tree.GetItemData(hItem);
+      m_pListView->OnGroupSelected((long)itemData);
+   }
 
    *pResult = 0;
 }
@@ -426,6 +435,40 @@ void CBarlistTreeView::OnRename()
    }
 }
 
+void CBarlistTreeView::OnUpdateEditCut(CCmdUI *pCmdUI)
+{
+   OnUpdateEditCopy(pCmdUI);
+}
+
+void CBarlistTreeView::OnEditCut()
+{
+   OnEditCopy();
+
+   // do the cut
+   CBarlistDoc* pDoc = GetDocument();
+   CComPtr<IBarlist> barlist;
+   pDoc->GetBarlist(&barlist);
+   CComPtr<IGroupCollection> groups;
+   barlist->get_Groups(&groups);
+   
+   long groupIdx = GetSelectedGroup();
+   groups->Remove(CComVariant(groupIdx));
+}
+
+void CBarlistTreeView::OnUpdateEditCopy(CCmdUI *pCmdUI)
+{
+   CTreeCtrl& tree = GetTreeCtrl();
+   HTREEITEM hItem = tree.GetSelectedItem();
+   pCmdUI->Enable(hItem != NULL && hItem != tree.GetRootItem());
+}
+
+void CBarlistTreeView::OnEditCopy()
+{
+   COleDataSource* pDataSource = new COleDataSource;
+   CacheBarlistClipboardData(*pDataSource);
+   pDataSource->SetClipboard();
+}
+
 void CBarlistTreeView::UpdateTree(long selectGroupIdx)
 {
    CTreeCtrl& tree = GetTreeCtrl();
@@ -524,10 +567,30 @@ void CBarlistTreeView::UpdateStatus()
    }
 }
 
+DROPEFFECT CBarlistTreeView::OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
+{
+   m_bRMouse = (dwKeyState == VK_RBUTTON);
+   return CTreeView::OnDragEnter(pDataObject, dwKeyState, point);
+}
+
+void CBarlistTreeView::OnDragLeave()
+{
+   m_bRMouse = false;
+   CTreeView::OnDragLeave();
+}
+
 DROPEFFECT CBarlistTreeView::OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point)
 {
-   if (pDataObject->IsDataAvailable(CBarlistListView::ms_cFormat))
+   CBarlistDoc* pDoc = GetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
    {
+      // can't drop onto a collaboration document
+      return DROPEFFECT_NONE;
+   }
+
+   if (pDataObject->IsDataAvailable(CBarlistListView::ms_cBarFormat))
+   {
+      // bars must drop on a tree node, execpt the root node
       CTreeCtrl& tree = GetTreeCtrl();
 
       UINT flags;
@@ -535,16 +598,6 @@ DROPEFFECT CBarlistTreeView::OnDragOver(COleDataObject* pDataObject, DWORD dwKey
       if (hItem == NULL || hItem == tree.GetRootItem())
       {
          // can't drop on tree root
-         return DROPEFFECT_NONE;
-      }
-
-      HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cFormat);
-      CBarlistClipboardData* pCBD = (CBarlistClipboardData*)::GlobalLock(hGlobal);
-      ::GlobalUnlock(hGlobal);
-
-      if (pCBD->nThreadID != AfxGetThread()->m_nThreadID)
-      {
-         // can't copy data from another thread
          return DROPEFFECT_NONE;
       }
 
@@ -558,18 +611,70 @@ DROPEFFECT CBarlistTreeView::OnDragOver(COleDataObject* pDataObject, DWORD dwKey
          return DROPEFFECT_NONE;
       }
    }
+   else if (pDataObject->IsDataAvailable(CBarlistListView::ms_cGroupFormat))
+   {
+      // groups must be dropped on the root node or in the whitespace
+      CTreeCtrl& tree = GetTreeCtrl();
+
+      UINT flags;
+      HTREEITEM hItem = tree.HitTest(point, &flags);
+
+      // can only drop on whitespace or the root node
+      if (hItem == NULL || hItem == tree.GetRootItem())
+      {
+         HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cGroupFormat);
+         DWORD* pThreadID = (DWORD*)::GlobalLock(hGlobal);
+
+         // can only drop a group if it comes from a different thread
+         if (*pThreadID == AfxGetApp()->m_nThreadID)
+         {
+            return DROPEFFECT_NONE;
+         }
+         else
+         {
+            return (dwKeyState & MK_CONTROL) ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
+         }
+      }
+      else
+      {
+         return DROPEFFECT_NONE;
+      }
+   }
 
    return CTreeView::OnDragOver(pDataObject, dwKeyState, point);
 }
 
-BOOL CBarlistTreeView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point)
+DROPEFFECT CBarlistTreeView::OnDropEx(COleDataObject* pDataObject, DROPEFFECT dropDefault, DROPEFFECT dropList, CPoint point)
 {
-   if (pDataObject->IsDataAvailable(CBarlistListView::ms_cFormat))
+   if (pDataObject->IsDataAvailable(CBarlistListView::ms_cBarFormat))
    {
       CTreeCtrl& tree = GetTreeCtrl();
       HTREEITEM hTargetItem = tree.HitTest(point);
       if (hTargetItem && hTargetItem != tree.GetRootItem())
       {
+         DROPEFFECT deResult = dropDefault;
+
+         if (m_bRMouse)
+         {
+            AFX_MANAGE_STATE(AfxGetStaticModuleState());
+            ClientToScreen(&point);
+            CMenu menu;
+            VERIFY(menu.LoadMenu(IDR_DROP));
+
+            CMenu* pPopup = menu.GetSubMenu(0);
+            ASSERT(pPopup != nullptr);
+
+            pPopup->SetDefaultItem(dropDefault == DROPEFFECT_COPY ? 0 : 1, MF_BYPOSITION);
+            BOOL nCmd = pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, point.x, point.y, this);
+            if (nCmd == 0)
+            {
+               // user cancelled the menu
+               return DROPEFFECT_NONE;
+            }
+
+            deResult = (nCmd == ID_EDIT_COPY ? DROPEFFECT_COPY : DROPEFFECT_MOVE);
+         }
+
          CBarlistDoc* pDoc = GetDocument();
          CComPtr<IBarlist> barlist;
          pDoc->GetBarlist(&barlist);
@@ -584,30 +689,300 @@ BOOL CBarlistTreeView::OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect
          CComPtr<IBarRecordCollection> targetBars;
          targetGroup->get_BarRecords(&targetBars);
 
-         HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cFormat);
-         CBarlistClipboardData* pCBD = (CBarlistClipboardData*)::GlobalLock(hGlobal);
+         // reconstitute the source barlist data from the XML string
+         HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cBarFormat);
+         LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
+         CComPtr<IBarlist> source_barlist;
+         pDoc->CreateBarlist(strXML, &source_barlist);
+         ::GlobalUnlock(hGlobal);
+
+         // get the collection of bar records to paste
+         CComPtr<IGroupCollection> source_groups;
+         source_barlist->get_Groups(&source_groups);
+         CComPtr<IGroup> source_group;
+         source_groups->get_Item(CComVariant(0), &source_group);
+         CComPtr<IBarRecordCollection> source_bars;
+         source_group->get_BarRecords(&source_bars);
+
          long nBars;
-         pCBD->bars->get_Count(&nBars);
+         source_bars->get_Count(&nBars);
          for (long barIdx = 0; barIdx < nBars; barIdx++)
          {
             CComPtr<IBarRecord> bar;
-            pCBD->bars->get_Item(CComVariant(0), &bar);
-            pCBD->bars->Remove(CComVariant(0));
+            source_bars->get_Item(CComVariant(barIdx), &bar);
             targetBars->Add(bar);
          }
 
+         tree.SelectItem(hTargetItem);
+
+         return deResult;
+      }
+      return DROPEFFECT_NONE;
+   }
+   else if (pDataObject->IsDataAvailable(CBarlistListView::ms_cGroupFormat))
+   {
+      CTreeCtrl& tree = GetTreeCtrl();
+      HTREEITEM hTargetItem = tree.HitTest(point);
+
+      // can only drop group data in whitespace or on the root item
+      if (hTargetItem == NULL || hTargetItem == tree.GetRootItem())
+      {
+         DROPEFFECT deResult = dropDefault;
+
+         if (m_bRMouse)
+         {
+            AFX_MANAGE_STATE(AfxGetStaticModuleState());
+            ClientToScreen(&point);
+            CMenu menu;
+            VERIFY(menu.LoadMenu(IDR_DROP));
+
+            CMenu* pPopup = menu.GetSubMenu(0);
+            ASSERT(pPopup != nullptr);
+            pPopup->SetDefaultItem(dropDefault == DROPEFFECT_COPY ? 0 : 1, MF_BYPOSITION);
+            BOOL nCmd = pPopup->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD, point.x, point.y, this);
+            if (nCmd == 0)
+            {
+               // user cancelled the menu
+               return DROPEFFECT_NONE;
+            }
+
+            deResult = (nCmd == ID_EDIT_COPY ? DROPEFFECT_COPY : DROPEFFECT_MOVE);
+         }
+
+
+         // reconstitute the source barlist data from the XML string
+         HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cGroupFormat);
+         DWORD* pThreadID = (DWORD*)::GlobalLock(hGlobal);
+         ATLASSERT(*pThreadID != AfxGetApp()->m_nThreadID); // can't drop a group from the same application
+
+         pThreadID++;
+
+         LPCSTR strXML = LPCSTR(pThreadID);
+         CComPtr<IBarlist> source_barlist;
+         CBarlistDoc* pDoc = GetDocument();
+         pDoc->CreateBarlist(strXML, &source_barlist);
          ::GlobalUnlock(hGlobal);
+
+         CComPtr<IBarlist> target_barlist;
+         pDoc->GetBarlist(&target_barlist);
+
+         CComPtr<IGroupCollection> target_groups;
+         target_barlist->get_Groups(&target_groups);
+
+         CComPtr<IGroupCollection> source_groups;
+         source_barlist->get_Groups(&source_groups);
+         long nGroups;
+         source_groups->get_Count(&nGroups);
+         for(long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+         {
+            CComPtr<IGroup> source_group;
+            source_groups->get_Item(CComVariant(groupIdx), &source_group);
+
+            // create a new group
+            CComBSTR bstrGroup;
+            source_group->get_Name(&bstrGroup);
+            CString strTargetGroupName(bstrGroup);
+            int trial = 0;
+            while (FAILED(target_groups->Add(CComBSTR(strTargetGroupName))))
+            {
+               if (trial == 0)
+               {
+                  strTargetGroupName.Format(_T("%s_Copy"), OLE2T(bstrGroup));
+               }
+               else
+               {
+                  strTargetGroupName.Format(_T("%s_Copy(%d)"), OLE2T(bstrGroup), trial);
+               }
+               trial++;
+            }
+
+            CComPtr<IGroup> target_group;
+            target_groups->get_Item(CComVariant(CComBSTR(strTargetGroupName)), &target_group);
+            CComPtr<IBarRecordCollection> target_bars;
+            target_group->get_BarRecords(&target_bars);
+
+            CComPtr<IBarRecordCollection> source_bars;
+            source_group->get_BarRecords(&source_bars);
+
+            long nBars;
+            source_bars->get_Count(&nBars);
+            for (long barIdx = 0; barIdx < nBars; barIdx++)
+            {
+               CComPtr<IBarRecord> bar;
+               source_bars->get_Item(CComVariant(barIdx), &bar);
+               target_bars->Add(bar);
+            }
+         }
 
          tree.SelectItem(hTargetItem);
 
-         return TRUE;
+         return deResult;
       }
-      return FALSE;
+      return DROPEFFECT_NONE;
    }
 
-   return CTreeView::OnDrop(pDataObject, dropEffect, point);
+
+   return CTreeView::OnDropEx(pDataObject, dropDefault, dropList, point);
 }
 
+void CBarlistTreeView::CacheBarlistClipboardData(COleDataSource& dataSource)
+{
+   CBarlistDoc* pDoc = GetDocument();
+   CComPtr<IBarlist> barlist;
+   pDoc->GetBarlist(&barlist);
+   CComPtr<IGroupCollection> groups;
+   barlist->get_Groups(&groups);
+   long nGroups;
+   groups->get_Count(&nGroups);
+
+   CComPtr<IBarlist> source_barlist;
+   source_barlist.CoCreateInstance(CLSID_Barlist);
+   CComPtr<IGroupCollection> source_groups;
+   source_barlist->get_Groups(&source_groups);
+
+   long selectedGroupIdx = GetSelectedGroup();
+   long firstGroupIdx = (selectedGroupIdx < 0 ? 0 : selectedGroupIdx);
+   long lastGroupIdx = (selectedGroupIdx < 0 ? nGroups - 1 : selectedGroupIdx);
+   for (long groupIdx = firstGroupIdx; groupIdx <= lastGroupIdx; groupIdx++)
+   {
+      CComPtr<IGroup> group;
+      groups->get_Item(CComVariant(groupIdx), &group);
+      CComPtr<IBarRecordCollection> bars;
+      group->get_BarRecords(&bars);
+
+      CComBSTR bstrName;
+      group->get_Name(&bstrName);
+
+      source_groups->Add(bstrName);
+      CComPtr<IGroup> source_group;
+      source_groups->get_Item(CComVariant(0), &source_group);
+      CComPtr<IBarRecordCollection> source_bars;
+      source_group->get_BarRecords(&source_bars);
+
+      long nBars;
+      bars->get_Count(&nBars);
+      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      {
+         CComPtr<IBarRecord> bar;
+         bars->get_Item(CComVariant(barIdx), &bar);
+
+         CComPtr<IBarRecord> clone;
+         pDoc->CopyBar(bar, &clone);
+
+         source_bars->Add(clone);
+      }
+   }
+
+   Barlist barlist_xml = pDoc->CreateXML(source_barlist);
+   std::ostringstream os;
+   Barlist_(os, barlist_xml, xml_schema::namespace_infomap(), _T("UTF-8"));
+
+   size_t size = os.str().size();
+   size++; // add one more for null terminaator
+
+   // add enough space to hold the thread id as well
+   DWORD threadID = AfxGetApp()->m_nThreadID;
+   size += sizeof(DWORD);
+
+   // allocate global memory space
+   HGLOBAL hGlobal = ::GlobalAlloc(GHND, size);
+
+   // save the thread id
+   DWORD* pThreadID = (DWORD*)::GlobalLock(hGlobal);
+   *pThreadID = threadID;
+
+   // advance the pointer to where we want to start saving the string
+   pThreadID++;
+
+   // cast the pointer and copy the string
+   char* pString = (char*)pThreadID;
+   ::strcpy_s(pString, os.str().size()+1, os.str().c_str());
+   pString[os.str().size()] = 0; // null terminate the string
+
+   // done with the global memory so unlock it
+   ::GlobalUnlock(hGlobal);
+
+   // cache the memory handle in the data source for later retreival
+   dataSource.CacheGlobalData(CBarlistListView::ms_cGroupFormat, hGlobal);
+}
+
+BOOL CBarlistTreeView::MouseButtonDrag(UINT nFlags, CPoint point)
+{
+   CBarlistDoc* pDoc = GetDocument();
+   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
+   {
+      return FALSE;
+   }
+   else
+   {
+      // Drag and drop will only occur if the mouse is on a tree node
+      CTreeCtrl& tree = GetTreeCtrl();
+      HTREEITEM hTreeItem = tree.HitTest(point);
+      if (hTreeItem != NULL)
+      {
+         CRect rect;
+         tree.GetItemRect(hTreeItem, &rect, FALSE);
+         if (rect.PtInRect(point))
+         {
+            tree.SelectItem(hTreeItem);
+
+            COleDataSource dataSource;
+            CacheBarlistClipboardData(dataSource);
+            if (dataSource.DoDragDrop(DROPEFFECT_COPY | DROPEFFECT_MOVE) == DROPEFFECT_MOVE)
+            {
+               // the group was moved, so remove it from the barlist
+               LPDATAOBJECT lpDataObject = (LPDATAOBJECT)dataSource.GetInterface(&IID_IDataObject);
+               COleDataObject dataObj;
+               dataObj.Attach(lpDataObject, FALSE);
+               HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cGroupFormat);
+
+               // reconstitute the source barlist data from the XML string
+               DWORD* pThreadID = (DWORD*)::GlobalLock(hGlobal);
+               ATLASSERT(*pThreadID == AfxGetApp()->m_nThreadID);
+               pThreadID++;
+
+               LPCSTR strXML = LPCSTR(pThreadID);
+               CComPtr<IBarlist> source_barlist;
+               pDoc->CreateBarlist(strXML, &source_barlist);
+               ::GlobalUnlock(hGlobal);
+
+               // get the collection of bar records to paste
+               CComPtr<IGroupCollection> source_groups;
+               source_barlist->get_Groups(&source_groups);
+               long nGroups;
+               source_groups->get_Count(&nGroups);
+               for (long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+               {
+                  CComPtr<IGroup> source_group;
+                  source_groups->get_Item(CComVariant(groupIdx), &source_group);
+
+                  CComBSTR bstrName;
+                  source_group->get_Name(&bstrName);
+
+                  CComPtr<IBarlist> barlist;
+                  pDoc->GetBarlist(&barlist);
+                  CComPtr<IGroupCollection> groups;
+                  barlist->get_Groups(&groups);
+                  groups->Remove(CComVariant(bstrName));
+               }
+            }
+         }
+      }
+      return TRUE;
+   }
+}
+
+void CBarlistTreeView::OnRButtonDown(UINT nFlags, CPoint point)
+{
+   if ( !MouseButtonDrag(nFlags, point) )
+      CTreeView::OnRButtonDown(nFlags, point);
+}
+
+void CBarlistTreeView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+   if (!MouseButtonDrag(nFlags, point) )
+      CTreeView::OnLButtonDown(nFlags, point);
+}
 
 void CBarlistTreeView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -634,16 +1009,16 @@ void CBarlistTreeView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
    GetCursorPos(&point);
    ScreenToClient(&point);
    HTREEITEM hItem = tree.HitTest(point);
+   ClientToScreen(&point);
    if (hItem)
    {
       tree.SelectItem(hItem);
-      ClientToScreen(&point);
-
-      AFX_MANAGE_STATE(AfxGetStaticModuleState());
-      CMenu menu;
-      menu.LoadMenu(IDR_TREE_CONTEXT);
-      menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, EAFGetMainFrame());
    }
+
+   AFX_MANAGE_STATE(AfxGetStaticModuleState());
+   CMenu menu;
+   menu.LoadMenu(IDR_TREE_CONTEXT);
+   menu.GetSubMenu(0)->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, EAFGetMainFrame());
 
    *pResult = 0;
 }
