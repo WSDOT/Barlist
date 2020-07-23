@@ -1245,11 +1245,9 @@ void CBarDlg::OnBnClickedAddBar()
    CComPtr<IBarRecordCollection> bars;
    group->get_BarRecords(&bars);
 
-   CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_MARK);
-   CComBSTR bstrMark;
-   barRecord->get_Mark(&bstrMark);
-   bstrMark = AutoIncrementMark(CString(bstrMark));
-   barRecord->put_Mark(bstrMark);
+   long nBars;
+   bars->get_Count(&nBars);
+   m_BarIdx = nBars; // this is before adding the bar record to the bars collection, so this is the index
 
    bars->Add(barRecord);
 
@@ -1259,11 +1257,13 @@ void CBarDlg::OnBnClickedAddBar()
    UpdateDimensions(barRecord);
    UpdateStatus(barRecord);
 
-   long nBars;
-   bars->get_Count(&nBars);
-   m_BarIdx = nBars - 1;
-
    SelectBar(m_GroupIdx, m_BarIdx);
+
+   CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_MARK);
+   CComBSTR bstrMark;
+   barRecord->get_Mark(&bstrMark);
+   bstrMark = AutoIncrementMark(CString(bstrMark));
+   pCB->SetCurSel(pCB->AddString(OLE2T(bstrMark)));
 }
 
 CString CBarDlg::AutoIncrementMark(const CString& strMark)
