@@ -87,6 +87,11 @@ protected:
    void UpdateTree(long selectGroupIdx=-1);
    void UpdateStatus();
 
+   BOOL m_bRMouse;
+
+   void CacheBarlistClipboardData(COleDataSource& dataSource);
+   BOOL MouseButtonDrag(UINT nFlags, CPoint point);
+
 // Generated message map functions
 protected:
 	//{{AFX_MSG(CBarlistTreeView)
@@ -108,11 +113,19 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+   afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+   afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+   virtual DROPEFFECT OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
+   virtual void OnDragLeave();
    virtual DROPEFFECT OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
-   virtual BOOL OnDrop(COleDataObject* pDataObject, DROPEFFECT dropEffect, CPoint point);
+   virtual DROPEFFECT OnDropEx(COleDataObject* pDataObject, DROPEFFECT dropDefault, DROPEFFECT dropList, CPoint point);
    afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
    afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
    virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo);
+   afx_msg void OnUpdateEditCut(CCmdUI *pCmdUI);
+   afx_msg void OnEditCut();
+   afx_msg void OnUpdateEditCopy(CCmdUI *pCmdUI);
+   afx_msg void OnEditCopy();
 };
 
 #ifndef _DEBUG  // debug version in BarlistTreeView.cpp

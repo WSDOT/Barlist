@@ -392,7 +392,174 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
       return FALSE;
    }
 
-   auto properties = barlist_xml->Properties();
+   CreateBarlist(*barlist_xml, &m_Barlist.p);
+   return TRUE;
+}
+
+BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
+{
+   if (!ReadBarlistFromFile(lpszPathName, &m_Barlist.p))
+   {
+      return FALSE;
+   }
+
+   // start getting events after the barlist is loaded, otherwise
+   // there will be tons of events fired during loading (we don't want that)
+   GetBarlistEvents(TRUE); 
+
+   EAFGetApp()->AddUnitModeListener(this); // resume listening for unit mode change events (see constructor)
+
+   return TRUE;
+}
+
+Barlist CBarlistDoc::CreateXML(IBarlist* pBarlist)
+{
+   CComBSTR bstr;
+
+   // Properties
+   PropertiesType properties(_T(""), _T(""), _T(""), _T(""), _T(""));
+   pBarlist->get_Project(&bstr);
+   properties.Project() = OLE2T(bstr);
+
+   pBarlist->get_JobNumber(&bstr);
+   properties.JobNumber() = OLE2T(bstr);
+
+   pBarlist->get_Engineer(&bstr);
+   properties.Engineer() = OLE2T(bstr);
+
+   pBarlist->get_Company(&bstr);
+   properties.Company() = OLE2T(bstr);
+
+   pBarlist->get_Comments(&bstr);
+   properties.Comments() = OLE2T(bstr);
+
+   Barlist barlist(properties);
+
+   CComPtr<IGroupCollection> groups;
+   pBarlist->get_Groups(&groups);
+   long nGroups;
+   groups->get_Count(&nGroups);
+   for (long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+   {
+      CComPtr<IGroup> pGroup;
+      groups->get_Item(CComVariant(groupIdx), &pGroup);
+
+      pGroup->get_Name(&bstr);
+      barlist.Group().push_back(GroupType(OLE2T(bstr)));
+
+      auto& group = barlist.Group().back();
+
+      CComPtr<IBarRecordCollection> bars;
+      pGroup->get_BarRecords(&bars);
+      long nBars;
+      bars->get_Count(&nBars);
+      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      {
+         CComPtr<IBarRecord> pBar;
+         bars->get_Item(CComVariant(barIdx), &pBar);
+
+         MaterialType material;
+         pBar->get_Material(&material);
+         BarRecordType::Material_type mat((BarRecordType::Material_type::value)material);
+
+         pBar->get_Mark(&bstr);
+         BarRecordType::Mark_type mark = OLE2T(bstr);
+
+         pBar->get_Location(&bstr);
+         BarRecordType::Location_type location = OLE2T(bstr);
+
+         pBar->get_Size(&bstr);
+         BarRecordType::Size_type size = OLE2T(bstr);
+
+         long lValue;
+         pBar->get_NumReqd(&lValue);
+         BarRecordType::NoReqd_type nReqd = lValue;
+
+         pBar->get_BendType(&lValue);
+         BarRecordType::BendType_type bendType = lValue;
+
+         UseType bar_usage;
+         pBar->get_Use(&bar_usage);
+         BarRecordType::Use_type use((BarRecordType::Use_type)bar_usage);
+
+         VARIANT_BOOL vb;
+         pBar->get_Substructure(&vb);
+         BarRecordType::Substructure_type substructure(vb == VARIANT_TRUE ? _T("True") : _T("False"));
+
+         pBar->get_Epoxy(&vb);
+         BarRecordType::Epoxy_type epoxy(vb == VARIANT_TRUE ? _T("True") : _T("False"));
+
+         VARIANT_BOOL vbVaries;
+         pBar->get_Varies(&vbVaries);
+         BarRecordType::Varies_type varies(vbVaries == VARIANT_TRUE ? _T("True") : _T("False"));
+
+         pBar->get_NumEach(&lValue);
+         BarRecordType::NoEach_type nEach = lValue;
+
+         Float64 u, w, x, y, z, t1, t2;
+         CComPtr<IBend> pPrimaryBend;
+         pBar->get_PrimaryBend(&pPrimaryBend);
+         pPrimaryBend->get_U(&u);
+         pPrimaryBend->get_W(&w);
+         pPrimaryBend->get_X(&x);
+         pPrimaryBend->get_Y(&y);
+         pPrimaryBend->get_Z(&z);
+         pPrimaryBend->get_T1(&t1);
+         pPrimaryBend->get_T2(&t2);
+
+         BarRecordType::PrimaryBend_type primaryBend(u, w, x, y, z, t1, t2);
+
+         BarRecordType barRecord(mat, mark, location, size, nReqd, bendType, use, substructure, epoxy, varies, nEach, primaryBend);
+
+         if (vbVaries == VARIANT_TRUE)
+         {
+            CComPtr<IBend> pVariesBend;
+            pBar->get_VariesBend(&pVariesBend);
+            pVariesBend->get_U(&u);
+            pVariesBend->get_W(&w);
+            pVariesBend->get_X(&x);
+            pVariesBend->get_Y(&y);
+            pVariesBend->get_Z(&z);
+            pVariesBend->get_T1(&t1);
+            pVariesBend->get_T2(&t2);
+            BarRecordType::VariesBend_type variesBend(u, w, x, y, z, t1, t2);
+
+            barRecord.VariesBend() = variesBend;
+         }
+
+         group.BarRecord().push_back(barRecord);
+      }
+   }
+
+   return barlist;
+}
+
+BOOL CBarlistDoc::CreateBarlist(LPCSTR strXML, IBarlist** ppBarlist)
+{
+   xml_schema::properties props;
+   CEAFApp* pApp = EAFGetApp();
+   CString strSchemaFile(pApp->GetAppLocation());
+   strSchemaFile.Append(_T("Barlist.xsd"));
+   props.no_namespace_schema_location(strSchemaFile.GetBuffer());
+   std::istringstream is(strXML);
+   std::auto_ptr<Barlist> barlistXML = Barlist_(is, 0, props);
+   return CreateBarlist(*barlistXML, ppBarlist);
+}
+
+BOOL CBarlistDoc::CreateBarlist(Barlist& barlistXML, IBarlist** ppBarlist)
+{
+   CComPtr<IBarlist> barlist;
+   if (*ppBarlist == nullptr)
+   {
+      barlist.CoCreateInstance(CLSID_Barlist);
+      barlist.CopyTo(ppBarlist);
+   }
+   else
+   {
+      barlist = *ppBarlist;
+   }
+
+   auto properties = barlistXML.Properties();
    barlist->put_Project(CComBSTR(properties.Project().c_str()));
    barlist->put_JobNumber(CComBSTR(properties.JobNumber().c_str()));
    barlist->put_Engineer(CComBSTR(properties.Engineer().c_str()));
@@ -402,7 +569,7 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
    CComPtr<IGroupCollection> groups;
    barlist->get_Groups(&groups);
    int nGroups = 0;
-   auto& grps = barlist_xml->Group();
+   auto& grps = barlistXML.Group();
    for (auto& grp : grps)
    {
       groups->Add(CComBSTR(grp.Name().c_str()));
@@ -482,21 +649,6 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
          barRecords->Add(barRecord);
       }
    }
-   return TRUE;
-}
-
-BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
-{
-   if (!ReadBarlistFromFile(lpszPathName, &m_Barlist.p))
-   {
-      return FALSE;
-   }
-
-   // start getting events after the barlist is loaded, otherwise
-   // there will be tons of events fired during loading (we don't want that)
-   GetBarlistEvents(TRUE); 
-
-   EAFGetApp()->AddUnitModeListener(this); // resume listening for unit mode change events (see constructor)
 
    return TRUE;
 }
@@ -514,123 +666,7 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
    }
    else
    {
-      CComBSTR bstr;
-
-      // Properties
-      PropertiesType properties(_T(""), _T(""), _T(""), _T(""), _T(""));
-      m_Barlist->get_Project(&bstr);
-      properties.Project() = OLE2T(bstr);
-
-      m_Barlist->get_JobNumber(&bstr);
-      properties.JobNumber() = OLE2T(bstr);
-
-      m_Barlist->get_Engineer(&bstr);
-      properties.Engineer() = OLE2T(bstr);
-
-      m_Barlist->get_Company(&bstr);
-      properties.Company() = OLE2T(bstr);
-
-      m_Barlist->get_Comments(&bstr);
-      properties.Comments() = OLE2T(bstr);
-
-      Barlist barlist(properties);
-
-      CComPtr<IGroupCollection> groups;
-      m_Barlist->get_Groups(&groups);
-      long nGroups;
-      groups->get_Count(&nGroups);
-      for (long groupIdx = 0; groupIdx < nGroups; groupIdx++)
-      {
-         CComPtr<IGroup> pGroup;
-         groups->get_Item(CComVariant(groupIdx), &pGroup);
-
-         pGroup->get_Name(&bstr);
-         barlist.Group().push_back(GroupType(OLE2T(bstr)));
-
-         auto& group = barlist.Group().back();
-
-         CComPtr<IBarRecordCollection> bars;
-         pGroup->get_BarRecords(&bars);
-         long nBars;
-         bars->get_Count(&nBars);
-         for (long barIdx = 0; barIdx < nBars; barIdx++)
-         {
-            CComPtr<IBarRecord> pBar;
-            bars->get_Item(CComVariant(barIdx), &pBar);
-
-            MaterialType material;
-            pBar->get_Material(&material);
-            BarRecordType::Material_type mat((BarRecordType::Material_type::value)material);
-
-            pBar->get_Mark(&bstr);
-            BarRecordType::Mark_type mark = OLE2T(bstr);
-
-            pBar->get_Location(&bstr);
-            BarRecordType::Location_type location = OLE2T(bstr);
-
-            pBar->get_Size(&bstr);
-            BarRecordType::Size_type size = OLE2T(bstr);
-
-            long lValue;
-            pBar->get_NumReqd(&lValue);
-            BarRecordType::NoReqd_type nReqd = lValue;
-
-            pBar->get_BendType(&lValue);
-            BarRecordType::BendType_type bendType = lValue;
-
-            UseType bar_usage;
-            pBar->get_Use(&bar_usage);
-            BarRecordType::Use_type use((BarRecordType::Use_type)bar_usage);
-
-            VARIANT_BOOL vb;
-            pBar->get_Substructure(&vb);
-            BarRecordType::Substructure_type substructure(vb == VARIANT_TRUE ? _T("True") : _T("False"));
-
-            pBar->get_Epoxy(&vb);
-            BarRecordType::Epoxy_type epoxy(vb == VARIANT_TRUE ? _T("True") : _T("False"));
-
-            VARIANT_BOOL vbVaries;
-            pBar->get_Varies(&vbVaries);
-            BarRecordType::Varies_type varies(vbVaries == VARIANT_TRUE ? _T("True") : _T("False"));
-
-            pBar->get_NumEach(&lValue);
-            BarRecordType::NoEach_type nEach = lValue;
-
-            Float64 u, w, x, y, z, t1, t2;
-            CComPtr<IBend> pPrimaryBend;
-            pBar->get_PrimaryBend(&pPrimaryBend);
-            pPrimaryBend->get_U(&u);
-            pPrimaryBend->get_W(&w);
-            pPrimaryBend->get_X(&x);
-            pPrimaryBend->get_Y(&y);
-            pPrimaryBend->get_Z(&z);
-            pPrimaryBend->get_T1(&t1);
-            pPrimaryBend->get_T2(&t2);
-
-            BarRecordType::PrimaryBend_type primaryBend(u, w, x, y, z, t1, t2);
-
-
-            BarRecordType barRecord(mat, mark, location, size, nReqd, bendType, use, substructure, epoxy, varies, nEach, primaryBend);
-
-            if (vbVaries == VARIANT_TRUE)
-            {
-               CComPtr<IBend> pVariesBend;
-               pBar->get_VariesBend(&pVariesBend);
-               pVariesBend->get_U(&u);
-               pVariesBend->get_W(&w);
-               pVariesBend->get_X(&x);
-               pVariesBend->get_Y(&y);
-               pVariesBend->get_Z(&z);
-               pVariesBend->get_T1(&t1);
-               pVariesBend->get_T2(&t2);
-               BarRecordType::VariesBend_type variesBend(u, w, x, y, z, t1, t2);
-
-               barRecord.VariesBend() = variesBend;
-            }
-
-            group.BarRecord().push_back(barRecord);
-         }
-      }
+      Barlist barlist = CreateXML(m_Barlist);
 
       // the no_xml_declaration flag prevents the <?xml...?> processing instruction from being written at the top of the
       // file. the processing instruction was not used in version 4 so we will skip it here so previous versions can open files

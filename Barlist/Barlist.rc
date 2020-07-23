@@ -34,7 +34,7 @@ END
 2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
-   "#include <EAF\EAFResources.h>\r\n"
+    "#include <EAF\\EAFResources.h>\r\n"
     "\0"
 END
 
@@ -224,6 +224,10 @@ BEGIN
     BEGIN
         MENUITEM "Delete Group",                IDC_DELETE
         MENUITEM "Rename Group",                IDC_RENAME
+        MENUITEM SEPARATOR
+        MENUITEM "Cut\tCtrl+X",                 ID_EDIT_CUT
+        MENUITEM "Copy\tCtrl+C",                ID_EDIT_COPY
+        MENUITEM "Paste\tCtrl+V",               ID_EDIT_PASTE
     END
 END
 
@@ -233,13 +237,22 @@ BEGIN
     BEGIN
         MENUITEM "Edit Bar",                    IDC_ADD_BAR
         MENUITEM SEPARATOR
-        MENUITEM "Cut",                         ID_EDIT_CUT
-        MENUITEM "Copy",                        ID_EDIT_COPY
-        MENUITEM "Paste",                       ID_EDIT_PASTE
+        MENUITEM "Cut\tCtrl+X",                 ID_EDIT_CUT
+        MENUITEM "Copy\tCtrl+C",                ID_EDIT_COPY
+        MENUITEM "Paste\tCtrl+V",               ID_EDIT_PASTE
         MENUITEM "Delete",                      IDC_DELETE
         MENUITEM SEPARATOR
         MENUITEM "Edit Mark No.",               IDC_RENAME
         MENUITEM "Renumber Bars",               ID_GENERATE_MARK_NUMBERS
+    END
+END
+
+IDR_DROP MENU
+BEGIN
+    POPUP "DropMenu"
+    BEGIN
+        MENUITEM "Copy",                        ID_EDIT_COPY
+        MENUITEM "Move",                        33071
     END
 END
 
@@ -785,6 +798,7 @@ BEGIN
     ID_VIEW_REPORT          "View quantities report\nReport"
     IDC_FILE_PRINT          "Print barlist report\nPrint"
     33067                   "Collaboration Manager\nCollaboration Manager"
+    ID_EDIT_MOVE            "Move\nMove"
 END
 
 STRINGTABLE
