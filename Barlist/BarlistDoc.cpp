@@ -267,6 +267,8 @@ BOOL CBarlistDoc::OnNewDocument()
 	if (!CEAFDocument::OnNewDocument())
 		return FALSE;
 
+   OnProperties();
+
    GetBarlistEvents(TRUE);
 
    return TRUE;

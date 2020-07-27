@@ -421,7 +421,7 @@ void CBarlistTreeView::OnUpdateRename(CCmdUI *pCmdUI)
 {
    CTreeCtrl& tree = GetTreeCtrl();
    HTREEITEM hSelectedItem = tree.GetSelectedItem();
-   BOOL bEnable = (hSelectedItem != NULL);
+   BOOL bEnable = (hSelectedItem != tree.GetRootItem() && hSelectedItem != NULL);
    pCmdUI->Enable(bEnable);
 }
 
