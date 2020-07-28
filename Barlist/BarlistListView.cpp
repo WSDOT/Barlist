@@ -650,12 +650,9 @@ BOOL CBarlistListView::MouseButtonDrag(UINT nFlags, CPoint point)
 {
    // if we begin the drag and drop on left button down, left button dbl click messages
    // never get through
+   BOOL bReturn = FALSE;
    CBarlistDoc* pDoc = GetDocument();
-   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
-   {
-      return FALSE;
-   }
-   else
+   if (!pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
    {
       // Drag and drop will only occur if the mouse is on the icon in the list view
       CListCtrl& list = GetListCtrl();
@@ -718,10 +715,12 @@ BOOL CBarlistListView::MouseButtonDrag(UINT nFlags, CPoint point)
                   bars->Remove(CComVariant(bstrMark));
                }
             }
+         
+            bReturn = TRUE;
          }
       }
-      return TRUE;
    }
+   return bReturn;
 }
 
 void CBarlistListView::OnRButtonDown(UINT nFlags, CPoint point)
