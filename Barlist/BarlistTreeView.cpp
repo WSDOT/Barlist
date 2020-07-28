@@ -908,17 +908,14 @@ void CBarlistTreeView::CacheBarlistClipboardData(COleDataSource& dataSource)
 
 BOOL CBarlistTreeView::MouseButtonDrag(UINT nFlags, CPoint point)
 {
+   BOOL bReturn = FALSE;
    CBarlistDoc* pDoc = GetDocument();
-   if (pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
+   if (!pDoc->IsKindOf(RUNTIME_CLASS(CCollaborationDoc)))
    {
-      return FALSE;
-   }
-   else
-   {
-      // Drag and drop will only occur if the mouse is on a tree node
+      // Drag will only occur if the mouse is on a tree node
       CTreeCtrl& tree = GetTreeCtrl();
       HTREEITEM hTreeItem = tree.HitTest(point);
-      if (hTreeItem != NULL)
+      if (hTreeItem != NULL && hTreeItem != tree.GetRootItem())
       {
          CRect rect;
          tree.GetItemRect(hTreeItem, &rect, FALSE);
@@ -966,10 +963,12 @@ BOOL CBarlistTreeView::MouseButtonDrag(UINT nFlags, CPoint point)
                   groups->Remove(CComVariant(bstrName));
                }
             }
+         
+            bReturn = TRUE;
          }
       }
-      return TRUE;
    }
+   return bReturn;
 }
 
 void CBarlistTreeView::OnRButtonDown(UINT nFlags, CPoint point)
