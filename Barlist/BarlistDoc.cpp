@@ -394,7 +394,7 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
       return FALSE;
    }
 
-   CreateBarlist(*barlist_xml, &m_Barlist.p);
+   CreateBarlist(*barlist_xml, &barlist.p);
    return TRUE;
 }
 
