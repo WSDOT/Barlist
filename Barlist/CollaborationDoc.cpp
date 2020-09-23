@@ -30,6 +30,9 @@
 
 #include "Events.h"
 
+#pragma Reminder("Once we switch to C++ 17/20, we can use the native std::filesystem instead of boost::filesystem")
+#include <boost\filesystem.hpp>
+
 // CCollaborationDoc
 
 IMPLEMENT_DYNCREATE(CCollaborationDoc, CBarlistDoc)
@@ -62,8 +65,9 @@ BOOL CCollaborationDoc::OpenTheDocument(LPCTSTR lpszPathName)
    USES_CONVERSION;
    m_vFiles.clear();
 
-   CString strPathName(lpszPathName);
-   std::ifstream ifile(strPathName);
+   boost::filesystem::path collaboration_file_path(lpszPathName); // create a path for the filename
+   std::ifstream ifile(collaboration_file_path.generic_string()); // open a file stream to read from
+
    if (ifile.fail() || !ifile.is_open())
    {
       CString strMsg;
@@ -73,6 +77,8 @@ BOOL CCollaborationDoc::OpenTheDocument(LPCTSTR lpszPathName)
    }
    else
    {
+      collaboration_file_path = collaboration_file_path.parent_path(); // we need only the path, not path + filename, to determine path from relatively located files
+
       CString strDelim((char)1); // Barlist 4 uses ascii char 1 as a delimiter
       std::vector<CString> vProperties;
       vProperties.reserve(5);
@@ -95,7 +101,11 @@ BOOL CCollaborationDoc::OpenTheDocument(LPCTSTR lpszPathName)
          }
          else
          {
-            m_vFiles.push_back(strLine);
+            boost::filesystem::path rel_path(strLine); // relative path to barlist file used in the collaboration
+
+            // convert the relative path to a full path
+            auto full_path_name = boost::filesystem::canonical(rel_path, collaboration_file_path);
+            m_vFiles.push_back(full_path_name.string());
          }
       }
 
@@ -141,17 +151,32 @@ void CCollaborationDoc::NotifyDuplicateGroups()
 BOOL CCollaborationDoc::SaveTheDocument(LPCTSTR lpszPathName)
 {
    USES_CONVERSION;
-   CString strPathName(lpszPathName);
-   std::ofstream ofile(strPathName);
+
+   boost::filesystem::path collaboration_file_path(lpszPathName); // create a file path object
+   std::ofstream ofile(collaboration_file_path.generic_string()); // open a file stream
    if (ofile.bad())
    {
       return FALSE;
    }
    else
    {
+      collaboration_file_path.remove_filename(); // remove the filename so we have just the path
+
+      // iterate over the files the make up the collaboration... these a full path filenames
       for (const auto& fileName : m_vFiles)
       {
-         ofile << fileName << std::endl;
+         boost::filesystem::path this_file(fileName);
+
+         // determine the relative location of the barlist file compared to the collaboration file
+         boost::filesystem::path rel_path = this_file.lexically_relative(collaboration_file_path);
+
+         if (rel_path.compare(_T("")) == 0)
+         {
+            // there isn't a relative path so we have to store the full path
+            rel_path = this_file;
+         }
+
+         ofile << rel_path.generic_string() << std::endl;
       }
       
       CComBSTR bstrProject, bstrJobNumber, bstrEngineer, bstrCompany, bstrComments;
