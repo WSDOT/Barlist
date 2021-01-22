@@ -31,7 +31,7 @@
 // hot fixes - sometimes there are bugs that need to be fixed and deployed now. That is a hot fix.
 
 #ifndef _BARLIST_VERSION
-#define _BARLIST_VERSION 524 // version 5.2.4
+#define _BARLIST_VERSION 530 // version 5.3.0
 #endif
 
 // includes WBFL Version macro and

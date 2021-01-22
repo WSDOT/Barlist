@@ -126,7 +126,7 @@ BOOL LoadXMLResource(int name, int type, DWORD& size, const char*& data)
 
 CBarlistDoc::CBarlistDoc()
 {
-   UIHints(FALSE); // not using UIHints feature
+   EnableUIHints(FALSE); // not using UIHints feature
 
    // Reserve command IDs for document plug ins
    UINT nCommands = GetPluginCommandManager()->ReserveCommandIDRange(PLUGIN_COMMAND_COUNT);
@@ -394,7 +394,7 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
       return FALSE;
    }
 
-   CreateBarlist(*barlist_xml, &m_Barlist.p);
+   CreateBarlist(*barlist_xml, &barlist.p);
    return TRUE;
 }
 

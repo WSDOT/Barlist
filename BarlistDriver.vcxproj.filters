@@ -83,4 +83,7 @@
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="GdiScaling.manifest" />
+  </ItemGroup>
 </Project>
