@@ -22,18 +22,8 @@
 
 #pragma once
 
-// Version Number Scheme... major.minor.fix.build
-// major = major version number (increment for major, significant new features, releases) 
-// minor = minor version number (increment for minor, bug fix releases)
-// fix = increment for hot fixes (don't increment major.minor for hot fixes)
-// build = the build or release candidate number
-//
-// hot fixes - sometimes there are bugs that need to be fixed and deployed now. That is a hot fix.
+#include <\ARP\BridgeLink\Include\BridgeLinkVersion.h>
 
 #ifndef _BARLIST_VERSION
-#define _BARLIST_VERSION 530 // version 5.3.0
+#define _BARLIST_VERSION _BRIDGELINK_VERSION
 #endif
-
-// includes WBFL Version macro and
-// macros that define the minimum version of Windows and IE
-#include <WBFLVersion.h>
