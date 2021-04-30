@@ -2,15 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by Barlist.rc
 //
-#define EAFID_INDICATOR_MIN             1
-#define EAFID_INDICATOR_MODIFIED        1
-#define EAFID_INDICATOR_STATUS          2
-#define EAFID_INDICATOR_AUTOCALC_ON     3
-#define EAFID_INDICATOR_AUTOCALC_OFF    4
-#define EAFID_INDICATOR_MAX             4
-#define EAF_TOOLBAR_MENU_COUNT          40
-#define EAF_REPORT_MENU_COUNT           50
-#define EAF_GRAPH_MENU_COUNT            50
+
 #define IDS_PROJNAME                    100
 #define IDR_BARLIST_10_TO_20_XSLT       101
 #define IDR_PLUGIN                      102

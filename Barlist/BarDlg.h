@@ -76,6 +76,13 @@ protected:
    CCacheCheckBox m_cbEpoxy;
 
    CMetaFileStatic m_BendGuide;
+   CCacheEdit m_ctrlVariesU;
+   CCacheEdit m_ctrlVariesW;
+   CCacheEdit m_ctrlVariesX;
+   CCacheEdit m_ctrlVariesY;
+   CCacheEdit m_ctrlVariesZ;
+   CCacheEdit m_ctrlVariesT1;
+   CCacheEdit m_ctrlVariesT2;
    CCacheEdit m_ctrlNumEach;
    CFont m_Font;
 

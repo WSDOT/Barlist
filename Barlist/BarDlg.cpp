@@ -135,9 +135,10 @@ void DDX_CBString(CDataExchange* pDX, int nIDC, CComBSTR& bstr)
 template <class U>
 void DDX_MyUnitValue(CDataExchange* pDX, int nIDC, Float64& data, const U& umIndirectMeasure)
 {
+   CWnd* pWnd = pDX->m_pDlgWnd->GetDlgItem(nIDC);
    if (pDX->m_bSaveAndValidate)
    {
-      if (pDX->m_pDlgWnd->GetDlgItem(nIDC)->IsWindowEnabled())
+      if (pWnd->IsWindowEnabled())
       {
          Float64 f;
          DDX_Text(pDX, nIDC, f);
@@ -151,20 +152,26 @@ void DDX_MyUnitValue(CDataExchange* pDX, int nIDC, Float64& data, const U& umInd
    else
    {
       CString strValue;
-      if (data != Float64_Inf || pDX->m_pDlgWnd->GetDlgItem(nIDC)->IsWindowEnabled()) // Infinite values create a blank line
+      if (data != Float64_Inf || pWnd->IsWindowEnabled()) // Infinite values create a blank line
       {
          strValue.Format(_T("%*.*f"), umIndirectMeasure.Width, umIndirectMeasure.Precision, ::ConvertFromSysUnits(data, umIndirectMeasure.UnitOfMeasure));
          strValue.TrimLeft();
       }
       DDX_Text(pDX, nIDC, strValue);
+
+      if (pWnd->IsKindOf(RUNTIME_CLASS(CCacheEdit)))
+      {
+         ((CCacheEdit*)(pWnd))->SetDefaultValue(data, strValue);
+      }
    }
 }
 
 void DDX_LengthValue(CDataExchange* pDX, int nIDC, Float64& data)
 {
+   CWnd* pWnd = pDX->m_pDlgWnd->GetDlgItem(nIDC);
    if (pDX->m_bSaveAndValidate)
    {
-      if (pDX->m_pDlgWnd->GetDlgItem(nIDC)->IsWindowEnabled())
+      if (pWnd->IsWindowEnabled())
       {
          CString strValue;
          DDX_Text(pDX, nIDC, strValue);
@@ -183,12 +190,18 @@ void DDX_LengthValue(CDataExchange* pDX, int nIDC, Float64& data)
    else
    {
       CString strValue;
-      if (data != Float64_Inf || pDX->m_pDlgWnd->GetDlgItem(nIDC)->IsWindowEnabled()) // Infinite values create a blank line
+      if (data != Float64_Inf || pWnd->IsWindowEnabled()) // Infinite values create a blank line
       {
-         strValue = Formatter::FormatLength(data,false);
+         strValue = Formatter::FormatLength(data, false);
          strValue.TrimLeft();
       }
+
       DDX_Text(pDX, nIDC, strValue);
+
+      if (pWnd->IsKindOf(RUNTIME_CLASS(CCacheEdit)))
+      {
+         ((CCacheEdit*)(pWnd))->SetDefaultValue(data, strValue);
+      }
    }
 }
 
@@ -268,6 +281,13 @@ void CBarDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
    DDX_Control(pDX, IDC_NUM_EACH, m_ctrlNumEach);
+   DDX_Control(pDX, IDC_VARIES_U, m_ctrlVariesU);
+   DDX_Control(pDX, IDC_VARIES_W, m_ctrlVariesW);
+   DDX_Control(pDX, IDC_VARIES_X, m_ctrlVariesX);
+   DDX_Control(pDX, IDC_VARIES_Y, m_ctrlVariesY);
+   DDX_Control(pDX, IDC_VARIES_Z, m_ctrlVariesZ);
+   DDX_Control(pDX, IDC_VARIES_T1, m_ctrlVariesT1);
+   DDX_Control(pDX, IDC_VARIES_T2, m_ctrlVariesT2);
    DDX_Control(pDX, IDC_TYPE, m_cbBendType);
    DDX_Control(pDX, IDC_EPOXY, m_cbEpoxy);
 }
@@ -404,7 +424,7 @@ BOOL CBarDlg::OnInitDialog()
       bars->get_Count(&nBars);
       if (0 < nBars)
       {
-         // there are bars in the group so we are in te editing state
+         // there are bars in the group so we are in the editing state
          m_SM.SetState(State::Editing);
 
          CComPtr<IBarRecord> barRecord;
@@ -1115,12 +1135,11 @@ void CBarDlg::UpdateDimensions(IBarRecord* pBarRecord)
 }
 
 
-#define UPDATE(_dim_,_IDC_,_IDC_VARIES_) \
+#define UPDATE(_dim_,_IDC_,ctrlVaries) \
 bend->get_SupportsDimension(_dim_, &vbSupported);\
 GetDlgItem(_IDC_)->EnableWindow(vbSupported == VARIANT_TRUE); \
-GetDlgItem(_IDC_VARIES_)->EnableWindow(bVaries && vbSupported == VARIANT_TRUE);\
-if(vbSupported==VARIANT_FALSE)GetDlgItem(_IDC_)->SetWindowText(_T("")); \
-if(!bVaries || vbSupported==VARIANT_FALSE)GetDlgItem(_IDC_VARIES_)->SetWindowText(_T(""));
+ctrlVaries.EnableWindow(bVaries && vbSupported == VARIANT_TRUE);\
+if(vbSupported==VARIANT_FALSE)GetDlgItem(_IDC_)->SetWindowText(_T(""));
 void CBarDlg::UpdateDimensions(long bendType, bool bVaries)
 {
    State state = m_SM.GetState();
@@ -1128,13 +1147,13 @@ void CBarDlg::UpdateDimensions(long bendType, bool bVaries)
    CComPtr<IBend> bend;
    CBendFactory::CreateBend(bendType,&bend);
    VARIANT_BOOL vbSupported;
-   UPDATE(dimU,IDC_U, IDC_VARIES_U);
-   UPDATE(dimW,IDC_W, IDC_VARIES_W);
-   UPDATE(dimX,IDC_X, IDC_VARIES_X);
-   UPDATE(dimY,IDC_Y, IDC_VARIES_Y);
-   UPDATE(dimZ,IDC_Z, IDC_VARIES_Z);
-   UPDATE(dimT1,IDC_T1, IDC_VARIES_T1);
-   UPDATE(dimT2,IDC_T2, IDC_VARIES_T2);
+   UPDATE(dimU,IDC_U, m_ctrlVariesU);
+   UPDATE(dimW,IDC_W, m_ctrlVariesW);
+   UPDATE(dimX,IDC_X, m_ctrlVariesX);
+   UPDATE(dimY,IDC_Y, m_ctrlVariesY);
+   UPDATE(dimZ,IDC_Z, m_ctrlVariesZ);
+   UPDATE(dimT1,IDC_T1, m_ctrlVariesT1);
+   UPDATE(dimT2,IDC_T2, m_ctrlVariesT2);
 
    m_SM.SetState(state);
 }
