@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by Barlist.rc
 //
-
 #define IDS_PROJNAME                    100
 #define IDR_BARLIST_10_TO_20_XSLT       101
 #define IDR_PLUGIN                      102
@@ -118,13 +117,14 @@
 #define ID_CUT_ID                       33069
 #define IDC_EDIT_COPY                   33070
 #define ID_EDIT_MOVE                    33071
+#define ID_OPTIONS_AUTOSAVE             33072
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        231
-#define _APS_NEXT_COMMAND_VALUE         33072
+#define _APS_NEXT_COMMAND_VALUE         33074
 #define _APS_NEXT_CONTROL_VALUE         275
 #define _APS_NEXT_SYMED_VALUE           104
 #endif

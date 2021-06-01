@@ -159,6 +159,10 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Options",                     ID_VIEW_OPTIONS
     END
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "AutoSave...",                 EAFID_OPTIONS_AUTOSAVE
+    END
     POPUP "Add-Ins"
     BEGIN
         MENUITEM "No addins were found",        ID_PLACEHOLDER
