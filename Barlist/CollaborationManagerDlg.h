@@ -25,7 +25,7 @@
 #include "resource.h"
 #include <vector>
 #include "afxwin.h"
-
+#include <string>
 
 // CCollaborationManagerDlg dialog
 
