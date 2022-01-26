@@ -987,8 +987,11 @@ void CBarlistTreeView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {
    CBarlistDoc* pDoc = GetDocument();
    long groupIdx = GetSelectedGroup();
-   long barIdx = m_pListView->GetSelectedBar();
-   pDoc->EditBar(groupIdx, barIdx);
+   if (0 <= groupIdx)
+   {
+      long barIdx = m_pListView->GetSelectedBar();
+      pDoc->EditBar(groupIdx, barIdx);
+   }
 
    *pResult = 0;
 }

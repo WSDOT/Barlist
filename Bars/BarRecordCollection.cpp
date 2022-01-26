@@ -222,6 +222,11 @@ STDMETHODIMP CBarRecordCollection::Remove(VARIANT varIndex)
       return E_INVALIDARG;
    }
 
+   if (index < 0 || m_coll.size() <= index)
+   {
+      return E_INVALIDARG;
+   }
+
    // Attach to the bar record object, QIing for its IBarRecord interface
    CComQIPtr<IBarRecord> pBarRecord( m_coll[index].pdispVal );
    CComBSTR bstrMark;
@@ -567,6 +572,9 @@ STDMETHODIMP CBarRecordCollection::Replace(VARIANT varIndex, IBarRecord *pBarRec
       return hr;
 
    if (index == -1)
+      return E_INVALIDARG;
+
+   if (index < 0 || m_coll.size() <= index)
       return E_INVALIDARG;
    
    // Get old mark number
