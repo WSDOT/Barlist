@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-// Barlist
+// ExcelExporter - Barlist Exchange File
 // Copyright © 1999-2021  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
@@ -20,28 +20,33 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
+// stdafx.h : include file for standard system include files,
+//      or project specific include files that are used frequently,
+//      but are changed infrequently
+
+#if !defined(AFX_STDAFX_H__12FCFC8A_1F41_11D3_8941_006097C68A9C__INCLUDED_)
+#define AFX_STDAFX_H__12FCFC8A_1F41_11D3_8941_006097C68A9C__INCLUDED_
+
+#if _MSC_VER > 1000
 #pragma once
+#endif // _MSC_VER > 1000
 
-#include <array>
-#include <MfcTools\Format.h>
-#include "..\Bars\Barlst.h"
+#define _ATL_APARTMENT_THREADED
 
-class Formatter
-{
-public:
-   static BOOL Init();
-   static CString FormatMass(Float64 mass, bool bUnits = true);
-   static CString FormatLength(Float64 length, bool bUnits = true);
-   static CString FormatLength(Float64 length, bool bFractionInches, bool bUnits);
-   static bool IsValidLength(const CString& strValue, Float64* pValue);
-   static bool ParseLength(const CString& strValue, Float64* pValue);
-   static CString FormatStatusValue(CComVariant& var);
-   static CString FormatStatusMessage(IStatusMessage* pStatusMessage);
-   static void USLength(Float64 length, Int32* pFt, Float64* pInch);
+#include <afxwin.h>
+#include <afxdisp.h>
+#include <afxext.h>
+#include <afxdlgs.h>
 
-private:
-   static unitmgtMassData gs_MassUnit;
-   static unitmgtForceData gs_WeightUnit;
-   static std::array<unitmgtLengthData, 2> gs_LengthUnit;
-   static CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
-};
+#include <atlbase.h>
+//You may derive a class from CComModule and use it if you want to override
+//something, but do not change the name of _Module
+extern CComModule _Module;
+#include <atlcom.h>
+
+#include <WBFLTypes.h>
+
+//{{AFX_INSERT_LOCATION}}
+// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+
+#endif // !defined(AFX_STDAFX_H__12FCFC8A_1F41_11D3_8941_006097C68A9C__INCLUDED)

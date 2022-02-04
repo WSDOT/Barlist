@@ -7,6 +7,9 @@ call UpdateBinFiles.bat
 cd \ARP\Barlist\BXF
 call UpdateBinFiles.bat
 
+cd \ARP\Barlist\ExcelExporter
+call UpdateBinFiles.bat
+
 REM - Update Barlist Files
 
 cd \ARP\Barlist

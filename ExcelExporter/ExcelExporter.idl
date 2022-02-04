@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-// Barlist
+// ExcelExporter - Barlist Exchange File
 // Copyright © 1999-2021  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
@@ -20,28 +20,32 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
-#pragma once
+// ExcelExporter.idl : IDL source for ExcelExporter.dll
+//
 
-#include <array>
-#include <MfcTools\Format.h>
-#include "..\Bars\Barlst.h"
+// This file will be processed by the MIDL tool to
+// produce the type library (Addin.tlb) and marshalling code.
 
-class Formatter
+import "oaidl.idl";
+import "ocidl.idl";
+import "BarlistAddin.idl";
+
+[
+	uuid(C3487A48-A7CB-4F8F-BF4B-F83EC7F69973),
+	version(1.0),
+	helpstring("ExcelExporter 1.0 Type Library")
+]
+library ExcelExporterLib
 {
-public:
-   static BOOL Init();
-   static CString FormatMass(Float64 mass, bool bUnits = true);
-   static CString FormatLength(Float64 length, bool bUnits = true);
-   static CString FormatLength(Float64 length, bool bFractionInches, bool bUnits);
-   static bool IsValidLength(const CString& strValue, Float64* pValue);
-   static bool ParseLength(const CString& strValue, Float64* pValue);
-   static CString FormatStatusValue(CComVariant& var);
-   static CString FormatStatusMessage(IStatusMessage* pStatusMessage);
-   static void USLength(Float64 length, Int32* pFt, Float64* pInch);
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
 
-private:
-   static unitmgtMassData gs_MassUnit;
-   static unitmgtForceData gs_WeightUnit;
-   static std::array<unitmgtLengthData, 2> gs_LengthUnit;
-   static CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
+	[
+		uuid(344436BE-AB02-47A2-919F-9E45DD33DFF2),
+		helpstring("ExcelExporterAddin Class")
+	]
+	coclass ExcelExporterAddin
+	{
+		[default] interface IBarlistAddin;
+	};
 };

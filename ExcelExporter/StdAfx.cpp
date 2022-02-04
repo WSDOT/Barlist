@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-// Barlist
+// ExcelExporter - Barlist Exchange File
 // Copyright © 1999-2021  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
@@ -20,28 +20,15 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
-#pragma once
+// stdafx.cpp : source file that includes just the standard includes
+//  stdafx.pch will be the pre-compiled header
+//  stdafx.obj will contain the pre-compiled type information
 
-#include <array>
-#include <MfcTools\Format.h>
-#include "..\Bars\Barlst.h"
+#include "stdafx.h"
 
-class Formatter
-{
-public:
-   static BOOL Init();
-   static CString FormatMass(Float64 mass, bool bUnits = true);
-   static CString FormatLength(Float64 length, bool bUnits = true);
-   static CString FormatLength(Float64 length, bool bFractionInches, bool bUnits);
-   static bool IsValidLength(const CString& strValue, Float64* pValue);
-   static bool ParseLength(const CString& strValue, Float64* pValue);
-   static CString FormatStatusValue(CComVariant& var);
-   static CString FormatStatusMessage(IStatusMessage* pStatusMessage);
-   static void USLength(Float64 length, Int32* pFt, Float64* pInch);
+#ifdef _ATL_STATIC_REGISTRY
+#include <statreg.h>
+#include <statreg.cpp>
+#endif
 
-private:
-   static unitmgtMassData gs_MassUnit;
-   static unitmgtForceData gs_WeightUnit;
-   static std::array<unitmgtLengthData, 2> gs_LengthUnit;
-   static CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
-};
+//#include <atlimpl.cpp>

@@ -155,17 +155,11 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
       else
       {
          // convert from system units
-         length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
+         Int32 feet;
+         Float64 inches;
+         USLength(length, &feet, &inches);
          int sign = BinarySign(length);
-         length = fabs(length);
-         long feet = (long)floor(length);
-         double inches = (length - feet) * 12;
-         if (IsEqual(inches, 12.0))
-         {
-            // don't want 6'-12"... make it 7'-0"
-            feet++;
-            inches = 0;
-         }
+         feet = abs(feet);
 
          CString strBuffer;
          if (bFractionInches)
@@ -268,4 +262,22 @@ CString Formatter::FormatStatusMessage(IStatusMessage* pStatusMessage)
    strMsg.Replace(_T("%2"), strVal2);
 
    return strMsg;
+}
+
+void Formatter::USLength(Float64 length, Int32* pFt, Float64* pInch)
+{
+   length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
+   int sign = BinarySign(length);
+   length = fabs(length);
+   long feet = (long)floor(length);
+   double inches = (length - feet) * 12;
+   if (IsEqual(inches, 12.0))
+   {
+      // don't want 6'-12"... make it 7'-0"
+      feet++;
+      inches = 0;
+   }
+
+   *pFt = sign*feet;
+   *pInch = inches;
 }
