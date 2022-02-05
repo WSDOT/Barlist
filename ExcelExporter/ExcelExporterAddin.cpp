@@ -27,13 +27,12 @@
 #include "ExcelExporterAddin.h"
 
 #include <EAF\EAFApp.h>
-#include <WBFLUnitServer.h>
+#include <EAF\EAFDocument.h>
 
 #include "..\Common\Formatter.h"
 
 CExcelExporterApp theApp;
 CComModule _Module;
-CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
 
 // Some constants to make the IDispatch calls easier
 COleVariant ovOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);  // optional parameter
@@ -205,8 +204,16 @@ STDMETHODIMP CExcelExporterAddin::Go(IBarlist* pBarlist)
       return S_FALSE;
    }
 
+   CString strBarlistFile;
+   CEAFDocument* pDoc = EAFGetDocument();
+   if (pDoc)
+   {
+      strBarlistFile = pDoc->GetPathName();
+      strBarlistFile.Replace(_T(".bar"), _T(""));
+   }
+
    CString strFile;
-   CFileDialog dlg(FALSE, _T("xlsx"), nullptr, OFN_HIDEREADONLY /* | OFN_OVERWRITEPROMPT*/, _T("Microsoft Excel (*.xlsx)|*.xlsx|"));
+   CFileDialog dlg(FALSE, _T("xlsx"), strBarlistFile, OFN_HIDEREADONLY /* | OFN_OVERWRITEPROMPT*/, _T("Microsoft Excel (*.xlsx)|*.xlsx|"));
    // don't prompt for overwrite - Excel will prompt when we save the file
    if (dlg.DoModal() == IDOK)
    {
