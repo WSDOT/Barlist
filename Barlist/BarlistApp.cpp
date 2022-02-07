@@ -77,6 +77,10 @@ BOOL CBarlistPluginApp::InitInstance()
    // See MSKB Article ID: Q118435, "Sharing Menus Between MDI Child Windows"
    m_hSharedMenu = nullptr; /*::LoadMenu( m_hInstance, MAKEINTRESOURCE(IDR_???) );*/
 
+   SetRegistryKey(_T("Washington State Department of Transportation"));
+   free((void*)m_pszProfileName);
+   m_pszProfileName = _tcsdup(_T("Barlist"));
+
    _Module.Init(ObjectMap, m_hInstance, &LIBID_BARLISTLib);
    return CWinApp::InitInstance();
 }

@@ -701,11 +701,11 @@ void CBarlistDoc::LoadDocumentSettings()
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    __super::LoadDocumentSettings();
 
-   CEAFApp* pApp = EAFGetApp();
+   CWinApp* pApp = AfxGetApp();
    m_MarkIncrement = pApp->GetProfileInt(_T("Settings"), _T("MarkIncrement"), 1);
 
    eafTypes::UnitMode unitMode = (eafTypes::UnitMode)(pApp->GetProfileInt(_T("Settings"), _T("Units"), (int)eafTypes::umUS));
-   pApp->SetUnitsMode(unitMode);
+   EAFGetApp()->SetUnitsMode(unitMode);
 }
 
 void CBarlistDoc::SaveDocumentSettings()
@@ -713,9 +713,9 @@ void CBarlistDoc::SaveDocumentSettings()
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    __super::SaveDocumentSettings();
 
-   CEAFApp* pApp = EAFGetApp();
+   CWinApp* pApp = AfxGetApp();
    VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("MarkIncrement"), m_MarkIncrement));
-   VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("Units"), (int)(pApp->GetUnitsMode())));
+   VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("Units"), (int)(EAFGetApp()->GetUnitsMode())));
 }
 
 void CBarlistDoc::SetModifiedFlag(BOOL bModified)
