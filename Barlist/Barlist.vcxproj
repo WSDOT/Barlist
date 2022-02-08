@@ -39,23 +39,23 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(ARPDIR)\BridgeLink\BridgeLink.props" />
+    <Import Project="$(ARPDIR)\WBFL\WBFL.props" />
+    <Import Project="$(ARPDIR)\WBFL\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(ARPDIR)\BridgeLink\BridgeLink.props" />
+    <Import Project="$(ARPDIR)\WBFL\WBFL.props" />
+    <Import Project="$(ARPDIR)\WBFL\XSD.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ARPDIR)\BridgeLink\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -63,7 +63,7 @@
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ARPDIR)\BridgeLink\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -78,7 +78,7 @@
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\Include;$(WBFLDIR)\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\WBFL\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -95,17 +95,17 @@
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ARPDIR)\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ARPDIR)\WBFL\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3.lib;$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1.lib;mfcs140u.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3.lib;$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1.lib;mfcs140u.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -113,7 +113,7 @@
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(ARPDIR)\WBFL\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
@@ -121,11 +121,11 @@
       <OutDir>.\Schema</OutDir>
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
+      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -137,7 +137,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRI
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\Include;$(WBFLDIR)\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\WBFL\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -154,11 +154,11 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRI
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ARPDIR)\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ARPDIR)\WBFL\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -166,7 +166,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRI
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3D.lib;$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1D.lib;mfcs140ud.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3D.lib;$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1D.lib;mfcs140ud.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -174,7 +174,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRI
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(ARPDIR)\WBFL\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
@@ -182,11 +182,11 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRI
       <OutDir>.\Schema</OutDir>
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
+      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>

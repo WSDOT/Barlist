@@ -1,20 +1,20 @@
 REM - Script to prepare for Release
 
 REM - Update Barlist Files
-cd \ARP\Barlist\Barlist
+cd %ARPDIR%\Barlist\Barlist
 call UpdateBinFiles.bat
 
-cd \ARP\Barlist\BXF
+cd %ARPDIR%\Barlist\BXF
 call UpdateBinFiles.bat
 
-cd \ARP\Barlist\ExcelExporter
+cd %ARPDIR%\Barlist\ExcelExporter
 call UpdateBinFiles.bat
 
 REM - Update Barlist Files
 
-cd \ARP\Barlist
+cd %ARPDIR%\Barlist
 SET BINTARGET=bin
-SET REGFREECOM=\ARP\BridgeLink\RegFreeCOM
+SET REGFREECOM=%ARPDIR%\BridgeLink\RegFreeCOM
 
 REM - Application files
 xcopy /Y /d %REGFREECOM%\x64\Release\Barlist.dll 	%BINTARGET%\x64\
