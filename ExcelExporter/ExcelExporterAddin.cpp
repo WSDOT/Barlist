@@ -179,6 +179,7 @@ HRESULT CExcelExporterAddin::FinalConstruct()
       {
          str += _T("\\");
       }
+      strDefaultLocation = str;
    }
 
    // Get the user's setting, using the local machine setting as the default if not present
