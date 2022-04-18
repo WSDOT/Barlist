@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "ExcelExporter Module"
             VALUE "FileVersion", "7.0.0.4"
             VALUE "InternalName", "ExcelExporter"
-            VALUE "LegalCopyright", "Copyright © 1999-2021, Washington State Department of Transportation, All Rights Reserved"
+            VALUE "LegalCopyright", "Copyright © 1999-2022, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "ExcelExporter.DLL"
             VALUE "ProductName", "ExcelExporter Module"
             VALUE "ProductVersion", "7.0.0.4"
