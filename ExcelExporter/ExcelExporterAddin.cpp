@@ -210,7 +210,8 @@ STDMETHODIMP CExcelExporterAddin::Go(IBarlist* pBarlist)
    if (pDoc)
    {
       strBarlistFile = pDoc->GetPathName();
-      strBarlistFile.Replace(_T(".bar"), _T(""));
+      strBarlistFile.Replace(_T(".bar"), _T("")); // regular bar files
+      strBarlistFile.Replace(_T(".cbm"), _T("")); // collaboration files
    }
 
    CString strFile;
