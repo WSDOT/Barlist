@@ -26,9 +26,9 @@
 #include <EAF\EAFUtilities.h>
 #include <EAF\EAFApp.h>
 
-unitmgtMassData Formatter::gs_MassUnit(unitMeasure::Kilogram, 0.001, 9, 0);
-unitmgtForceData Formatter::gs_WeightUnit(unitMeasure::Pound, 0.001, 9, 0);
-std::array<unitmgtLengthData, 2> Formatter::gs_LengthUnit{ unitmgtLengthData(unitMeasure::Meter,0.001,9,0),unitmgtLengthData(unitMeasure::Feet,0.001,9,0) };
+WBFL::Units::MassData Formatter::gs_MassUnit(WBFL::Units::Measure::Kilogram, 0.001, 9, 0);
+WBFL::Units::ForceData Formatter::gs_WeightUnit(WBFL::Units::Measure::Pound, 0.001, 9, 0);
+std::array<WBFL::Units::LengthData, 2> Formatter::gs_LengthUnit{ WBFL::Units::LengthData(WBFL::Units::Measure::Meter,0.001,9,0),WBFL::Units::LengthData(WBFL::Units::Measure::Feet,0.001,9,0) };
 CComPtr<IAnnotatedDisplayUnitFormatter> Formatter::g_formatter;
 
 BOOL Formatter::Init()
@@ -100,13 +100,13 @@ CString Formatter::FormatLength(Float64 length, bool bUnits)
       {
          USES_CONVERSION;
          CComBSTR bstr;
-         g_formatter->Format(::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
+         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
          return OLE2T(bstr);
       }
       else
       {
          // convert from system units
-         length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
+         length = WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
          int sign = BinarySign(length);
          length = fabs(length);
          long feet = (long)floor(length);
@@ -149,7 +149,7 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
       {
          USES_CONVERSION;
          CComBSTR bstr;
-         g_formatter->Format(::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
+         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
          return OLE2T(bstr);
       }
       else
@@ -216,7 +216,7 @@ bool Formatter::ParseLength(const CString& strValue, Float64* pValue)
       return false;
    }
 
-   unitmgtLengthData* pLength;
+   WBFL::Units::LengthData* pLength;
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
       pLength = &gs_LengthUnit[0];
@@ -226,7 +226,7 @@ bool Formatter::ParseLength(const CString& strValue, Float64* pValue)
       pLength = &gs_LengthUnit[1];
    }
 
-   *pValue = ::ConvertToSysUnits(value, pLength->UnitOfMeasure);
+   *pValue = WBFL::Units::ConvertToSysUnits(value, pLength->UnitOfMeasure);
    return true;
 }
 
@@ -266,7 +266,7 @@ CString Formatter::FormatStatusMessage(IStatusMessage* pStatusMessage)
 
 void Formatter::USLength(Float64 length, Int32* pFt, Float64* pInch)
 {
-   length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
+   length = WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
    int sign = BinarySign(length);
    length = fabs(length);
    long feet = (long)floor(length);

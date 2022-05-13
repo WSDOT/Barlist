@@ -35,7 +35,7 @@
 #include <Bars\Bars.h>
 
 #include <array>
-#include <UnitMgt\IndirectMeasure.h>
+#include <Units\IndirectMeasure.h>
 
 #include "Report.h"
 #include "..\Common\Formatter.h"

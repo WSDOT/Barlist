@@ -67,8 +67,8 @@ struct HookInfo
 
 #pragma warning(disable : 4251)
 #include <Units\Units.h>
-static Float64 _40_ft = ::ConvertToSysUnits(40.0, unitMeasure::Feet);
-static Float64 _60_ft = ::ConvertToSysUnits(60.0, unitMeasure::Feet);
+static Float64 _40_ft = WBFL::Units::ConvertToSysUnits(40.0, WBFL::Units::Measure::Feet);
+static Float64 _60_ft = WBFL::Units::ConvertToSysUnits(60.0, WBFL::Units::Measure::Feet);
 
 
 ////////////////////////////////////////////////////////
@@ -77,32 +77,32 @@ static Float64 _60_ft = ::ConvertToSysUnits(60.0, unitMeasure::Feet);
 
 BarInfo steel_barinfo[] = 
 {
-   BarInfo( "#3", ::ConvertToSysUnits(0.375,unitMeasure::Inch),  ::ConvertToSysUnits(0.376, unitMeasure::LbfPerFoot), _40_ft, _40_ft),
-   BarInfo( "#4", ::ConvertToSysUnits(0.500,unitMeasure::Inch),  ::ConvertToSysUnits(0.668, unitMeasure::LbfPerFoot), _40_ft, _40_ft),
-   BarInfo( "#5", ::ConvertToSysUnits(0.625,unitMeasure::Inch),  ::ConvertToSysUnits(1.043, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo( "#6", ::ConvertToSysUnits(0.750,unitMeasure::Inch),  ::ConvertToSysUnits(1.502, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo( "#7", ::ConvertToSysUnits(0.875,unitMeasure::Inch),  ::ConvertToSysUnits(2.044, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo( "#8", ::ConvertToSysUnits(1.000,unitMeasure::Inch),  ::ConvertToSysUnits(2.670, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo( "#9", ::ConvertToSysUnits(1.128,unitMeasure::Inch),  ::ConvertToSysUnits(3.400, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo("#10", ::ConvertToSysUnits(1.270,unitMeasure::Inch),  ::ConvertToSysUnits(4.303, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo("#11", ::ConvertToSysUnits(1.410,unitMeasure::Inch),  ::ConvertToSysUnits(5.313, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo("#14", ::ConvertToSysUnits(1.693,unitMeasure::Inch),  ::ConvertToSysUnits(7.650, unitMeasure::LbfPerFoot), _60_ft, _60_ft),
-   BarInfo("#18", ::ConvertToSysUnits(2.257,unitMeasure::Inch),  ::ConvertToSysUnits(13.60, unitMeasure::LbfPerFoot), _60_ft, _60_ft)
+   BarInfo( "#3", WBFL::Units::ConvertToSysUnits(0.375,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(0.376, WBFL::Units::Measure::LbfPerFoot), _40_ft, _40_ft),
+   BarInfo( "#4", WBFL::Units::ConvertToSysUnits(0.500,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(0.668, WBFL::Units::Measure::LbfPerFoot), _40_ft, _40_ft),
+   BarInfo( "#5", WBFL::Units::ConvertToSysUnits(0.625,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(1.043, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo( "#6", WBFL::Units::ConvertToSysUnits(0.750,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(1.502, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo( "#7", WBFL::Units::ConvertToSysUnits(0.875,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(2.044, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo( "#8", WBFL::Units::ConvertToSysUnits(1.000,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(2.670, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo( "#9", WBFL::Units::ConvertToSysUnits(1.128,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(3.400, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo("#10", WBFL::Units::ConvertToSysUnits(1.270,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(4.303, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo("#11", WBFL::Units::ConvertToSysUnits(1.410,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(5.313, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo("#14", WBFL::Units::ConvertToSysUnits(1.693,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(7.650, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft),
+   BarInfo("#18", WBFL::Units::ConvertToSysUnits(2.257,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(13.60, WBFL::Units::Measure::LbfPerFoot), _60_ft, _60_ft)
 };
 
 BarInfo galvanized_barinfo[] =
 {
-   BarInfo( "#3", ::ConvertToSysUnits(0.375,unitMeasure::Inch),  ::ConvertToSysUnits(0.376, unitMeasure::LbfPerFoot), _40_ft, _40_ft),
-   BarInfo( "#4", ::ConvertToSysUnits(0.500,unitMeasure::Inch),  ::ConvertToSysUnits(0.668, unitMeasure::LbfPerFoot), _40_ft, _40_ft),
-   BarInfo( "#5", ::ConvertToSysUnits(0.625,unitMeasure::Inch),  ::ConvertToSysUnits(1.043, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo( "#6", ::ConvertToSysUnits(0.750,unitMeasure::Inch),  ::ConvertToSysUnits(1.502, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo( "#7", ::ConvertToSysUnits(0.875,unitMeasure::Inch),  ::ConvertToSysUnits(2.044, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo( "#8", ::ConvertToSysUnits(1.000,unitMeasure::Inch),  ::ConvertToSysUnits(2.670, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo( "#9", ::ConvertToSysUnits(1.128,unitMeasure::Inch),  ::ConvertToSysUnits(3.400, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo("#10", ::ConvertToSysUnits(1.270,unitMeasure::Inch),  ::ConvertToSysUnits(4.303, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo("#11", ::ConvertToSysUnits(1.410,unitMeasure::Inch),  ::ConvertToSysUnits(5.313, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo("#14", ::ConvertToSysUnits(1.693,unitMeasure::Inch),  ::ConvertToSysUnits(7.650, unitMeasure::LbfPerFoot), _40_ft, _60_ft),
-   BarInfo("#18", ::ConvertToSysUnits(2.257,unitMeasure::Inch),  ::ConvertToSysUnits(13.60, unitMeasure::LbfPerFoot), _40_ft, _60_ft)
+   BarInfo( "#3", WBFL::Units::ConvertToSysUnits(0.375,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(0.376, WBFL::Units::Measure::LbfPerFoot), _40_ft, _40_ft),
+   BarInfo( "#4", WBFL::Units::ConvertToSysUnits(0.500,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(0.668, WBFL::Units::Measure::LbfPerFoot), _40_ft, _40_ft),
+   BarInfo( "#5", WBFL::Units::ConvertToSysUnits(0.625,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(1.043, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo( "#6", WBFL::Units::ConvertToSysUnits(0.750,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(1.502, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo( "#7", WBFL::Units::ConvertToSysUnits(0.875,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(2.044, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo( "#8", WBFL::Units::ConvertToSysUnits(1.000,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(2.670, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo( "#9", WBFL::Units::ConvertToSysUnits(1.128,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(3.400, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo("#10", WBFL::Units::ConvertToSysUnits(1.270,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(4.303, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo("#11", WBFL::Units::ConvertToSysUnits(1.410,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(5.313, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo("#14", WBFL::Units::ConvertToSysUnits(1.693,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(7.650, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft),
+   BarInfo("#18", WBFL::Units::ConvertToSysUnits(2.257,WBFL::Units::Measure::Inch),  WBFL::Units::ConvertToSysUnits(13.60, WBFL::Units::Measure::LbfPerFoot), _40_ft, _60_ft)
 };
 
 BendInfo steel_bendinfo[] =
@@ -141,55 +141,55 @@ BendInfo steel_bendinfo[] =
 HookInfo steel_hookinfo[] =
 {
    HookInfo("#3", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#3", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#3", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
    HookInfo("#3", utTransverse,   ht90,   6.0,    0.0),
    HookInfo("#3", utTransverse,   ht135,  6.0,    0.0),
-   HookInfo("#3", utSeismic,      ht135,  6.0,   ::ConvertToSysUnits(3.0,unitMeasure::Inch)),
+   HookInfo("#3", utSeismic,      ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
 
    HookInfo("#4", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#4", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#4", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
    HookInfo("#4", utTransverse,   ht90,   6.0,    0.0),
    HookInfo("#4", utTransverse,   ht135,  6.0,    0.0),
-   HookInfo("#4", utSeismic,      ht135,  6.0,   ::ConvertToSysUnits(3.0,unitMeasure::Inch)),
+   HookInfo("#4", utSeismic,      ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
 
    HookInfo("#5", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#5", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#5", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
    HookInfo("#5", utTransverse,   ht90,   6.0,    0.0),
    HookInfo("#5", utTransverse,   ht135,  6.0,    0.0),
-   HookInfo("#5", utSeismic,      ht135,  6.0,   ::ConvertToSysUnits(3.0,unitMeasure::Inch)),
+   HookInfo("#5", utSeismic,      ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
 
    HookInfo("#6", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#6", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#6", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
    HookInfo("#6", utTransverse,   ht90,  12.0,    0.0),
    HookInfo("#6", utTransverse,   ht135,  6.0,    0.0),
-   HookInfo("#6", utSeismic,      ht135,  6.0,   ::ConvertToSysUnits(3.0,unitMeasure::Inch)),
+   HookInfo("#6", utSeismic,      ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
 
    HookInfo("#7", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#7", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#7", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
    HookInfo("#7", utTransverse,   ht90,  12.0,    0.0),
    HookInfo("#7", utTransverse,   ht135,  6.0,    0.0),
-   HookInfo("#7", utSeismic,      ht135,  6.0,   ::ConvertToSysUnits(3.0,unitMeasure::Inch)),
+   HookInfo("#7", utSeismic,      ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
 
    HookInfo("#8", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#8", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#8", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
    HookInfo("#8", utTransverse,   ht90,  12.0,    0.0),
    HookInfo("#8", utTransverse,   ht135,  6.0,    0.0),
-   HookInfo("#8", utSeismic,      ht135,  6.0,   ::ConvertToSysUnits(3.0,unitMeasure::Inch)),
+   HookInfo("#8", utSeismic,      ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
 
    HookInfo("#9", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#9", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#9", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
 
    HookInfo("#10", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#10", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#10", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
 
    HookInfo("#11", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#11", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#11", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
 
    HookInfo("#14", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#14", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch)),
+   HookInfo("#14", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
 
    HookInfo("#18", utLongitudinal, ht90,  12.0,    0.0),
-   HookInfo("#18", utLongitudinal, ht180,  4.0,   ::ConvertToSysUnits(2.5,unitMeasure::Inch))
+   HookInfo("#18", utLongitudinal, ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch))
 };
 
 ////////////////////////////////////////////////////////
@@ -197,14 +197,14 @@ HookInfo steel_hookinfo[] =
 ////////////////////////////////////////////////////////
 BarInfo gfrp_barinfo[] =
 {
-   BarInfo("#3",  ::ConvertToSysUnits(0.375,unitMeasure::Inch), 0.0, _40_ft, _60_ft), // weight = 0 because quantities are by length
-   BarInfo("#4",  ::ConvertToSysUnits(0.500,unitMeasure::Inch), 0.0, _40_ft, _60_ft),
-   BarInfo("#5",  ::ConvertToSysUnits(0.625,unitMeasure::Inch), 0.0, _40_ft, _60_ft),
-   BarInfo("#6",  ::ConvertToSysUnits(0.750,unitMeasure::Inch), 0.0, _40_ft, _60_ft),
-   BarInfo("#7",  ::ConvertToSysUnits(0.875,unitMeasure::Inch), 0.0, _40_ft, _60_ft),
-   BarInfo("#8",  ::ConvertToSysUnits(1.000,unitMeasure::Inch), 0.0, _40_ft, _60_ft),
-   BarInfo("#9",  ::ConvertToSysUnits(1.128,unitMeasure::Inch), 0.0, _40_ft, _60_ft),
-   BarInfo("#10", ::ConvertToSysUnits(1.270,unitMeasure::Inch), 0.0, _40_ft, _60_ft),
+   BarInfo("#3",  WBFL::Units::ConvertToSysUnits(0.375,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft), // weight = 0 because quantities are by length
+   BarInfo("#4",  WBFL::Units::ConvertToSysUnits(0.500,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft),
+   BarInfo("#5",  WBFL::Units::ConvertToSysUnits(0.625,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft),
+   BarInfo("#6",  WBFL::Units::ConvertToSysUnits(0.750,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft),
+   BarInfo("#7",  WBFL::Units::ConvertToSysUnits(0.875,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft),
+   BarInfo("#8",  WBFL::Units::ConvertToSysUnits(1.000,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft),
+   BarInfo("#9",  WBFL::Units::ConvertToSysUnits(1.128,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft),
+   BarInfo("#10", WBFL::Units::ConvertToSysUnits(1.270,WBFL::Units::Measure::Inch), 0.0, _40_ft, _60_ft),
 };
 
 BendInfo gfrp_bendinfo[] = 
