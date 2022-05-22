@@ -136,11 +136,11 @@ STDAPI DllRegisterServer(void)
    if ( FAILED(hr) )
       return hr;
 
-   sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, true);
-   sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,true);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, true);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,true);
 
-   sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, true);
-   sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, true);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, true);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, true);
 
    return S_OK;
 }
@@ -150,11 +150,11 @@ STDAPI DllRegisterServer(void)
 
 STDAPI DllUnregisterServer(void)
 {
-   sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, false);
-   sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,false);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, false);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,false);
 
-   sysComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, false);
-   sysComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, false);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, false);
+   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, false);
 
    return _Module.UnregisterServer(TRUE);
 }

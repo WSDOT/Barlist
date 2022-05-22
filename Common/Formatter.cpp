@@ -180,24 +180,24 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
 
 bool Formatter::IsValidLength(const CString& strValue, Float64* pValue)
 {
-   sysTokenizer tokenizer(_T(" "));
+   WBFL::System::Tokenizer tokenizer(_T(" "));
    tokenizer.push_back(strValue);
    auto size = tokenizer.size();
    if (size == 1)
    {
       // there is only one token so strValue must be decimal length
-      return sysTokenizer::ParseDouble(tokenizer[0].c_str(), pValue);
+      return WBFL::System::Tokenizer::ParseDouble(tokenizer[0].c_str(), pValue);
    }
    else if (size == 2)
    {
       // there are 2 tokens... feet inch
       Float64 ft, in;
-      if (!sysTokenizer::ParseDouble(tokenizer[0].c_str(), &ft))
+      if (!WBFL::System::Tokenizer::ParseDouble(tokenizer[0].c_str(), &ft))
       {
          return false;
       }
 
-      if (!sysTokenizer::ParseDouble(tokenizer[1].c_str(), &in))
+      if (!WBFL::System::Tokenizer::ParseDouble(tokenizer[1].c_str(), &in))
       {
          return false;
       }

@@ -262,8 +262,8 @@ BOOL CBarlistApp::InitInstance()
 
    // Must be done after call to base class InitInstance because OLE has not been
    // initialized yet.
-   //sysComCatMgr::CreateCategory(_T("Barlist Application Plugin"),CATID_BarlistAppPlugin); // this is done by the base class
-   sysComCatMgr::CreateCategory(_T("Barlist Components"),CATID_BarlistComponentInfo);
+   //WBFL::System::ComCatMgr::CreateCategory(_T("Barlist Application Plugin"),CATID_BarlistAppPlugin); // this is done by the base class
+   WBFL::System::ComCatMgr::CreateCategory(_T("Barlist Components"),CATID_BarlistComponentInfo);
 
    // Need to let drag and drop messages through
    // See http://helgeklein.com/blog/2010/03/how-to-enable-drag-and-drop-for-an-elevated-mfc-application-on-vistawindows-7/

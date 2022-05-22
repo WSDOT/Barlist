@@ -935,7 +935,7 @@ CString CBarlistDoc::GetDocumentationSetName()
 
 CString CBarlistDoc::GetDocumentationMapFile()
 {
-   sysAutoVariable<bool> autoVar(&m_bGettingDocumentationMapFile, true);
+   WBFL::System::AutoVariable<bool> autoVar(&m_bGettingDocumentationMapFile, true);
    return __super::GetDocumentationMapFile();
 }
 
@@ -943,7 +943,7 @@ CString CBarlistDoc::AutoIncrementMark(const CString& strMark) const
 {
    CString strNewMark(strMark);
    ULONG mark;
-   if (sysTokenizer::ParseULong(strMark, &mark))
+   if (WBFL::System::Tokenizer::ParseULong(strMark, &mark))
    {
       mark += m_MarkIncrement;
       strNewMark.Format(_T("%ld"), mark);

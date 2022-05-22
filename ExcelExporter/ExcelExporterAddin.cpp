@@ -629,7 +629,7 @@ Range CExcelExporterAddin::GetRangeAtLocation(IndexType worksheetIdx, LPCTSTR st
    CString strrow = trunc_address.Right(cnt - pn - 1);
 
    long rownum;
-   if (sysTokenizer::ParseLong(strrow, &rownum))
+   if (WBFL::System::Tokenizer::ParseLong(strrow, &rownum))
    {
       rownum += (long)rowIdx;
 
