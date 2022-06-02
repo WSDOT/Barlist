@@ -1,0 +1,26 @@
+HKCR
+{
+	ExcelExporter.ExcelExporterAddin.1 = s 'ExcelExporterAddin Class'
+	{
+		CLSID = s '{344436BE-AB02-47A2-919F-9E45DD33DFF2}'
+	}
+	ExcelExporter.ExcelExporterAddin = s 'ExcelExporterAddin Class'
+	{
+		CLSID = s '{344436BE-AB02-47A2-919F-9E45DD33DFF2}'
+		CurVer = s 'ExcelExporter.ExcelExporterAddin.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {344436BE-AB02-47A2-919F-9E45DD33DFF2} = s 'ExcelExporterAddin Class'
+		{
+			ProgID = s 'ExcelExporter.ExcelExporterAddin.1'
+			VersionIndependentProgID = s 'ExcelExporter.ExcelExporterAddin'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			'TypeLib' = s '{C3487A48-A7CB-4F8F-BF4B-F83EC7F69973}'
+		}
+	}
+}

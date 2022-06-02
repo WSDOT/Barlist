@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -987,8 +987,11 @@ void CBarlistTreeView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {
    CBarlistDoc* pDoc = GetDocument();
    long groupIdx = GetSelectedGroup();
-   long barIdx = m_pListView->GetSelectedBar();
-   pDoc->EditBar(groupIdx, barIdx);
+   if (0 <= groupIdx)
+   {
+      long barIdx = m_pListView->GetSelectedBar();
+      pDoc->EditBar(groupIdx, barIdx);
+   }
 
    *pResult = 0;
 }

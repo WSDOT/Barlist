@@ -1,0 +1,51 @@
+///////////////////////////////////////////////////////////////////////
+// ExcelExporter - Barlist Exchange File
+// Copyright © 1999-2022  Washington State Department of Transportation
+//                        Bridge and Structures Office
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the Alternate Route Open Source License as 
+// published by the Washington State Department of Transportation, 
+// Bridge and Structures Office.
+//
+// This program is distributed in the hope that it will be useful, but 
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// the Alternate Route Open Source License for more details.
+//
+// You should have received a copy of the Alternate Route Open Source 
+// License along with this program; if not, write to the Washington 
+// State Department of Transportation, Bridge and Structures Office, 
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// Bridge_Support@wsdot.wa.gov
+///////////////////////////////////////////////////////////////////////
+
+// ExcelExporter.idl : IDL source for ExcelExporter.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (Addin.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+import "BarlistAddin.idl";
+
+[
+	uuid(C3487A48-A7CB-4F8F-BF4B-F83EC7F69973),
+	version(1.0),
+	helpstring("ExcelExporter 1.0 Type Library")
+]
+library ExcelExporterLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(344436BE-AB02-47A2-919F-9E45DD33DFF2),
+		helpstring("ExcelExporterAddin Class")
+	]
+	coclass ExcelExporterAddin
+	{
+		[default] interface IBarlistAddin;
+	};
+};

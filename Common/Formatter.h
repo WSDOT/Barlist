@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@ public:
    static bool ParseLength(const CString& strValue, Float64* pValue);
    static CString FormatStatusValue(CComVariant& var);
    static CString FormatStatusMessage(IStatusMessage* pStatusMessage);
+   static void USLength(Float64 length, Int32* pFt, Float64* pInch);
 
 private:
    static unitmgtMassData gs_MassUnit;

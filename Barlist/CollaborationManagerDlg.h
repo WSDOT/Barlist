@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 #include "resource.h"
 #include <vector>
 #include "afxwin.h"
-
+#include <string>
 
 // CCollaborationManagerDlg dialog
 

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -218,6 +218,11 @@ STDMETHODIMP CBarRecordCollection::Remove(VARIANT varIndex)
       index = (varIndex.vt == VT_I2 ? varIndex.iVal : varIndex.lVal);
    }
    else
+   {
+      return E_INVALIDARG;
+   }
+
+   if (index < 0 || m_coll.size() <= index)
    {
       return E_INVALIDARG;
    }
@@ -567,6 +572,9 @@ STDMETHODIMP CBarRecordCollection::Replace(VARIANT varIndex, IBarRecord *pBarRec
       return hr;
 
    if (index == -1)
+      return E_INVALIDARG;
+
+   if (index < 0 || m_coll.size() <= index)
       return E_INVALIDARG;
    
    // Get old mark number

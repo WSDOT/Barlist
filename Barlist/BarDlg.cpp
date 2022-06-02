@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -706,11 +706,14 @@ void CBarDlg::OnCbnSelchangeMark()
       CComPtr<IBarRecord> bar;
       bars->get_Item(CComVariant(m_BarIdx), &bar);
 
-      UpdateBarData(FALSE,m_GroupIdx,m_BarIdx,bar);
+      if (bar)
+      {
+         UpdateBarData(FALSE, m_GroupIdx, m_BarIdx, bar);
 
-      UpdateVaries();
-      UpdateDimensions(bar);
-      UpdateStatus(bar);
+         UpdateVaries();
+         UpdateDimensions(bar);
+         UpdateStatus(bar);
+      }
    }
 }
 
@@ -1216,13 +1219,20 @@ void CBarDlg::OnBnClickedUpdate()
    CComPtr<IBarRecordCollection> bars;
    group->get_BarRecords(&bars);
 
-   bars->Replace(CComVariant(m_BarIdx), barRecord);
+   if (SUCCEEDED(bars->Replace(CComVariant(m_BarIdx), barRecord)))
+   {
+      m_SM.StateChange(Action::UpdateRecord);
 
-   m_SM.StateChange(Action::UpdateRecord);
-
-   UpdateVaries();
-   UpdateDimensions(barRecord);
-   UpdateStatus(barRecord);
+      UpdateVaries();
+      UpdateDimensions(barRecord);
+      UpdateStatus(barRecord);
+   }
+   else
+   {
+      // Attempted to replace a non-existent bar record. This happens when there is a new bar mark at the bottom of the drop down list that
+      // was generated from the last AddBar. There isn't a bar to update so add the bar instead
+      OnBnClickedAddBar();
+   }
 }
 
 void CBarDlg::OnCbnSelchangeType()
@@ -1270,8 +1280,6 @@ void CBarDlg::OnBnClickedAddBar()
 
    bars->Add(barRecord);
 
-   m_SM.StateChange(Action::AddRecord);
-
    UpdateVaries();
    UpdateDimensions(barRecord);
    UpdateStatus(barRecord);
@@ -1283,6 +1291,8 @@ void CBarDlg::OnBnClickedAddBar()
    barRecord->get_Mark(&bstrMark);
    bstrMark = AutoIncrementMark(CString(bstrMark));
    pCB->SetCurSel(pCB->AddString(OLE2T(bstrMark)));
+
+   m_SM.StateChange(Action::AddRecord);
 }
 
 CString CBarDlg::AutoIncrementMark(const CString& strMark)

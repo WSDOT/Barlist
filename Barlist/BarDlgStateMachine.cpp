@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -41,8 +41,11 @@ void CBarDlgStateMachine::StateChange(Action action)
       break;
 
    case Action::AddRecord:
-      m_State = State::Editing;
+      // when a bar record is added, the UI starts with a "new bar" that is a copy of the last bar saved
+      // with the mark number incremented. set the state of the UI for new bar... then change to editing state
+      m_State = State::NewBar;
       m_pBarDlg->OnStateChanged();
+      m_State = State::Editing;
       break;
 
    case Action::UpdateRecord:

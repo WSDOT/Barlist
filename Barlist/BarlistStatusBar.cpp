@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,7 @@ static char THIS_FILE[] = __FILE__;
 static UINT indicators[] =
 {
    ID_SEPARATOR,           // status line indicator
+   EAFID_INDICATOR_AUTOSAVE_ON,
    EAFID_INDICATOR_MODIFIED,
    ID_INDICATOR_CAPS,
    ID_INDICATOR_NUM,

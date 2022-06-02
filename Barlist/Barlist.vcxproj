@@ -1,25 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Profile|Win32">
-      <Configuration>Profile</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Profile|x64">
-      <Configuration>Profile</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -30,50 +14,19 @@
     <ProjectGuid>{E2E82570-23E6-4991-8D0E-AA57C1416D5F}</ProjectGuid>
     <RootNamespace>Barlist</RootNamespace>
     <Keyword>MFCProj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Dynamic</UseOfMfc>
-    <UseOfAtl>Dynamic</UseOfAtl>
-    <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Dynamic</UseOfMfc>
-    <UseOfAtl>Dynamic</UseOfAtl>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Dynamic</UseOfMfc>
-    <UseOfAtl>Dynamic</UseOfAtl>
-    <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Dynamic</UseOfMfc>
-    <UseOfAtl>Dynamic</UseOfAtl>
-    <CharacterSet>Unicode</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <UseOfAtl>Dynamic</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>Dynamic</UseOfMfc>
     <UseOfAtl>Dynamic</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
@@ -83,164 +36,40 @@
   <ImportGroup Label="ExtensionSettings">
     <Import Project="$(XSDDIR)\etc\vc-10.0\xsd-cxx-tree.props" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(ARPDIR)\BridgeLink\BridgeLink.props" />
+    <Import Project="$(ARPDIR)\WBFL\WBFL.props" />
+    <Import Project="$(ARPDIR)\WBFL\XSD.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
-    <Import Project="$(BRIDGELINKDIR)\BridgeLink.props" />
-    <Import Project="$(WBFLDIR)\WBFL.props" />
-    <Import Project="$(WBFLDIR)\XSD.props" />
+    <Import Project="$(ARPDIR)\BridgeLink\BridgeLink.props" />
+    <Import Project="$(ARPDIR)\WBFL\WBFL.props" />
+    <Import Project="$(ARPDIR)\WBFL\XSD.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>14.0.25431.1</_ProjectFileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules />
-    <CodeAnalysisRuleAssemblies />
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ARPDIR)\BridgeLink\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules />
-    <CodeAnalysisRuleAssemblies />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ARPDIR)\BridgeLink\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
-    <OutDir>..\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules />
-    <CodeAnalysisRuleAssemblies />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
-    <OutDir>..\RegFreeCOM\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules />
-    <CodeAnalysisRuleAssemblies />
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Midl>
-      <TypeLibraryName>
-      </TypeLibraryName>
-      <HeaderFileName />
-      <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
-    </Midl>
-    <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <DebugInformationFormat>None</DebugInformationFormat>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Link>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\lib\xerces-c_3.lib</AdditionalDependencies>
-      <ImageHasSafeExceptionHandlers />
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ProgramDatabaseFile />
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/Barlist.bsc</OutputFile>
-    </Bscmake>
-    <Manifest>
-      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
-      <OutputManifestFile>$(IntDir)$(TargetName)$(TargetExt).embed.manifest</OutputManifestFile>
-    </Manifest>
-    <CXX_Tree_Mapping_Rule>
-      <GenSerialization>true</GenSerialization>
-      <GenIntellisense>true</GenIntellisense>
-      <OutDir>.\Schema</OutDir>
-    </CXX_Tree_Mapping_Rule>
-    <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeML.* ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
-      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\OpenBridgeML.dll</Outputs>
-    </CustomBuildStep>
-    <ManifestResourceCompile>
-      <ResourceOutputFileName>$(IntDir)$(TargetName)$(TargetExt).embed.manifest.res</ResourceOutputFileName>
-    </ManifestResourceCompile>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -249,7 +78,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\Include;$(WBFLDIR)\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\WBFL\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -266,17 +95,17 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ARPDIR)\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ARPDIR)\WBFL\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3.lib;$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1.lib;mfcs140u.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3.lib;$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1.lib;mfcs140u.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -284,7 +113,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(ARPDIR)\WBFL\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
@@ -292,72 +121,11 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <OutDir>.\Schema</OutDir>
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
-    </CustomBuildStep>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Midl>
-      <TypeLibraryName>
-      </TypeLibraryName>
-      <HeaderFileName />
-      <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
-    </Midl>
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Link>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\lib\xerces-c_3D.lib</AdditionalDependencies>
-      <ImageHasSafeExceptionHandlers />
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/Barlist.bsc</OutputFile>
-    </Bscmake>
-    <Manifest>
-      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
-    </Manifest>
-    <CXX_Tree_Mapping_Rule>
-      <GenSerialization>true</GenSerialization>
-      <GenIntellisense>true</GenIntellisense>
-      <OutDir>.\Schema</OutDir>
-    </CXX_Tree_Mapping_Rule>
-    <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X86-VC100\bin\xerces-c_3_1D.dll ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeML.* ..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
-      <Outputs>..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll;..\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\OpenBridgeML.dll</Outputs>
+      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -369,8 +137,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\Include;$(WBFLDIR)\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <MinimalRebuild>true</MinimalRebuild>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\WBFL\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -387,11 +154,11 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ARPDIR)\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ARPDIR)\WBFL\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -399,7 +166,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>$(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3D.lib;$(WBFLDIR)\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1D.lib;mfcs140ud.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3D.lib;$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1D.lib;mfcs140ud.lib</AdditionalDependencies>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -407,7 +174,7 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
     </Bscmake>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
+      <AdditionalManifestFiles>$(ARPDIR)\WBFL\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
     </Manifest>
     <CXX_Tree_Mapping_Rule>
       <GenSerialization>true</GenSerialization>
@@ -415,126 +182,20 @@ xcopy /y /d $(BRIDGELINKDIR)\RegFreeCOM\$(Platform)\$(Configuration)\OpenBridgeM
       <OutDir>.\Schema</OutDir>
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
-      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+      <Command>xcopy /y /d .\Schema\Barlist.xsd  $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(BRIDGELINKDIR)\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
+      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
     </CustomBuildStep>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
-    <Midl>
-      <TypeLibraryName>
-      </TypeLibraryName>
-      <HeaderFileName />
-      <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
-    </Midl>
-    <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Link>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-      <ImageHasSafeExceptionHandlers />
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/Barlist.bsc</OutputFile>
-    </Bscmake>
-    <CXX_Tree_Mapping_Rule>
-      <GenSerialization>true</GenSerialization>
-      <GenIntellisense>true</GenIntellisense>
-      <OutDir>.\Schema</OutDir>
-    </CXX_Tree_Mapping_Rule>
-    <Manifest>
-      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
-    </Manifest>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
-    <Midl>
-      <TargetEnvironment>X64</TargetEnvironment>
-      <TypeLibraryName>.\Release/Barlist.tlb</TypeLibraryName>
-      <HeaderFileName />
-      <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
-    </Midl>
-    <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(WBFLDIR)\Include;$(WBFLDIR)\Include\$(Platform);$(ARPDIR)\Barlist\Barlist\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\Barlist\Barlist\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-      <AdditionalIncludeDirectories>$(WBFLDIR)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
-    <Link>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(WBFLDIR)\RegFreeCOM\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ModuleDefinitionFile>.\Barlist.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX64</TargetMachine>
-      <Profile>true</Profile>
-    </Link>
-    <Bscmake>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/Barlist.bsc</OutputFile>
-    </Bscmake>
-    <CXX_Tree_Mapping_Rule>
-      <GenSerialization>true</GenSerialization>
-      <GenIntellisense>true</GenIntellisense>
-      <OutDir>.\Schema</OutDir>
-    </CXX_Tree_Mapping_Rule>
-    <Manifest>
-      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
-      <AdditionalManifestFiles>$(WBFLDIR)\RegFreeCOM\WBFL.manifest</AdditionalManifestFiles>
-    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Formatter.cpp" />
     <ClCompile Include="BarDlg.cpp" />
     <ClCompile Include="BarDlgStateMachine.cpp" />
     <ClCompile Include=".\Schema\Barlist.cxx">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="BarlistDoc.cpp" />
     <ClCompile Include="BarlistApp.cpp" />
@@ -544,20 +205,12 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
     <ClCompile Include="BarlistTreeView.cpp" />
     <ClCompile Include="BarlistListView.cpp" />
     <ClCompile Include="..\Bars\Barlist_i.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\Bars\Bars_i.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="BendFactory.cpp" />
     <ClCompile Include="BarlistFrame.cpp" />
@@ -575,11 +228,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
     <ClCompile Include="Report.cpp" />
     <ClCompile Include="ReportDlg.cpp" />
     <ClCompile Include="StdAfx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
@@ -626,26 +275,10 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
   </ItemGroup>
   <ItemGroup>
     <Midl Include="Barlist.idl">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Barlist.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Barlist_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Barlist_i.c</InterfaceIdentifierFileName>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\Barlist.tlb</TypeLibraryName>
       <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Barlist_i.h</HeaderFileName>
       <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\Barlist_i.c</InterfaceIdentifierFileName>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">.\Barlist.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">Barlist_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">.\Barlist_i.c</InterfaceIdentifierFileName>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">.\Barlist.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Barlist_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">.\Barlist_i.c</InterfaceIdentifierFileName>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Barlist.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Barlist_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Barlist_i.c</InterfaceIdentifierFileName>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Barlist.tlb</TypeLibraryName>
       <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Barlist_i.h</HeaderFileName>
@@ -655,11 +288,7 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Barlist.rc">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemGroup>
@@ -711,17 +340,9 @@ xcopy /y /d $(WBFLDIR)\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(BR
   <ItemGroup>
     <CXX_Tree_Mapping_Rule Include=".\Schema\Barlist.xsd">
       <FileType>XSD</FileType>
-      <RootElement Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </RootElement>
-      <RootElement Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </RootElement>
-      <RootElement Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
-      </RootElement>
       <RootElement Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </RootElement>
       <RootElement Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </RootElement>
-      <RootElement Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
       </RootElement>
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>

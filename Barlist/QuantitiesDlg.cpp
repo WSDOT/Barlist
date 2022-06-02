@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2021  Washington State Department of Transportation
+// Copyright © 1999-2022  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -169,19 +169,11 @@ void CQuantitiesDlg::RestoreWindowPosition()
    WINDOWPLACEMENT wp;
    if (EAFGetApp()->ReadWindowPlacement(CString(_T("Window Positions")), _T("Quantities"), &wp))
    {
-      CWnd* pDesktop = GetDesktopWindow();
-      //CRect rDesktop;
-      //pDesktop->GetWindowRect(&rDesktop); // this is the size of one monitor.... use GetSystemMetrics to get the entire desktop
-      CRect rDesktop(0, 0, GetSystemMetrics(SM_CXVIRTUALSCREEN), GetSystemMetrics(SM_CYVIRTUALSCREEN));
-      CRect rThisWnd(wp.rcNormalPosition);
-      if (rDesktop.PtInRect(rThisWnd.TopLeft()) && rDesktop.PtInRect(rThisWnd.BottomRight()))
+      HMONITOR hMonitor = MonitorFromRect(&wp.rcNormalPosition, MONITOR_DEFAULTTONULL); // get the monitor that has maximum overlap with the dialog rectangle (returns null if none)
+      if (hMonitor != NULL)
       {
-         // if window is within the desktop area, set its position... otherwise the default position will be used
-         SetWindowPlacement(&wp);
-      }
-      else
-      {
-         ShowWindow(wp.showCmd);
+         // if dialog is within a monitor, set its position... otherwise the default position will be sued
+         SetWindowPos(NULL, wp.rcNormalPosition.left, wp.rcNormalPosition.top, wp.rcNormalPosition.right - wp.rcNormalPosition.left, wp.rcNormalPosition.bottom - wp.rcNormalPosition.top, 0);
       }
    }
 }

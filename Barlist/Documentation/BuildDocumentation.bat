@@ -1,10 +1,10 @@
-cd \ARP\Barlist\Barlist\Documentation
+cd %ARPDIR%\Barlist\Barlist\Documentation
 
 rmdir /S /Q doc
 doxygen Doxygen.dox
 
-\ARP\BridgeLink\RegFreeCOM\x64\Release\MakeDocMap Barlist
-rmdir /S /Q \ARP\BridgeLink\Docs\Barlist\Barlist\%1\
-mkdir \ARP\BridgeLink\Docs\Barlist\Barlist\%1\
-copy \ARP\Barlist\Barlist\Documentation\doc\html\* \ARP\BridgeLink\Docs\Barlist\Barlist\%1\
-copy \ARP\Barlist\Barlist\Documentation\Barlist.dm \ARP\BridgeLink\Docs\Barlist\Barlist\%1\BarlistDocs.dm
+%ARPDIR%\BridgeLink\RegFreeCOM\x64\Release\MakeDocMap Barlist
+rmdir /S /Q %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\
+mkdir %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\
+copy %ARPDIR%\Barlist\Barlist\Documentation\doc\html\* %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\
+copy %ARPDIR%\Barlist\Barlist\Documentation\Barlist.dm %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\BarlistDocs.dm
