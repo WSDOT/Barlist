@@ -15,5 +15,5 @@ Getting Started
 
 Manuals
 ----------
-* [User Guide](http://www.wsdot.wa.gov/eesc/bridge/software/Documentation/Barlist/Barlist/5.2/user_guide.html) - Get more in-depth information
+* [User Guide](http://www.wsdot.wa.gov/eesc/bridge/software/Documentation/Barlist/Barlist/7.0/user_guide.html) - Get more in-depth information
 
