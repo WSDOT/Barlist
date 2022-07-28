@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <\ARP\BridgeLink\Include\BridgeLinkVersion.h>
+#include <BridgeLinkVersion.h>
 
 #ifndef _BARLIST_VERSION
 #define _BARLIST_VERSION _BRIDGELINK_VERSION
