@@ -106,7 +106,7 @@ CString CBarlistApp::GetDocumentationRootLocation()
    {
       // NOTE: The following approach allows third party distributers to use their own server for documentation.
       // Their installer should write the documentation root location to HKLM\Settings\DocumentationRoot.
-      // This value will be the default when the documenation root setting is read for a specific user from HKCU\Settings\DocumentationRoot
+      // This value will be the default when the documentation root setting is read for a specific user from HKCU\Settings\DocumentationRoot
       // If the HKCU value isn't found, the default from HKLM is used.
 
       // Get the default location for the documentation root from the local machine registry hive
@@ -147,7 +147,7 @@ LPCTSTR CBarlistApp::GetRegistryKey()
    return _T("Washington State Department of Transportation");
 }
 
-OLECHAR* CBarlistApp::GetAppPluginCategoryName()
+LPCTSTR CBarlistApp::GetAppPluginCategoryName()
 {
    return _T("Barlist Application Plugin");
 }
@@ -157,7 +157,7 @@ CATID CBarlistApp::GetAppPluginCategoryID()
    return CATID_BarlistAppPlugin;
 }
 
-OLECHAR* CBarlistApp::GetPluginCategoryName()
+LPCTSTR CBarlistApp::GetPluginCategoryName()
 {
    return _T("Barlist Plugin");
 }

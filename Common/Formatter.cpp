@@ -43,7 +43,7 @@ BOOL Formatter::Init()
          AfxMessageBox(strMessage);
          return FALSE;
       }
-      g_formatter->put_Annotation(_T("'-,\""));
+      g_formatter->put_Annotation(CComBSTR("'-,\""));
       g_formatter->put_Multiplier(12.0);
       g_formatter->put_OffsetDigits(0);
       g_formatter->FormatSpecifiers(7, 1, tjRight, nftFixed, 0.0001);
@@ -100,7 +100,7 @@ CString Formatter::FormatLength(Float64 length, bool bUnits)
       {
          USES_CONVERSION;
          CComBSTR bstr;
-         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
+         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), CComBSTR(""), &bstr);
          return OLE2T(bstr);
       }
       else
@@ -149,7 +149,7 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
       {
          USES_CONVERSION;
          CComBSTR bstr;
-         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
+         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), CComBSTR(""), &bstr);
          return OLE2T(bstr);
       }
       else

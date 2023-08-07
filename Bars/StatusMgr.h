@@ -46,7 +46,7 @@ public:
    void SetStatusLevel( StatusType status );
    StatusType GetStatusLevel();
    void AddStatusMsg(BSTR bstrMsg, VARIANT v1, VARIANT v2);
-   IStatusMessageCollection* CStatusMgr::GetStatusMessages();
+   IStatusMessageCollection* GetStatusMessages();
    void ResetStatusMsgs();
 
 private:

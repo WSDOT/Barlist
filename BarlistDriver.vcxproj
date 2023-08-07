@@ -94,6 +94,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;_BETA_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -152,6 +154,8 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_BETA_VERSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -217,6 +221,20 @@
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="GdiScaling.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Barlist\Barlist.vcxproj">
+      <Project>{e2e82570-23e6-4991-8d0e-aa57c1416d5f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Bars\Bars.vcxproj">
+      <Project>{baf8f8b7-5950-4e78-8a32-892636f6197a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="BXF\BXF.vcxproj">
+      <Project>{59c9591e-a903-41bd-a363-caf862420ad7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="ExcelExporter\ExcelExporter.vcxproj">
+      <Project>{fc93c7d7-288a-4746-9120-55f6af1581c2}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

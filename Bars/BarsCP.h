@@ -36,12 +36,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBendEvents* pIBendEvents = reinterpret_cast<IBendEvents*>(sp.p);
 			if (pIBendEvents != NULL)
@@ -61,12 +61,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarRecordEvents* pIBarRecordEvents = reinterpret_cast<IBarRecordEvents*>(sp.p);
 			if (pIBarRecordEvents != NULL)
@@ -86,12 +86,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarRecordCollectionEvents* pIBarRecordCollectionEvents = reinterpret_cast<IBarRecordCollectionEvents*>(sp.p);
 			if (pIBarRecordCollectionEvents != NULL)
@@ -104,12 +104,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarRecordCollectionEvents* pIBarRecordCollectionEvents = reinterpret_cast<IBarRecordCollectionEvents*>(sp.p);
 			if (pIBarRecordCollectionEvents != NULL)
@@ -122,12 +122,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarRecordCollectionEvents* pIBarRecordCollectionEvents = reinterpret_cast<IBarRecordCollectionEvents*>(sp.p);
 			if (pIBarRecordCollectionEvents != NULL)
@@ -140,12 +140,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarRecordCollectionEvents* pIBarRecordCollectionEvents = reinterpret_cast<IBarRecordCollectionEvents*>(sp.p);
 			if (pIBarRecordCollectionEvents != NULL)
@@ -158,12 +158,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarRecordCollectionEvents* pIBarRecordCollectionEvents = reinterpret_cast<IBarRecordCollectionEvents*>(sp.p);
 			if (pIBarRecordCollectionEvents != NULL)
@@ -183,12 +183,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupEvents* pIGroupEvents = reinterpret_cast<IGroupEvents*>(sp.p);
 			if (pIGroupEvents != NULL)
@@ -201,12 +201,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupEvents* pIGroupEvents = reinterpret_cast<IGroupEvents*>(sp.p);
 			if (pIGroupEvents != NULL)
@@ -219,12 +219,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupEvents* pIGroupEvents = reinterpret_cast<IGroupEvents*>(sp.p);
 			if (pIGroupEvents != NULL)
@@ -237,12 +237,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupEvents* pIGroupEvents = reinterpret_cast<IGroupEvents*>(sp.p);
 			if (pIGroupEvents != NULL)
@@ -255,12 +255,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupEvents* pIGroupEvents = reinterpret_cast<IGroupEvents*>(sp.p);
 			if (pIGroupEvents != NULL)
@@ -273,12 +273,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupEvents* pIGroupEvents = reinterpret_cast<IGroupEvents*>(sp.p);
 			if (pIGroupEvents != NULL)
@@ -301,12 +301,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -319,12 +319,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -337,12 +337,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -355,12 +355,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -373,12 +373,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -391,12 +391,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -409,12 +409,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -427,12 +427,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -445,12 +445,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IGroupCollectionEvents* pIGroupCollectionEvents = reinterpret_cast<IGroupCollectionEvents*>(sp.p);
 			if (pIGroupCollectionEvents != NULL)
@@ -470,12 +470,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -488,12 +488,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -506,12 +506,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -524,12 +524,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -542,12 +542,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -560,12 +560,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -578,12 +578,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -596,12 +596,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -614,12 +614,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)
@@ -632,12 +632,12 @@ public:
 		HRESULT ret = S_OK;
 		T* pT = static_cast<T*>(this);
 		int nConnectionIndex;
-		int nConnections = m_vec.GetSize();
+		int nConnections = this->m_vec.GetSize();
 		
 		for (nConnectionIndex = 0; nConnectionIndex < nConnections; nConnectionIndex++)
 		{
 			pT->Lock();
-			CComPtr<IUnknown> sp = m_vec.GetAt(nConnectionIndex);
+			CComPtr<IUnknown> sp = this->m_vec.GetAt(nConnectionIndex);
 			pT->Unlock();
 			IBarlistEvents* pIBarlistEvents = reinterpret_cast<IBarlistEvents*>(sp.p);
 			if (pIBarlistEvents != NULL)

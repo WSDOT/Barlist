@@ -357,6 +357,11 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll 
   <ItemGroup>
     <Xml Include="Schema\Barlist_Version_1.0_to_Vesion_2.0.xslt" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bars\Bars.vcxproj">
+      <Project>{baf8f8b7-5950-4e78-8a32-892636f6197a}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(XSDDIR)\etc\vc-10.0\xsd-cxx-tree.targets" />
