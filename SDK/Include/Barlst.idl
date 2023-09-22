@@ -60,6 +60,8 @@ interface IStatusMessageCollection;
       D7957
    } MaterialType;
 
+	cpp_quote("#define MATERIAL_COUNT ((int)D7957+1)")
+
    typedef [public,uuid(21A44900-1381-11d3-8933-006097C68A9C),helpstring("enum HookType")]
    enum HookType { ht90, ht135, ht180 } HookType;
 
@@ -210,6 +212,7 @@ interface IStatusMessageCollection;
 		[propget, id(1), helpstring("property Groups")] HRESULT Groups([out, retval] IGroupCollection* *pVal);
 
       [propget, id(3), helpstring("property Quantity")] HRESULT Quantity([in]MaterialType material, [in]VARIANT_BOOL bEpoxy, [in]VARIANT_BOOL bSubstructure, [out, retval]Float64* pVal);
+		[propget, id(4), helpstring("property QuantityByGroup")] HRESULT QuantityByGroup([in]BSTR bstrGroup,[in]MaterialType material, [in]VARIANT_BOOL bEpoxy, [in]VARIANT_BOOL bSubstructure, [out, retval]Float64* pVal);
 
 		[propget, id(9), helpstring("property Status")] HRESULT Status([out, retval] StatusType *pVal);
 		[propget, id(10), helpstring("property Project")] HRESULT Project([out, retval] BSTR *pVal);

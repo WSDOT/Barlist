@@ -33,6 +33,7 @@
 #include <set>
 #include <string>
 #include <array>
+#include <map>
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarlist
@@ -53,10 +54,10 @@ public:
    m_Company(""),
    m_Comments("")
 	{
-      m_Substructure.fill(0);
-      m_SubstructureEpoxy.fill(0);
-      m_Superstructure.fill(0);
-      m_SuperstructureEpoxy.fill(0);
+      m_Substructure[AllGroups].fill(0);
+      m_SubstructureEpoxy[AllGroups].fill(0);
+      m_Superstructure[AllGroups].fill(0);
+      m_SuperstructureEpoxy[AllGroups].fill(0);
 
       m_Status = stOK;
 	}
@@ -133,13 +134,16 @@ private:
    CComPtr<IGroupCollection> m_Groups;
    DWORD m_GroupCookie;
 
+   // key is group name 
+   const CComBSTR AllGroups;
+
    // array index is MaterialType
    // quantities are mass/weight in all cases
    // except D7957 (GFRP) in which case the quantity is length
-   std::array<Float64, 16> m_Substructure;
-   std::array<Float64, 16> m_SubstructureEpoxy;
-   std::array<Float64, 16> m_Superstructure;
-   std::array<Float64, 16> m_SuperstructureEpoxy;
+   std::map<CComBSTR,std::array<Float64, MATERIAL_COUNT>> m_Substructure;
+   std::map<CComBSTR,std::array<Float64, MATERIAL_COUNT>> m_SubstructureEpoxy;
+   std::map<CComBSTR,std::array<Float64, MATERIAL_COUNT>> m_Superstructure;
+   std::map<CComBSTR,std::array<Float64, MATERIAL_COUNT>> m_SuperstructureEpoxy;
 
    StatusType m_Status;
 
@@ -158,6 +162,7 @@ private:
 // IBarlist
 public:
    STDMETHOD(get_Quantity)(/*[in]*/MaterialType material, /*[in]*/VARIANT_BOOL bEpoxy, /*[in]*/VARIANT_BOOL bSubstructure, /*[out, retval]*/Float64* pVal);
+   STDMETHOD(get_QuantityByGroup)(/*[in]*/BSTR bstrGroup, /*[in]*/MaterialType material, /*[in]*/VARIANT_BOOL bEpoxy, /*[in]*/VARIANT_BOOL bSubstructure, /*[out, retval]*/Float64* pVal);
    STDMETHOD(get_Groups)(/*[out, retval]*/ IGroupCollection* *pVal);
 
 public :

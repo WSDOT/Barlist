@@ -24,8 +24,6 @@
 
 #include <Bars\Barlst.h>
 
-#define MATERIAL_COUNT ((int)D7957+1)
-
 // Returns a text string for the material specification, such as A615 Grade 40
 LPCTSTR GetMaterialSpecification(MaterialType material);
 

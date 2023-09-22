@@ -48,7 +48,8 @@ private:
    void ReportBarRecord(IBarRecord* pBarRecord);
    CString ReportBend(IBend* pBend, bool bVaries);
    void ReportErrors(IBend* pBend);
-   void ReportSummary(IBarlist* pBarlist);
+   void ReportQuantities(IBarlist* pBarlist);
+   void ReportQuantitiesByGroup(IBarlist* pBarlist);
 
    TCHAR GetUse(UseType use);
    TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c);

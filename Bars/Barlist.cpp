@@ -73,10 +73,15 @@ void CBarlist::FinalRelease()
 
 void CBarlist::Update()
 {
-   m_Superstructure.fill(0);
-   m_SuperstructureEpoxy.fill(0);
-   m_Substructure.fill(0);
-   m_SubstructureEpoxy.fill(0);
+   m_Superstructure.clear();
+   m_SuperstructureEpoxy.clear();
+   m_Substructure.clear();
+   m_SubstructureEpoxy.clear();
+
+   m_Superstructure[AllGroups].fill(0);
+   m_SuperstructureEpoxy[AllGroups].fill(0);
+   m_Substructure[AllGroups].fill(0);
+   m_SubstructureEpoxy[AllGroups].fill(0);
 
    m_Status = stOK;
 
@@ -87,27 +92,38 @@ void CBarlist::Update()
       CComPtr<IGroup> pGroup;
       m_Groups->get_Item( CComVariant(i), &pGroup );
 
+      CComBSTR bstrGroupName;
+      pGroup->get_Name(&bstrGroupName);
+
+      m_Superstructure[bstrGroupName].fill(0);
+      m_SuperstructureEpoxy[bstrGroupName].fill(0);
+      m_Substructure[bstrGroupName].fill(0);
+      m_SubstructureEpoxy[bstrGroupName].fill(0);
+
       StatusType status;
       pGroup->get_Status( &status );
       if ( m_Status < status )
          m_Status = status;
 
-      auto n = m_Superstructure.size();
-      for (auto i = 0; i < n; i++)
+      for (auto i = 0; i < MATERIAL_COUNT; i++)
       {
          MaterialType material = (MaterialType)i;
          Float64 quantity;
          pGroup->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_TRUE /*substructure*/, &quantity);
-         m_SubstructureEpoxy[material] += quantity;
+         m_SubstructureEpoxy[bstrGroupName][material] = quantity;
+         m_SubstructureEpoxy[AllGroups][material] += quantity;
 
          pGroup->get_Quantity(material, VARIANT_FALSE /*epoxy*/, VARIANT_TRUE /*substructure*/, &quantity);
-         m_Substructure[material] += quantity;
+         m_Substructure[bstrGroupName][material] = quantity;
+         m_Substructure[AllGroups][material] += quantity;
 
          pGroup->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_FALSE /*substructure*/, &quantity);
-         m_SuperstructureEpoxy[material] += quantity;
+         m_SuperstructureEpoxy[bstrGroupName][material] = quantity;
+         m_SuperstructureEpoxy[AllGroups][material] += quantity;
 
          pGroup->get_Quantity(material, VARIANT_FALSE /*epoxy*/, VARIANT_FALSE /*substructure*/, &quantity);
-         m_Superstructure[material] += quantity;
+         m_Superstructure[bstrGroupName][material] = quantity;
+         m_Superstructure[AllGroups][material] += quantity;
       }
    }
 }
@@ -122,26 +138,31 @@ STDMETHODIMP CBarlist::get_Groups(IGroupCollection **pVal)
 
 STDMETHODIMP CBarlist::get_Quantity(MaterialType material, VARIANT_BOOL bEpoxy, VARIANT_BOOL bSubstructure, Float64* pVal)
 {
+   return get_QuantityByGroup(AllGroups, material, bEpoxy, bSubstructure, pVal);
+}
+
+STDMETHODIMP CBarlist::get_QuantityByGroup(BSTR bstrGroup, MaterialType material, VARIANT_BOOL bEpoxy, VARIANT_BOOL bSubstructure, Float64* pVal)
+{
    if (bSubstructure == VARIANT_TRUE)
    {
       if (bEpoxy == VARIANT_TRUE)
       {
-         *pVal = m_SubstructureEpoxy[material];
+         *pVal = m_SubstructureEpoxy[bstrGroup][material];
       }
       else
       {
-         *pVal = m_Substructure[material];
+         *pVal = m_Substructure[bstrGroup][material];
       }
    }
    else
    {
       if (bEpoxy == VARIANT_TRUE)
       {
-         *pVal = m_SuperstructureEpoxy[material];
+         *pVal = m_SuperstructureEpoxy[bstrGroup][material];
       }
       else
       {
-         *pVal = m_Superstructure[material];
+         *pVal = m_Superstructure[bstrGroup][material];
       }
    }
 
