@@ -1061,7 +1061,8 @@ CReport& CBarlistDoc::GetReport(int reportOptions)
    if (m_bDirtyReport)
    {
       m_Report.BuildReport(m_Barlist, reportOptions);
-      m_bDirtyReport = false;
+      m_bDirtyReport = true;
+      //m_bDirtyReport = false;
    }
    return m_Report;
 }
