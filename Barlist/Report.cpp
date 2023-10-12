@@ -77,7 +77,7 @@ const std::vector<CString>& CReport::GetReport()
    return m_vReportLines;
 }
 
-void CReport::BuildReport(IBarlist* pBarlist)
+void CReport::BuildReport(IBarlist* pBarlist, int reportOptions)
 {
    // First capture some infomation for the report cover page
    USES_CONVERSION;
@@ -106,7 +106,10 @@ void CReport::BuildReport(IBarlist* pBarlist)
    m_vReportLines.reserve(1000);
 
    ReportGroups(pBarlist);
-   //ReportQuantitiesByGroup(pBarlist);
+   if (reportOptions == REPORT_TOTAL_AND_GROUP_QUANTITIES) 
+   {
+       ReportQuantitiesByGroup(pBarlist);
+   }
    ReportQuantities(pBarlist);
 }
 
