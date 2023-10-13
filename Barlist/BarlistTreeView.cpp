@@ -191,7 +191,7 @@ BOOL CBarlistTreeView::OnPreparePrinting(CPrintInfo* pInfo)
    pInfo->m_pPD = new CBarlistPrintDialog(FALSE);
 
    CBarlistDoc* pDoc = GetDocument();
-   CReport& report = pDoc->GetReport(CReport::ReportOptions::REPORT_GROUP_QUANTITIES);
+   CReport& report = pDoc->GetReport(CReport::ReportOptions::REPORT_TOTAL_QUANTITIES);
 
    pInfo->m_pPD->m_pd.Flags |= PD_ALLPAGES | PD_NOPAGENUMS | PD_NOSELECTION | PD_NOCURRENTPAGE;
    pInfo->m_pPD->m_pd.nFromPage = 1;
@@ -205,7 +205,7 @@ BOOL CBarlistTreeView::OnPreparePrinting(CPrintInfo* pInfo)
 void CBarlistTreeView::OnPrint(CDC* pDC, CPrintInfo* pInfo)
 {
    CBarlistDoc* pDoc = GetDocument();
-   CReport& report = pDoc->GetReport(CReport::ReportOptions::REPORT_GROUP_QUANTITIES);
+   CReport& report = pDoc->GetReport(CReport::ReportOptions::REPORT_TOTAL_QUANTITIES);
    report.PrepareForPrinting(pDC, pInfo);
    report.Print(pDC, pInfo);
    report.EndPrinting(pDC, pInfo);

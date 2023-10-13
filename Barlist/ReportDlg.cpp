@@ -73,14 +73,12 @@ void CReportDlg::UpdateReport()
     //define options parameter
     
     CButton* pCheckBox = (CButton*)GetDlgItem(IDC_CHECK_QTY_BY_GROUP);
-    int reportOptions = CReport::ReportOptions::REPORT_GROUP_QUANTITIES;
+    CReport::ReportOptions reportOptions = CReport::ReportOptions::REPORT_TOTAL_QUANTITIES;
 
     if (pCheckBox->GetCheck() == BST_CHECKED) {
         reportOptions = CReport::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES;
     }
-    if (pCheckBox->GetCheck() == BST_UNCHECKED) {
-        reportOptions = CReport::ReportOptions::REPORT_GROUP_QUANTITIES;
-    }
+
 
     const auto& vReportLines = pDoc->GetReport(reportOptions).GetReport();
     CString strReport;

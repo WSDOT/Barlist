@@ -1056,7 +1056,7 @@ void CBarlistDoc::CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const
    clone.CopyTo(ppClone);
 }
 
-CReport& CBarlistDoc::GetReport(int reportOptions)
+CReport& CBarlistDoc::GetReport(CReport::ReportOptions reportOptions)
 {
    if (m_bDirtyReport)
    {
