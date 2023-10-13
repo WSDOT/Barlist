@@ -91,7 +91,8 @@ public:
 
    void CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const;
 
-   CReport& GetReport();
+   CReport& GetReport(CReport::ReportOptions rptOptions);
+
 
 // Implementation
 public:

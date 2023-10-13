@@ -47,7 +47,10 @@ protected:
    int m_cyMin;
 
 	DECLARE_MESSAGE_MAP()
+
 public:
+
+   void UpdateReport();
    virtual BOOL OnInitDialog();
    afx_msg void OnClickedPrint();
    afx_msg void OnDestroy();

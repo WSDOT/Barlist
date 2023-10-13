@@ -91,6 +91,8 @@
 #define IDC_QUANTITIES_LIST             273
 #define IDC_COMBO1                      274
 #define IDC_MATERIALS                   274
+#define IDC_CHECK1                      275
+#define IDC_CHECK_QTY_BY_GROUP          275
 #define ID_NEW_VIEW                     33029
 #define ID_VIEW_OPTIONS                 33032
 #define IDC_MOVE_UP                     33035
@@ -125,7 +127,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        231
 #define _APS_NEXT_COMMAND_VALUE         33074
-#define _APS_NEXT_CONTROL_VALUE         275
+#define _APS_NEXT_CONTROL_VALUE         276
 #define _APS_NEXT_SYMED_VALUE           104
 #endif
 #endif

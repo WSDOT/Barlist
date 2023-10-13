@@ -51,18 +51,51 @@ void CReportDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CReportDlg, CDialog)
-   ON_BN_CLICKED(IDC_PRINT, &CReportDlg::OnClickedPrint)
-   ON_WM_DESTROY()
-   ON_WM_SHOWWINDOW()
+    ON_BN_CLICKED(IDC_PRINT, &CReportDlg::OnClickedPrint)
+    ON_BN_CLICKED(IDC_CHECK_QTY_BY_GROUP, &CReportDlg::UpdateReport)
+    ON_WM_DESTROY()
+    ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 
+
+
+
 // CReportDlg message handlers
+
+void CReportDlg::UpdateReport()
+{
+    CWnd* pReport = GetDlgItem(IDC_REPORT);
+    pReport->SetFont(&m_Font);
+
+    CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+
+    //define options parameter
+    
+    CButton* pCheckBox = (CButton*)GetDlgItem(IDC_CHECK_QTY_BY_GROUP);
+    CReport::ReportOptions reportOptions = CReport::ReportOptions::REPORT_TOTAL_QUANTITIES;
+
+    if (pCheckBox->GetCheck() == BST_CHECKED) {
+        reportOptions = CReport::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES;
+    }
+
+
+    const auto& vReportLines = pDoc->GetReport(reportOptions).GetReport();
+    CString strReport;
+    for (auto line : vReportLines)
+    {
+        line.Replace(_T("\n"), _T("\r\n"));
+        strReport += line;
+    }
+    pReport->SetWindowText(strReport);
+}
 
 
 BOOL CReportDlg::OnInitDialog()
 {
    CDialog::OnInitDialog();
+
+   UpdateReport();
 
    m_Font.CreatePointFont(100, _T("Courier New"));
 
@@ -70,20 +103,6 @@ BOOL CReportDlg::OnInitDialog()
    CWnd* pHeader = GetDlgItem(IDC_HEADER);
    pHeader->SetFont(&m_Font);
    pHeader->SetWindowText(strHeader);
-
-   CWnd* pReport = GetDlgItem(IDC_REPORT);
-   pReport->SetFont(&m_Font);
-
-   CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
-
-   const auto& vReportLines = pDoc->GetReport().GetReport();
-   CString strReport;
-   for (auto line : vReportLines)
-   {
-      line.Replace(_T("\n"), _T("\r\n"));
-      strReport += line;
-   }
-   pReport->SetWindowText(strReport);
 
    CButton* pPrint = (CButton*)GetDlgItem(IDC_PRINT);
    HICON hPrintIcon = (HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PRINT), IMAGE_ICON, 16, 16, 0);
