@@ -440,6 +440,7 @@ void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
 
             m_vReportLines.push_back(strMaterial);
         }
+        m_vReportLines.push_back(_T("\n"));
     }
 }
 
