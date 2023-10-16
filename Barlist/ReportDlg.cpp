@@ -77,6 +77,10 @@ void CReportDlg::UpdateReport()
     if (pCheckBox->GetCheck() == BST_CHECKED) {
         pDoc->SetReportOptions(CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES);
     }
+    else if (pCheckBox->GetCheck() == BST_UNCHECKED)
+    {
+        pDoc->SetReportOptions(CBarlistDoc::ReportOptions::REPORT_TOTAL_QUANTITIES);
+    }
 
 
     const auto& vReportLines = pDoc->GetReport().GetReport();
