@@ -95,6 +95,8 @@ BOOL CReportDlg::OnInitDialog()
 {
    CDialog::OnInitDialog();
 
+   UpdateReport();
+
    m_Font.CreatePointFont(100, _T("Courier New"));
 
    CString strHeader = CReport::GetReportHeader();
