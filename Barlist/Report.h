@@ -32,12 +32,9 @@ public:
 
    static CString GetReportHeader();
 
-   enum class ReportOptions {
-	   REPORT_TOTAL_QUANTITIES = 1,
-	   REPORT_TOTAL_AND_GROUP_QUANTITIES = 2
-   };
 
-   void BuildReport(IBarlist* pBarlist, CReport::ReportOptions reportOptions);
+
+   void BuildReport(IBarlist* pBarlist);
 
    const std::vector<CString>& GetReport();
 

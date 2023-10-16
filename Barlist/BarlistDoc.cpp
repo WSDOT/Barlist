@@ -136,6 +136,8 @@ CBarlistDoc::CBarlistDoc()
 
    m_dwBarlistEventCookie = 0;
 
+   m_reportOptions = ReportOptions::REPORT_TOTAL_QUANTITIES;
+
    EAFGetApp()->RemoveUnitModeListener(this); // hold off on listening for unit mode change events until after the document is loaded
 }
 
@@ -175,6 +177,7 @@ BOOL CBarlistDoc::Init()
 
    return __super::Init();
 }
+
 
 void CBarlistDoc::GetBarlist(IBarlist** ppBarlist)
 {
@@ -1056,13 +1059,22 @@ void CBarlistDoc::CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const
    clone.CopyTo(ppClone);
 }
 
-CReport& CBarlistDoc::GetReport(CReport::ReportOptions reportOptions)
+void CBarlistDoc::SetReportOptions(const CBarlistDoc::ReportOptions& reportOptions)
+{
+    m_reportOptions = reportOptions;
+}
+
+CBarlistDoc::ReportOptions CBarlistDoc::GetReportOptions() const
+{
+    return m_reportOptions;
+}
+
+CReport& CBarlistDoc::GetReport()
 {
    if (m_bDirtyReport)
    {
-      m_Report.BuildReport(m_Barlist, reportOptions);
+      m_Report.BuildReport(m_Barlist);
       m_bDirtyReport = true;
-      //m_bDirtyReport = false;
    }
    return m_Report;
 }
