@@ -108,7 +108,9 @@ void CReport::BuildReport(IBarlist* pBarlist, CReport::ReportOptions reportOptio
    
    if (reportOptions == CReport::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES) 
    {
+       ReportGroups(pBarlist);
        ReportQuantitiesByGroup(pBarlist);
+       ReportQuantities(pBarlist);
    }
    else
    {
