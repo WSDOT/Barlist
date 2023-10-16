@@ -95,13 +95,14 @@ BOOL CReportDlg::OnInitDialog()
 {
    CDialog::OnInitDialog();
 
-   UpdateReport();
-
    m_Font.CreatePointFont(100, _T("Courier New"));
 
    CString strHeader = CReport::GetReportHeader();
    CWnd* pHeader = GetDlgItem(IDC_HEADER);
    pHeader->SetFont(&m_Font);
+
+   UpdateReport();
+
    pHeader->SetWindowText(strHeader);
 
    CButton* pPrint = (CButton*)GetDlgItem(IDC_PRINT);
@@ -116,6 +117,8 @@ BOOL CReportDlg::OnInitDialog()
 
    return TRUE;  // return TRUE unless you set the focus to a control
                  // EXCEPTION: OCX Property Pages should return FALSE
+
+
 }
 
 void CReportDlg::OnClickedPrint()
