@@ -46,6 +46,8 @@ private:
    void PageHeader(CDC* pDC, CPrintInfo* pInfo);
    void PrintCoverPage(CDC* pDC, CPrintInfo* pInfo);
    void ReportGroups(IBarlist* pBarlist);
+   void AddReportHeader();
+   void AddMaterialDataToReport(MaterialType material, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy);
    void ReportQuantities(IBarlist* pBarlist);
    void ReportQuantitiesByGroup(IBarlist* pBarlist);
    void ReportBarRecords(IGroup* pGroup);
@@ -57,6 +59,8 @@ private:
    TCHAR GetUse(UseType use);
    TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c);
    CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
+
+
 
    std::vector<CString> m_vReportLines;
 
