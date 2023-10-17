@@ -473,6 +473,13 @@ void CReport::ReportQuantities(IBarlist* pBarlist)
     CString strSummaryHeading{ _T("\nSummary of Quantities:\n") };
     m_vReportLines.push_back(strSummaryHeading);
 
+    // Define column headers
+    CString columnHeader;
+    columnHeader.Format(_T("%-30s %-20s %-20s %-20s %-20s\n"),
+        _T("Material"), _T("Substructure"), _T("Substructure w/Epoxy"),
+        _T("Superstructure"), _T("Superstructure w/Epoxy"));
+    m_vReportLines.push_back(columnHeader);
+
     for (int i = 0; i < MATERIAL_COUNT; i++)
     {
         if (i != 0)
