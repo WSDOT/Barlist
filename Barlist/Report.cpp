@@ -402,7 +402,7 @@ void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
             Float64 sub{ 0.0 }, subEpoxy{ 0.0 }, super{ 0.0 }, superEpoxy{ 0.0 };
             pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_TRUE, VARIANT_TRUE, &subEpoxy);
             pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_FALSE, VARIANT_TRUE, &sub);
-            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_TRUE, VARIANT_FALSE, &super);
+            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_TRUE, VARIANT_FALSE, &superEpoxy);
             pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_FALSE, VARIANT_FALSE, &super);
 
             if (material == D7957)
@@ -427,6 +427,12 @@ void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
                     strSubEpoxy.Format(_T("%-20s "), Formatter::FormatMass(subEpoxy));
                     strMaterial += strSubEpoxy;
                 }
+                else
+                {
+                    CString strSubEpoxy;
+                    strSubEpoxy.Format(_T("%-20s "), _T(""));
+                    strMaterial += strSubEpoxy;
+                }
 
                 CString strSuper;
                 strSuper.Format(_T("%-20s "), Formatter::FormatMass(super));
@@ -436,6 +442,12 @@ void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
                 {
                     CString strSuperEpoxy;
                     strSuperEpoxy.Format(_T("%-20s "), Formatter::FormatMass(superEpoxy));
+                    strMaterial += strSuperEpoxy;
+                }
+                else
+                {
+                    CString strSuperEpoxy;
+                    strSuperEpoxy.Format(_T("%-20s "), _T(""));
                     strMaterial += strSuperEpoxy;
                 }
             }
