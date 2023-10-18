@@ -709,6 +709,17 @@ void CBarlistDoc::LoadDocumentSettings()
 
    eafTypes::UnitMode unitMode = (eafTypes::UnitMode)(pApp->GetProfileInt(_T("Settings"), _T("Units"), (int)eafTypes::umUS));
    EAFGetApp()->SetUnitsMode(unitMode);
+
+   auto report_options_string = pApp->GetProfileString(_T("Settings"), _T("ReportOptions"),_T("Report Total Quantities"));
+
+   if (report_options_string == L"Report Total Quantities")
+   {
+       m_reportOptions = ReportOptions::REPORT_TOTAL_QUANTITIES;
+   }
+   else if (report_options_string == L"Report Total and Group Quantities")
+   {
+       m_reportOptions = ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES;
+   }
 }
 
 void CBarlistDoc::SaveDocumentSettings()
@@ -719,6 +730,18 @@ void CBarlistDoc::SaveDocumentSettings()
    CWinApp* pApp = AfxGetApp();
    VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("MarkIncrement"), m_MarkIncrement));
    VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("Units"), (int)(EAFGetApp()->GetUnitsMode())));
+
+   if (m_reportOptions == ReportOptions::REPORT_TOTAL_QUANTITIES)
+   {
+       VERIFY(pApp->WriteProfileString(_T("Settings"), _T("ReportOptions"),_T("Report Total Quantities")));
+   }
+   else if (m_reportOptions == ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES)
+   {
+       VERIFY(pApp->WriteProfileString(_T("Settings"), _T("ReportOptions"), _T("Report Total and Group Quantities")));
+   }
+
+
+   
 }
 
 void CBarlistDoc::SetModifiedFlag(BOOL bModified)

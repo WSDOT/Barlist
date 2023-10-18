@@ -98,12 +98,24 @@ BOOL CReportDlg::OnInitDialog()
 {
    CDialog::OnInitDialog();
 
-
    m_Font.CreatePointFont(100, _T("Courier New"));
 
    CString strHeader = CReport::GetReportHeader();
    CWnd* pHeader = GetDlgItem(IDC_HEADER);
    pHeader->SetFont(&m_Font);
+
+   CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+   CBarlistDoc::ReportOptions options = pDoc->GetReportOptions();
+   CButton* pCheckBox = (CButton*)GetDlgItem(IDC_CHECK_QTY_BY_GROUP);
+
+   if (options == CBarlistDoc::ReportOptions::REPORT_TOTAL_QUANTITIES)
+   {
+       pCheckBox->SetCheck(BST_UNCHECKED);
+   }
+   else if (options == CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES)
+   {
+       pCheckBox->SetCheck(BST_CHECKED);
+   }
 
    UpdateReport();
 
