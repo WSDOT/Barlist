@@ -32,12 +32,9 @@ public:
 
    static CString GetReportHeader();
 
-   enum class ReportOptions {
-	   REPORT_TOTAL_QUANTITIES = 1,
-	   REPORT_TOTAL_AND_GROUP_QUANTITIES = 2
-   };
 
-   void BuildReport(IBarlist* pBarlist, CReport::ReportOptions reportOptions);
+
+   void BuildReport(IBarlist* pBarlist);
 
    const std::vector<CString>& GetReport();
 
@@ -49,16 +46,21 @@ private:
    void PageHeader(CDC* pDC, CPrintInfo* pInfo);
    void PrintCoverPage(CDC* pDC, CPrintInfo* pInfo);
    void ReportGroups(IBarlist* pBarlist);
+   void AddReportHeader();
+   void AddMaterialDataToReport(MaterialType material, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy);
+   void ReportQuantities(IBarlist* pBarlist);
+   void ReportQuantitiesByGroup(IBarlist* pBarlist);
    void ReportBarRecords(IGroup* pGroup);
    void ReportBarRecord(IBarRecord* pBarRecord);
    CString ReportBend(IBend* pBend, bool bVaries);
    void ReportErrors(IBend* pBend);
-   void ReportQuantities(IBarlist* pBarlist);
-   void ReportQuantitiesByGroup(IBarlist* pBarlist);
+
 
    TCHAR GetUse(UseType use);
    TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c);
    CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
+
+
 
    std::vector<CString> m_vReportLines;
 

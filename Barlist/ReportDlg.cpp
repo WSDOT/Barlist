@@ -73,14 +73,17 @@ void CReportDlg::UpdateReport()
     //define options parameter
     
     CButton* pCheckBox = (CButton*)GetDlgItem(IDC_CHECK_QTY_BY_GROUP);
-    CReport::ReportOptions reportOptions = CReport::ReportOptions::REPORT_TOTAL_QUANTITIES;
 
     if (pCheckBox->GetCheck() == BST_CHECKED) {
-        reportOptions = CReport::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES;
+        pDoc->SetReportOptions(CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES);
+    }
+    else if (pCheckBox->GetCheck() == BST_UNCHECKED)
+    {
+        pDoc->SetReportOptions(CBarlistDoc::ReportOptions::REPORT_TOTAL_QUANTITIES);
     }
 
 
-    const auto& vReportLines = pDoc->GetReport(reportOptions).GetReport();
+    const auto& vReportLines = pDoc->GetReport().GetReport();
     CString strReport;
     for (auto line : vReportLines)
     {
@@ -95,13 +98,27 @@ BOOL CReportDlg::OnInitDialog()
 {
    CDialog::OnInitDialog();
 
-   UpdateReport();
-
    m_Font.CreatePointFont(100, _T("Courier New"));
 
    CString strHeader = CReport::GetReportHeader();
    CWnd* pHeader = GetDlgItem(IDC_HEADER);
    pHeader->SetFont(&m_Font);
+
+   CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+   CBarlistDoc::ReportOptions options = pDoc->GetReportOptions();
+   CButton* pCheckBox = (CButton*)GetDlgItem(IDC_CHECK_QTY_BY_GROUP);
+
+   if (options == CBarlistDoc::ReportOptions::REPORT_TOTAL_QUANTITIES)
+   {
+       pCheckBox->SetCheck(BST_UNCHECKED);
+   }
+   else if (options == CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES)
+   {
+       pCheckBox->SetCheck(BST_CHECKED);
+   }
+
+   UpdateReport();
+
    pHeader->SetWindowText(strHeader);
 
    CButton* pPrint = (CButton*)GetDlgItem(IDC_PRINT);
@@ -116,6 +133,8 @@ BOOL CReportDlg::OnInitDialog()
 
    return TRUE;  // return TRUE unless you set the focus to a control
                  // EXCEPTION: OCX Property Pages should return FALSE
+
+
 }
 
 void CReportDlg::OnClickedPrint()

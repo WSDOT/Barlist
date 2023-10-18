@@ -65,6 +65,15 @@ public:
 
    virtual BOOL Init() override;
 
+   enum class ReportOptions {
+	   REPORT_TOTAL_QUANTITIES, ///< Reports only the total quantities
+	   REPORT_TOTAL_AND_GROUP_QUANTITIES ///< Reports total quantities and quantities per bar group
+   };
+
+
+   void SetReportOptions(const ReportOptions& reportOptions);
+   ReportOptions GetReportOptions() const;
+
    Barlist CreateXML(IBarlist* pBarlist);
    BOOL CreateBarlist(LPCSTR strXML, IBarlist** ppBarlist);
    BOOL CreateBarlist(Barlist& barlistXML, IBarlist** ppBarlist);
@@ -91,7 +100,7 @@ public:
 
    void CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const;
 
-   CReport& GetReport(CReport::ReportOptions rptOptions);
+   CReport& GetReport();
 
 
 // Implementation
@@ -116,6 +125,8 @@ protected:
 
    bool m_bDirtyReport{ true };
    CReport m_Report;
+
+   ReportOptions m_reportOptions;
 
    virtual UINT GetToolbarResourceID();
 
