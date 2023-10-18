@@ -66,8 +66,8 @@ public:
    virtual BOOL Init() override;
 
    enum class ReportOptions {
-	   REPORT_TOTAL_QUANTITIES = 1,
-	   REPORT_TOTAL_AND_GROUP_QUANTITIES = 2
+	   REPORT_TOTAL_QUANTITIES, ///< Reports only the total quantities
+	   REPORT_TOTAL_AND_GROUP_QUANTITIES ///< Reports total quantities and quantities per bar group
    };
 
 
