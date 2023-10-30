@@ -142,7 +142,7 @@ void DDX_MyUnitValue(CDataExchange* pDX, int nIDC, Float64& data, const U& umInd
       {
          Float64 f;
          DDX_Text(pDX, nIDC, f);
-         data = ::ConvertToSysUnits(f, umIndirectMeasure.UnitOfMeasure);
+         data = WBFL::Units::ConvertToSysUnits(f, umIndirectMeasure.UnitOfMeasure);
       }
       else
       {
@@ -154,7 +154,7 @@ void DDX_MyUnitValue(CDataExchange* pDX, int nIDC, Float64& data, const U& umInd
       CString strValue;
       if (data != Float64_Inf || pWnd->IsWindowEnabled()) // Infinite values create a blank line
       {
-         strValue.Format(_T("%*.*f"), umIndirectMeasure.Width, umIndirectMeasure.Precision, ::ConvertFromSysUnits(data, umIndirectMeasure.UnitOfMeasure));
+         strValue.Format(_T("%*.*f"), umIndirectMeasure.Width, umIndirectMeasure.Precision, WBFL::Units::ConvertFromSysUnits(data, umIndirectMeasure.UnitOfMeasure));
          strValue.TrimLeft();
       }
       DDX_Text(pDX, nIDC, strValue);

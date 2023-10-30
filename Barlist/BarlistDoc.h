@@ -35,7 +35,7 @@
 #include <Bars\Bars.h>
 
 #include <array>
-#include <UnitMgt\IndirectMeasure.h>
+#include <Units\IndirectMeasure.h>
 
 #include "Report.h"
 #include "..\Common\Formatter.h"
@@ -65,6 +65,15 @@ public:
 
    virtual BOOL Init() override;
 
+   enum class ReportOptions {
+	   REPORT_TOTAL_QUANTITIES, ///< Reports only the total quantities
+	   REPORT_TOTAL_AND_GROUP_QUANTITIES ///< Reports total quantities and quantities per bar group
+   };
+
+
+   void SetReportOptions(const ReportOptions& reportOptions);
+   ReportOptions GetReportOptions() const;
+
    Barlist CreateXML(IBarlist* pBarlist);
    BOOL CreateBarlist(LPCSTR strXML, IBarlist** ppBarlist);
    BOOL CreateBarlist(Barlist& barlistXML, IBarlist** ppBarlist);
@@ -93,6 +102,7 @@ public:
 
    CReport& GetReport();
 
+
 // Implementation
 public:
 	virtual ~CBarlistDoc();
@@ -115,6 +125,8 @@ protected:
 
    bool m_bDirtyReport{ true };
    CReport m_Report;
+
+   ReportOptions m_reportOptions;
 
    virtual UINT GetToolbarResourceID();
 

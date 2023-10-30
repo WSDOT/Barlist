@@ -119,9 +119,9 @@ void CQuantitiesDlg::SetQuantities(MaterialType material, Float64 sub, Float64 s
    else
    {
       strSub = Formatter::FormatMass(sub);
-      strSubEpoxy = CanBeEpoxyCoated(material) ? Formatter::FormatMass(subEpoxy) : _T("-");
+      strSubEpoxy = CanBeEpoxyCoated(material) ? Formatter::FormatMass(subEpoxy) : CString("-");
       strSuper = Formatter::FormatMass(super);
-      strSuperEpoxy = CanBeEpoxyCoated(material) ? Formatter::FormatMass(superEpoxy) : _T("-");
+      strSuperEpoxy = CanBeEpoxyCoated(material) ? Formatter::FormatMass(superEpoxy) : CString("-");
    }
 
    int row = (int)(material)-(int)A706_Grade60;

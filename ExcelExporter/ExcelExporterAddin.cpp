@@ -517,14 +517,14 @@ void CExcelExporterAddin::ExportBend(IBend* pBend)
    pBend->get_SupportsDimension(dimT1, &vbSupported);
    if (vbSupported == VARIANT_TRUE)
    {
-      strValue.Format(_T("%3.0f"), ::ConvertFromSysUnits(t1, unitMeasure::Degree));
+      strValue.Format(_T("%3.0f"), WBFL::Units::ConvertFromSysUnits(t1, WBFL::Units::Measure::Degree));
       WriteStringToCell(_T("Theta1"), strValue);
    }
 
    pBend->get_SupportsDimension(dimT2, &vbSupported);
    if (vbSupported == VARIANT_TRUE)
    {
-      strValue.Format(_T("%3.0f"), ::ConvertFromSysUnits(t2, unitMeasure::Degree));
+      strValue.Format(_T("%3.0f"), WBFL::Units::ConvertFromSysUnits(t2, WBFL::Units::Measure::Degree));
       WriteStringToCell(_T("Theta2"), strValue);
    }
 
@@ -629,7 +629,7 @@ Range CExcelExporterAddin::GetRangeAtLocation(IndexType worksheetIdx, LPCTSTR st
    CString strrow = trunc_address.Right(cnt - pn - 1);
 
    long rownum;
-   if (sysTokenizer::ParseLong(strrow, &rownum))
+   if (WBFL::System::Tokenizer::ParseLong(strrow, &rownum))
    {
       rownum += (long)rowIdx;
 

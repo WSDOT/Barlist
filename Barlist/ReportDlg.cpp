@@ -51,13 +51,47 @@ void CReportDlg::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CReportDlg, CDialog)
-   ON_BN_CLICKED(IDC_PRINT, &CReportDlg::OnClickedPrint)
-   ON_WM_DESTROY()
-   ON_WM_SHOWWINDOW()
+    ON_BN_CLICKED(IDC_PRINT, &CReportDlg::OnClickedPrint)
+    ON_BN_CLICKED(IDC_CHECK_QTY_BY_GROUP, &CReportDlg::UpdateReport)
+    ON_WM_DESTROY()
+    ON_WM_SHOWWINDOW()
 END_MESSAGE_MAP()
 
 
+
+
+
 // CReportDlg message handlers
+
+void CReportDlg::UpdateReport()
+{
+    CWnd* pReport = GetDlgItem(IDC_REPORT);
+    pReport->SetFont(&m_Font);
+
+    CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+
+    //define options parameter
+    
+    CButton* pCheckBox = (CButton*)GetDlgItem(IDC_CHECK_QTY_BY_GROUP);
+
+    if (pCheckBox->GetCheck() == BST_CHECKED) {
+        pDoc->SetReportOptions(CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES);
+    }
+    else if (pCheckBox->GetCheck() == BST_UNCHECKED)
+    {
+        pDoc->SetReportOptions(CBarlistDoc::ReportOptions::REPORT_TOTAL_QUANTITIES);
+    }
+
+
+    const auto& vReportLines = pDoc->GetReport().GetReport();
+    CString strReport;
+    for (auto line : vReportLines)
+    {
+        line.Replace(_T("\n"), _T("\r\n"));
+        strReport += line;
+    }
+    pReport->SetWindowText(strReport);
+}
 
 
 BOOL CReportDlg::OnInitDialog()
@@ -69,21 +103,23 @@ BOOL CReportDlg::OnInitDialog()
    CString strHeader = CReport::GetReportHeader();
    CWnd* pHeader = GetDlgItem(IDC_HEADER);
    pHeader->SetFont(&m_Font);
-   pHeader->SetWindowText(strHeader);
-
-   CWnd* pReport = GetDlgItem(IDC_REPORT);
-   pReport->SetFont(&m_Font);
 
    CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+   CBarlistDoc::ReportOptions options = pDoc->GetReportOptions();
+   CButton* pCheckBox = (CButton*)GetDlgItem(IDC_CHECK_QTY_BY_GROUP);
 
-   const auto& vReportLines = pDoc->GetReport().GetReport();
-   CString strReport;
-   for (auto line : vReportLines)
+   if (options == CBarlistDoc::ReportOptions::REPORT_TOTAL_QUANTITIES)
    {
-      line.Replace(_T("\n"), _T("\r\n"));
-      strReport += line;
+       pCheckBox->SetCheck(BST_UNCHECKED);
    }
-   pReport->SetWindowText(strReport);
+   else if (options == CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES)
+   {
+       pCheckBox->SetCheck(BST_CHECKED);
+   }
+
+   UpdateReport();
+
+   pHeader->SetWindowText(strHeader);
 
    CButton* pPrint = (CButton*)GetDlgItem(IDC_PRINT);
    HICON hPrintIcon = (HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_PRINT), IMAGE_ICON, 16, 16, 0);
@@ -97,6 +133,8 @@ BOOL CReportDlg::OnInitDialog()
 
    return TRUE;  // return TRUE unless you set the focus to a control
                  // EXCEPTION: OCX Property Pages should return FALSE
+
+
 }
 
 void CReportDlg::OnClickedPrint()

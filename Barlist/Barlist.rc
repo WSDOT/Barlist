@@ -61,8 +61,8 @@ IDR_BARLIST_10_TO_20_XSLT 256                     ".\\Schema\\Barlist_Version_1.
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 7,0,5,0
- PRODUCTVERSION 7,0,5,0
+ FILEVERSION 8,0,0,4
+ PRODUCTVERSION 8,0,0,4
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -80,12 +80,12 @@ BEGIN
             VALUE "Comments", "A member of the Alternate Route Project"
             VALUE "CompanyName", "Washington State Department of Transportation"
             VALUE "FileDescription", "Barlist Module"
-            VALUE "FileVersion", "7.0.5.0"
+            VALUE "FileVersion", "8.0.0.4"
             VALUE "InternalName", "Barlist"
             VALUE "LegalCopyright", "Copyright © 1999-2023, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Barlist.DLL"
             VALUE "ProductName", "Barlist Module"
-            VALUE "ProductVersion", "7.0.5.0"
+            VALUE "ProductVersion", "8.0.0.4"
         END
     END
     BLOCK "VarFileInfo"
@@ -599,10 +599,12 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFR
 CAPTION "Report"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "Close",IDOK,7,7,50,14
-    EDITTEXT        IDC_HEADER,7,22,697,112,ES_MULTILINE | ES_READONLY
-    EDITTEXT        IDC_REPORT,7,133,697,140,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+    DEFPUSHBUTTON   "Close",IDOK,6,7,50,14
+    EDITTEXT        IDC_HEADER,7,24,697,97,ES_MULTILINE | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_REPORT,7,124,697,151,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | WS_VSCROLL
     PUSHBUTTON      "Print",IDC_PRINT,60,7,15,14,BS_ICON
+    CONTROL         "Include quantities by group",IDC_CHECK_QTY_BY_GROUP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,79,7,102,10
 END
 
 IDD_COLLABORATION_MANAGER DIALOGEX 0, 0, 253, 213
@@ -728,6 +730,7 @@ BEGIN
     0, 0, 0, 0,
     0, 0, 100, 0,
     0, 0, 100, 100,
+    0, 0, 0, 0,
     0, 0, 0, 0
 END
 

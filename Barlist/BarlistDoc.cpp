@@ -136,6 +136,8 @@ CBarlistDoc::CBarlistDoc()
 
    m_dwBarlistEventCookie = 0;
 
+   m_reportOptions = ReportOptions::REPORT_TOTAL_QUANTITIES;
+
    EAFGetApp()->RemoveUnitModeListener(this); // hold off on listening for unit mode change events until after the document is loaded
 }
 
@@ -175,6 +177,7 @@ BOOL CBarlistDoc::Init()
 
    return __super::Init();
 }
+
 
 void CBarlistDoc::GetBarlist(IBarlist** ppBarlist)
 {
@@ -706,6 +709,17 @@ void CBarlistDoc::LoadDocumentSettings()
 
    eafTypes::UnitMode unitMode = (eafTypes::UnitMode)(pApp->GetProfileInt(_T("Settings"), _T("Units"), (int)eafTypes::umUS));
    EAFGetApp()->SetUnitsMode(unitMode);
+
+   auto report_options_string = pApp->GetProfileString(_T("Settings"), _T("ReportOptions"),_T("Report Total Quantities"));
+
+   if (report_options_string == L"Report Total Quantities")
+   {
+       m_reportOptions = ReportOptions::REPORT_TOTAL_QUANTITIES;
+   }
+   else if (report_options_string == L"Report Total and Group Quantities")
+   {
+       m_reportOptions = ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES;
+   }
 }
 
 void CBarlistDoc::SaveDocumentSettings()
@@ -716,6 +730,18 @@ void CBarlistDoc::SaveDocumentSettings()
    CWinApp* pApp = AfxGetApp();
    VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("MarkIncrement"), m_MarkIncrement));
    VERIFY(pApp->WriteProfileInt(_T("Settings"), _T("Units"), (int)(EAFGetApp()->GetUnitsMode())));
+
+   if (m_reportOptions == ReportOptions::REPORT_TOTAL_QUANTITIES)
+   {
+       VERIFY(pApp->WriteProfileString(_T("Settings"), _T("ReportOptions"),_T("Report Total Quantities")));
+   }
+   else if (m_reportOptions == ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES)
+   {
+       VERIFY(pApp->WriteProfileString(_T("Settings"), _T("ReportOptions"), _T("Report Total and Group Quantities")));
+   }
+
+
+   
 }
 
 void CBarlistDoc::SetModifiedFlag(BOOL bModified)
@@ -935,7 +961,7 @@ CString CBarlistDoc::GetDocumentationSetName()
 
 CString CBarlistDoc::GetDocumentationMapFile()
 {
-   sysAutoVariable<bool> autoVar(&m_bGettingDocumentationMapFile, true);
+   WBFL::System::AutoVariable<bool> autoVar(&m_bGettingDocumentationMapFile, true);
    return __super::GetDocumentationMapFile();
 }
 
@@ -943,7 +969,7 @@ CString CBarlistDoc::AutoIncrementMark(const CString& strMark) const
 {
    CString strNewMark(strMark);
    ULONG mark;
-   if (sysTokenizer::ParseULong(strMark, &mark))
+   if (WBFL::System::Tokenizer::ParseULong(strMark, &mark))
    {
       mark += m_MarkIncrement;
       strNewMark.Format(_T("%ld"), mark);
@@ -1056,12 +1082,22 @@ void CBarlistDoc::CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const
    clone.CopyTo(ppClone);
 }
 
+void CBarlistDoc::SetReportOptions(const CBarlistDoc::ReportOptions& reportOptions)
+{
+    m_reportOptions = reportOptions;
+}
+
+CBarlistDoc::ReportOptions CBarlistDoc::GetReportOptions() const
+{
+    return m_reportOptions;
+}
+
 CReport& CBarlistDoc::GetReport()
 {
    if (m_bDirtyReport)
    {
       m_Report.BuildReport(m_Barlist);
-      m_bDirtyReport = false;
+      m_bDirtyReport = true;
    }
    return m_Report;
 }

@@ -105,9 +105,18 @@ void CReport::BuildReport(IBarlist* pBarlist)
    m_vReportLines.clear();
    m_vReportLines.reserve(1000);
 
-   ReportGroups(pBarlist);
-   m_vReportLines.push_back(_T("\n"));
-   ReportSummary(pBarlist);
+   CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
+   if (pDoc->GetReportOptions() == CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES)
+   {
+       ReportGroups(pBarlist);
+       ReportQuantitiesByGroup(pBarlist);
+       ReportQuantities(pBarlist);
+   }
+   else
+   {
+       ReportGroups(pBarlist);
+       ReportQuantities(pBarlist);
+   }
 }
 
 void CReport::ReportGroups(IBarlist* pBarlist)
@@ -272,7 +281,7 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
    if (vbSupported == VARIANT_TRUE)
    {
       CString strT1;
-      strT1.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t1, pDisplayUnits->Angle.UnitOfMeasure));
+      strT1.Format(_T(" %3.0f"), WBFL::Units::ConvertFromSysUnits(t1, pDisplayUnits->Angle.UnitOfMeasure));
       strBend += strT1;
    }
    else
@@ -284,7 +293,7 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
    if (vbSupported == VARIANT_TRUE)
    {
       CString strT2;
-      strT2.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t2, pDisplayUnits->Angle.UnitOfMeasure));
+      strT2.Format(_T(" %3.0f"), WBFL::Units::ConvertFromSysUnits(t2, pDisplayUnits->Angle.UnitOfMeasure));
       strBend += strT2;
    }
    else
@@ -351,63 +360,124 @@ CString CReport::GetMaterial(MaterialType material,VARIANT_BOOL vbEpoxy)
    return strMaterial;
 }
 
-void CReport::ReportSummary(IBarlist* pBarlist)
+
+void CReport::AddReportHeader()
 {
-   m_vReportLines.push_back(_T("Summary of Quantities:\n"));
-   for (int i = 0; i < MATERIAL_COUNT; i++)
-   {
-      if (i != 0)
-      {
-         m_vReportLines.push_back(_T("\n"));
-      }
+    CString columnHeader;
+    columnHeader.Format(_T("%-30s %24s %26s %23s %31s\n"),
+        _T("Material"), _T("Substructure"), _T("Substructure w/Epoxy"),
+        _T("Superstructure"), _T("Superstructure w/Epoxy"));
+    m_vReportLines.push_back(columnHeader);
+}
 
-      MaterialType material = (MaterialType)(i);
 
-      CString strMaterial;
-      strMaterial.Format(_T("%s\n"),GetMaterialSpecification(material));
-      m_vReportLines.push_back(strMaterial);
 
-      Float64 sub, subEpoxy, super, superEpoxy;
-      pBarlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
-      pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
-      pBarlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
-      pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+void CReport::AddMaterialDataToReport(MaterialType material, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy)
+{
+    CString strMaterial;
+    strMaterial.Format(_T("%-30s "), GetMaterialSpecification(material));
 
-      if (material == D7957)
-      {
-         CString strSub;
-         strSub.Format(_T("Substructure:           %s\n"), Formatter::FormatLength(sub));
-         m_vReportLines.push_back(strSub);
+    if (material == D7957)
+    {
+        strMaterial.AppendFormat(_T("%23s %25s %25s %25s "), Formatter::FormatLength(sub), _T(""), Formatter::FormatLength(super), _T(""));
+    }
+    else
+    {
+        strMaterial.AppendFormat(_T("%22s "), Formatter::FormatMass(sub));
 
-         CString strSuper;
-         strSuper.Format(_T("Superstructure:         %s\n"), Formatter::FormatLength(super));
-         m_vReportLines.push_back(strSuper);
-      }
-      else
-      {
-         CString strSub;
-         strSub.Format(_T("Substructure:           %s\n"), Formatter::FormatMass(sub));
-         m_vReportLines.push_back(strSub);
+        if (CanBeEpoxyCoated(material))
+        {
+            strMaterial.AppendFormat(_T("%22s "), Formatter::FormatMass(subEpoxy));
+        }
+        else
+        {
+            strMaterial.AppendFormat(_T("%22s "), _T(""));
+        }
 
-         if (CanBeEpoxyCoated(material))
-         {
-            CString strSubEpoxy;
-            strSubEpoxy.Format(_T("Substructure w/Epoxy:   %s\n"), Formatter::FormatMass(subEpoxy));
-            m_vReportLines.push_back(strSubEpoxy);
-         }
+        strMaterial.AppendFormat(_T("%27s "), Formatter::FormatMass(super));
 
-         CString strSuper;
-         strSuper.Format(_T("Superstructure:         %s\n"), Formatter::FormatMass(super));
-         m_vReportLines.push_back(strSuper);
+        if (CanBeEpoxyCoated(material))
+        {
+            strMaterial.AppendFormat(_T("%25s "), Formatter::FormatMass(superEpoxy));
+        }
+        else
+        {
+            strMaterial.AppendFormat(_T("%25s "), _T(""));
+        }
+    }
+    m_vReportLines.push_back(strMaterial);
+}
 
-         if (CanBeEpoxyCoated(material))
-         {
-            CString strSuperEpoxy;
-            strSuperEpoxy.Format(_T("Superstructure w/Epoxy: %s\n"), Formatter::FormatMass(superEpoxy));
-            m_vReportLines.push_back(strSuperEpoxy);
-         }
-      }
-   }
+
+
+void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
+{
+    USES_CONVERSION;
+
+    CComPtr<IGroupCollection> groups;
+    pBarlist->get_Groups(&groups);
+    long nGroups;
+    groups->get_Count(&nGroups);
+
+    for (auto i = 0; i < nGroups; i++)
+    {
+        CComPtr<IGroup> group;
+        groups->get_Item(CComVariant(i), &group);
+        CComBSTR bstrGroupName;
+        group->get_Name(&bstrGroupName);
+
+        CString strGroupHeading;
+        strGroupHeading.Format(_T("\nGroup : %s\n"), OLE2T(bstrGroupName));
+        m_vReportLines.push_back(strGroupHeading);
+
+        AddReportHeader();
+
+        for (int j = 0; j < MATERIAL_COUNT; j++)
+        {
+            if (j != 0)
+            {
+                m_vReportLines.push_back(_T("\n"));
+            }
+
+            MaterialType material = static_cast<MaterialType>(j);
+
+            Float64 sub{ 0.0 }, subEpoxy{ 0.0 }, super{ 0.0 }, superEpoxy{ 0.0 };
+            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_TRUE /*epoxy*/, VARIANT_TRUE /*substructure*/, &subEpoxy);
+            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE /*substructure*/, &sub);
+            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_TRUE /*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
+            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+
+            AddMaterialDataToReport(material, sub, subEpoxy, super, superEpoxy);
+        }
+        m_vReportLines.push_back(_T("\n"));
+    }
+}
+
+
+void CReport::ReportQuantities(IBarlist* pBarlist)
+{
+    CString strSummaryHeading{ _T("\nSummary of Quantities:\n") };
+    m_vReportLines.push_back(strSummaryHeading);
+
+    AddReportHeader();
+
+    for (int i = 0; i < MATERIAL_COUNT; i++)
+    {
+        if (i != 0)
+        {
+            m_vReportLines.push_back(_T("\n"));
+        }
+
+        MaterialType material = static_cast<MaterialType>(i);
+
+        Float64 sub{ 0.0 }, subEpoxy{ 0.0 }, super{ 0.0 }, superEpoxy{ 0.0 };
+        pBarlist->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_TRUE /*substructure*/, &subEpoxy);
+        pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE /*substructure*/, &sub);
+        pBarlist->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
+        pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+
+        AddMaterialDataToReport(material, sub, subEpoxy, super, superEpoxy);
+    }
 }
 
 void CReport::PrepareForPrinting(CDC* pDC,CPrintInfo* pInfo)

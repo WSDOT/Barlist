@@ -382,7 +382,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    if (vbSupported == VARIANT_TRUE)
    {
       CString strT1;
-      strT1.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t1, pDisplayUnits->Angle.UnitOfMeasure));
+      strT1.Format(_T(" %3.0f"), WBFL::Units::ConvertFromSysUnits(t1, pDisplayUnits->Angle.UnitOfMeasure));
       strBend += strT1;
    }
    else
@@ -394,7 +394,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    if (vbSupported == VARIANT_TRUE)
    {
       CString strT2;
-      strT2.Format(_T(" %3.0f"), ::ConvertFromSysUnits(t2, pDisplayUnits->Angle.UnitOfMeasure));
+      strT2.Format(_T(" %3.0f"), WBFL::Units::ConvertFromSysUnits(t2, pDisplayUnits->Angle.UnitOfMeasure));
       strBend += strT2;
    }
    else

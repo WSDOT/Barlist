@@ -130,7 +130,7 @@ public:
    {
       m_U = newVal;
       m_bIsDirty = true;
-      Fire_OnBendChanged();
+      this->Fire_OnBendChanged();
       return S_OK;
    }
 
@@ -144,7 +144,7 @@ public:
    {
       m_W = newVal;
       m_bIsDirty = true;
-      Fire_OnBendChanged();
+      this->Fire_OnBendChanged();
       return S_OK;
    }
 
@@ -158,7 +158,7 @@ public:
    {
       m_X = newVal;
       m_bIsDirty = true;
-      Fire_OnBendChanged();
+      this->Fire_OnBendChanged();
       return S_OK;
    }
 
@@ -172,7 +172,7 @@ public:
    {
       m_Y = newVal;
       m_bIsDirty = true;
-      Fire_OnBendChanged();
+      this->Fire_OnBendChanged();
       return S_OK;
    }
 
@@ -186,7 +186,7 @@ public:
    {
       m_Z = newVal;
       m_bIsDirty = true;
-      Fire_OnBendChanged();
+      this->Fire_OnBendChanged();
       return S_OK;
    }
 
@@ -200,7 +200,7 @@ public:
    {
       m_T1 = newVal;
       m_bIsDirty = true;
-      Fire_OnBendChanged();
+      this->Fire_OnBendChanged();
       return S_OK;
    }
 
@@ -214,7 +214,7 @@ public:
    {
       m_T2 = newVal;
       m_bIsDirty = true;
-      Fire_OnBendChanged();
+      this->Fire_OnBendChanged();
       return S_OK;
    }
 

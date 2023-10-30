@@ -40,8 +40,8 @@ public:
    static void USLength(Float64 length, Int32* pFt, Float64* pInch);
 
 private:
-   static unitmgtMassData gs_MassUnit;
-   static unitmgtForceData gs_WeightUnit;
-   static std::array<unitmgtLengthData, 2> gs_LengthUnit;
+   static WBFL::Units::MassData gs_MassUnit;
+   static WBFL::Units::ForceData gs_WeightUnit;
+   static std::array<WBFL::Units::LengthData, 2> gs_LengthUnit;
    static CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
 };

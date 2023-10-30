@@ -26,9 +26,9 @@
 #include <EAF\EAFUtilities.h>
 #include <EAF\EAFApp.h>
 
-unitmgtMassData Formatter::gs_MassUnit(unitMeasure::Kilogram, 0.001, 9, 0);
-unitmgtForceData Formatter::gs_WeightUnit(unitMeasure::Pound, 0.001, 9, 0);
-std::array<unitmgtLengthData, 2> Formatter::gs_LengthUnit{ unitmgtLengthData(unitMeasure::Meter,0.001,9,0),unitmgtLengthData(unitMeasure::Feet,0.001,9,0) };
+WBFL::Units::MassData Formatter::gs_MassUnit(WBFL::Units::Measure::Kilogram, 0.001, 9, 0);
+WBFL::Units::ForceData Formatter::gs_WeightUnit(WBFL::Units::Measure::Pound, 0.001, 9, 0);
+std::array<WBFL::Units::LengthData, 2> Formatter::gs_LengthUnit{ WBFL::Units::LengthData(WBFL::Units::Measure::Meter,0.001,9,0),WBFL::Units::LengthData(WBFL::Units::Measure::Feet,0.001,9,0) };
 CComPtr<IAnnotatedDisplayUnitFormatter> Formatter::g_formatter;
 
 BOOL Formatter::Init()
@@ -43,7 +43,7 @@ BOOL Formatter::Init()
          AfxMessageBox(strMessage);
          return FALSE;
       }
-      g_formatter->put_Annotation(_T("'-,\""));
+      g_formatter->put_Annotation(CComBSTR("'-,\""));
       g_formatter->put_Multiplier(12.0);
       g_formatter->put_OffsetDigits(0);
       g_formatter->FormatSpecifiers(7, 1, tjRight, nftFixed, 0.0001);
@@ -100,13 +100,13 @@ CString Formatter::FormatLength(Float64 length, bool bUnits)
       {
          USES_CONVERSION;
          CComBSTR bstr;
-         g_formatter->Format(::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
+         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), CComBSTR(""), &bstr);
          return OLE2T(bstr);
       }
       else
       {
          // convert from system units
-         length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
+         length = WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
          int sign = BinarySign(length);
          length = fabs(length);
          long feet = (long)floor(length);
@@ -149,7 +149,7 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
       {
          USES_CONVERSION;
          CComBSTR bstr;
-         g_formatter->Format(::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), _T(""), &bstr);
+         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), CComBSTR(""), &bstr);
          return OLE2T(bstr);
       }
       else
@@ -180,24 +180,24 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
 
 bool Formatter::IsValidLength(const CString& strValue, Float64* pValue)
 {
-   sysTokenizer tokenizer(_T(" "));
+   WBFL::System::Tokenizer tokenizer(_T(" "));
    tokenizer.push_back(strValue);
    auto size = tokenizer.size();
    if (size == 1)
    {
       // there is only one token so strValue must be decimal length
-      return sysTokenizer::ParseDouble(tokenizer[0].c_str(), pValue);
+      return WBFL::System::Tokenizer::ParseDouble(tokenizer[0].c_str(), pValue);
    }
    else if (size == 2)
    {
       // there are 2 tokens... feet inch
       Float64 ft, in;
-      if (!sysTokenizer::ParseDouble(tokenizer[0].c_str(), &ft))
+      if (!WBFL::System::Tokenizer::ParseDouble(tokenizer[0].c_str(), &ft))
       {
          return false;
       }
 
-      if (!sysTokenizer::ParseDouble(tokenizer[1].c_str(), &in))
+      if (!WBFL::System::Tokenizer::ParseDouble(tokenizer[1].c_str(), &in))
       {
          return false;
       }
@@ -216,7 +216,7 @@ bool Formatter::ParseLength(const CString& strValue, Float64* pValue)
       return false;
    }
 
-   unitmgtLengthData* pLength;
+   WBFL::Units::LengthData* pLength;
    if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
    {
       pLength = &gs_LengthUnit[0];
@@ -226,7 +226,7 @@ bool Formatter::ParseLength(const CString& strValue, Float64* pValue)
       pLength = &gs_LengthUnit[1];
    }
 
-   *pValue = ::ConvertToSysUnits(value, pLength->UnitOfMeasure);
+   *pValue = WBFL::Units::ConvertToSysUnits(value, pLength->UnitOfMeasure);
    return true;
 }
 
@@ -266,7 +266,7 @@ CString Formatter::FormatStatusMessage(IStatusMessage* pStatusMessage)
 
 void Formatter::USLength(Float64 length, Int32* pFt, Float64* pInch)
 {
-   length = ::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
+   length = WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
    int sign = BinarySign(length);
    length = fabs(length);
    long feet = (long)floor(length);

@@ -30,8 +30,13 @@
 
 #include "Events.h"
 
-#pragma Reminder("Once we switch to C++ 17/20, we can use the native std::filesystem instead of boost::filesystem")
+#if (201703L <= _MSVC_LANG )
+#include <filesystem>
+#define FSNamespace std
+#else
 #include <boost\filesystem.hpp>
+#define FSNamespace boost
+#endif
 
 // CCollaborationDoc
 
@@ -65,7 +70,7 @@ BOOL CCollaborationDoc::OpenTheDocument(LPCTSTR lpszPathName)
    USES_CONVERSION;
    m_vFiles.clear();
 
-   boost::filesystem::path collaboration_file_path(lpszPathName); // create a path for the filename
+   FSNamespace::filesystem::path collaboration_file_path(lpszPathName); // create a path for the filename
    std::ifstream ifile(collaboration_file_path.generic_string()); // open a file stream to read from
 
    if (ifile.fail() || !ifile.is_open())
@@ -101,10 +106,13 @@ BOOL CCollaborationDoc::OpenTheDocument(LPCTSTR lpszPathName)
          }
          else
          {
-            boost::filesystem::path rel_path(strLine); // relative path to barlist file used in the collaboration
-
             // convert the relative path to a full path
-            auto full_path_name = boost::filesystem::canonical(rel_path, collaboration_file_path);
+#if (201703L <= _MSVC_LANG )
+            auto full_path_name = FSNamespace::filesystem::canonical(collaboration_file_path);
+#else
+            FSNamespace::filesystem::path rel_path(strLine); // relative path to barlist file used in the collaboration
+            auto full_path_name = FSNamespace::filesystem::canonical(rel_path, collaboration_file_path);
+#endif
             m_vFiles.push_back(full_path_name.string());
          }
       }
@@ -152,7 +160,7 @@ BOOL CCollaborationDoc::SaveTheDocument(LPCTSTR lpszPathName)
 {
    USES_CONVERSION;
 
-   boost::filesystem::path collaboration_file_path(lpszPathName); // create a file path object
+   FSNamespace::filesystem::path collaboration_file_path(lpszPathName); // create a file path object
    std::ofstream ofile(collaboration_file_path.generic_string()); // open a file stream
    if (ofile.bad())
    {
@@ -165,10 +173,10 @@ BOOL CCollaborationDoc::SaveTheDocument(LPCTSTR lpszPathName)
       // iterate over the files the make up the collaboration... these a full path filenames
       for (const auto& fileName : m_vFiles)
       {
-         boost::filesystem::path this_file(fileName);
+         FSNamespace::filesystem::path this_file(fileName);
 
          // determine the relative location of the barlist file compared to the collaboration file
-         boost::filesystem::path rel_path = this_file.lexically_relative(collaboration_file_path);
+         FSNamespace::filesystem::path rel_path = this_file.lexically_relative(collaboration_file_path);
 
          if (rel_path.compare(_T("")) == 0)
          {
