@@ -18,5 +18,5 @@ echo ^</script^> >> %SEARCH_HTML%
 %ARPDIR%\BridgeLink\RegFreeCOM\x64\Release\MakeDocMap Barlist
 rmdir /S /Q %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\
 mkdir %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\
-copy %ARPDIR%\Barlist\Barlist\Documentation\doc\html\* %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\
+xcopy /s /y /d %ARPDIR%\Barlist\Barlist\Documentation\doc\html\* %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\
 copy %ARPDIR%\Barlist\Barlist\Documentation\Barlist.dm %ARPDIR%\BridgeLink\Docs\Barlist\Barlist\%1\BarlistDocs.dm
