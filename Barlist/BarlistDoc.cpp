@@ -281,6 +281,20 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
 {
    USES_CONVERSION;
 
+   // The Xalan and Xerses libraries error out when the lpszPathName contains a % character.
+   // We are not sure how to fix this problem.
+   // As a stop-gap measure, provide an error message the provides instructions to the user
+   // rather than a generic error message.
+   auto pos = std::_tstring(lpszPathName).find('%');
+   if (pos != std::_tstring::npos)
+   {
+      CString strMsg;
+      strMsg.Format(_T("Error opening %s\n\nBarlist files cannot have %% in the name or directory path."), lpszPathName);
+      AfxMessageBox(strMsg);
+      return FALSE;
+   }
+
+
    CComPtr<IBarlist> barlist;
    if (*ppBarlist == nullptr)
    {
