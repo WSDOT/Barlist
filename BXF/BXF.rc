@@ -72,7 +72,7 @@ BEGIN
             VALUE "FileDescription", "BXF Module"
             VALUE "FileVersion", "8.1.0.1"
             VALUE "InternalName", "BXF"
-            VALUE "LegalCopyright", "Copyright © 1999-2024, Washington State Department of Transportation, All Rights Reserved"
+            VALUE "LegalCopyright", "Copyright © 1999-2025, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "BXF.DLL"
             VALUE "ProductName", "BXF Module"
             VALUE "ProductVersion", "8.1.0.1"
