@@ -222,6 +222,7 @@ BEGIN
     WARN_DIMLESSTHANHOOK    "WARNING : %1 is smaller than standard hook %2"
     WARN_DUPMARKNUMBER      "WARNING : Mark Number %1 is currently in use"
     WARN_SHOULDBEGREATERTHAN "WARNING: %1 should be greater than %2"
+    WARN_LARGEBAR           "WARNING: Due to safety concerns, CRSI does not recommend bending bars larger than #14 with grade designation of Grade 75 or higher"
 END
 
 STRINGTABLE
