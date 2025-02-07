@@ -27,6 +27,7 @@
 #include "stdafx.h"
 #include "Bars.h"
 #include "BarRecord.h"
+#include <unordered_set>
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarRecord
@@ -393,6 +394,29 @@ void CBarRecord::UpdateStatus()
       CComBSTR msg;
       msg.LoadString( WARN_DUPMARKNUMBER );
       m_StatusMgr.AddStatusMsg( msg, CComVariant(m_Mark), CComVariant() );
+   }
+
+   // Check if bar is larger than #14 and Grade 75 or higher
+   std::unordered_set<int> grade75andHigher = {
+	   A706_Grade80,
+	   A1035_Grade100,
+	   A1035_Grade120,
+	   A767_A1094_Grade80,
+	   A767_A1094_Grade100,
+	   A955_Grade75,
+	   A955_Grade80
+   };
+
+   BSTR bstrSize;
+   get_Size(&bstrSize);
+
+   std::string size(OLE2A(bstrSize));
+   if (grade75andHigher.find(m_Material) != grade75andHigher.end() && size == "#18")
+   {
+	   m_StatusMgr.SetStatusLevel(stWarning);
+	   CComBSTR msg;
+	   msg.LoadString(WARN_LARGEBAR);
+	   m_StatusMgr.AddStatusMsg(msg, CComVariant(), CComVariant());
    }
 
    // Check if the number required is evenly divided by the number each
