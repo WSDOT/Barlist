@@ -33,6 +33,7 @@
 
 #include <EAF\EAFDocument.h>
 #include <Bars\Bars.h>
+#include "PluginManager.h"
 
 #include <array>
 #include <Units\IndirectMeasure.h>
@@ -117,7 +118,7 @@ protected:
    CComPtr<IBarlist> m_Barlist;
    DWORD m_dwBarlistEventCookie;
 
-   CComPtr<IAddinMgr> m_AddinMgr;
+   PluginManager m_PluginMgr;
 
    UINT m_ToolbarID;
 
@@ -167,7 +168,7 @@ protected:
    void GetBarlistEvents(BOOL bListenForEvents);
 
    //virtual void OnUnitsModeChanging() override;
-   virtual void OnUnitsModeChanged(eafTypes::UnitMode newUnitMode) override;
+   virtual void OnUnitsModeChanged(WBFL::EAF::UnitMode newUnitMode) override;
 };
 
 /////////////////////////////////////////////////////////////////////////////

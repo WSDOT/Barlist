@@ -79,7 +79,7 @@
     </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\WBFL\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories);$(ARPDIR)\BridgeLink\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -153,7 +153,7 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_ATL_NO_UUIDOF;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
@@ -242,8 +242,6 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll 
   </ItemGroup>
   <ItemGroup>
     <None Include="Barlist.def" />
-    <None Include="ComponentInfo.rgs" />
-    <None Include="Plugin.rgs" />
     <None Include="res\Type_50.emf" />
     <None Include="res\Type_51.emf" />
     <None Include="res\Type_52.emf" />
@@ -282,19 +280,6 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll 
     <None Include="res\Type_Unknown.emf" />
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="Barlist.idl">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\Barlist.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Barlist_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\Barlist_i.c</InterfaceIdentifierFileName>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\WBFL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Barlist.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Barlist_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\Barlist_i.c</InterfaceIdentifierFileName>
-    </Midl>
-    <Midl Include="..\SDK\Include\BarlistAddin.idl" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Barlist.rc">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -303,7 +288,7 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll 
   <ItemGroup>
     <ClInclude Include="..\Common\Formatter.h" />
     <ClInclude Include="..\Include\BarlistVersion.h" />
-    <ClInclude Include="..\SDK\Include\BarlistAddinCatid.h" />
+    <ClInclude Include="..\SDK\Include\BarlistPlugin.h" />
     <ClInclude Include="BarDlg.h" />
     <ClInclude Include="BarDlgStateMachine.h" />
     <ClInclude Include=".\Schema\Barlist.hxx" />
@@ -316,6 +301,7 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll 
     <ClInclude Include="BarlistListView.h" />
     <ClInclude Include="BendFactory.h" />
     <ClInclude Include="BarlistFrame.h" />
+    <ClInclude Include="CLSID.h" />
     <ClInclude Include="CollaborationDoc.h" />
     <ClInclude Include="CollaborationDocTemplate.h" />
     <ClInclude Include="CollaborationManagerDlg.h" />
@@ -326,6 +312,7 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll 
     <ClInclude Include="mfcdual.h" />
     <ClInclude Include="OptionsDlg.h" />
     <ClInclude Include="Plugin.h" />
+    <ClInclude Include="PluginManager.h" />
     <ClInclude Include="PropertiesDlg.h" />
     <ClInclude Include="QuantitiesDlg.h" />
     <ClInclude Include="Report.h" />

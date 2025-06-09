@@ -27,7 +27,7 @@ class CBarlistDocTemplate : public CEAFDocTemplate
 {
 public:
    CBarlistDocTemplate(UINT nIDResource,
-      IEAFCommandCallback* pCallback,
+      std::shared_ptr<WBFL::EAF::ICommandCallback> pCallback,
       CRuntimeClass* pDocClass,
       CRuntimeClass* pFrameClass,
       CRuntimeClass* pViewClass,

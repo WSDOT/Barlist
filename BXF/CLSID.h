@@ -20,44 +20,10 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
-
-// BXFAddin.h : Declaration of the CBXFAddin
-
 #pragma once
 
-#include "BarlistPlugin.h"
-#include <EAF\ComponentObject.h>
-#include "Barlst.h"
+#include <initguid.h>
 
-class CBXFApp : public CWinApp
-{
-public:
-   virtual BOOL InitInstance() override;
-   virtual int ExitInstance() override;
-};
-
-/////////////////////////////////////////////////////////////////////////////
-// CBXFAddin
-class CBXFAddin : public WBFL::EAF::ComponentObject,
-   public IBarlistPlugin
-{
-public:
-	CBXFAddin()
-	{
-	}
-
-// IBarlistPlugin
-public:
-   void Init(CEAFDocument* pDoc) override;
-   void Terminate() override;
-   void Go(IBarlist* pBarlist) override;
-   CString GetMenuItem() const override;
-
-private:
-   void CreateBarlistExchangeFile(const CString& strFile, IBarlist* pBarlist);
-   void ExchangeBarRecords(CStdioFile* pFile, IGroup* pGroup);
-   void ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord);
-   CString ReportBend(IBend* pBend, bool bVaries);
-   void ReportErrors(CStdioFile* pFile, IBend* pBend);
-   CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
-};
+// {94C24A7B-D39A-4DD0-B086-8C695D977B26}
+DEFINE_GUID(CLSID_BXFAddin,
+   0x94c24a7b, 0xd39a, 0x4dd0, 0xb0, 0x86, 0x8c, 0x69, 0x5d, 0x97, 0x7b, 0x26);

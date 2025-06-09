@@ -23,7 +23,6 @@
 // Plugin.cpp : Implementation of CPlugin
 #include "stdafx.h"
 #include "resource.h"
-#include "Barlist_i.h"
 #include "Plugin.h"
 
 #include "BarlistFrame.h"
@@ -33,28 +32,11 @@
 #include "CollaborationDoc.h"
 #include "CollaborationDocTemplate.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-
-/////////////////////////////////////////////////////////////////////////////
-// CPlugin
-HRESULT CPlugin::FinalConstruct()
-{
-   return S_OK;
-}
-
-void CPlugin::FinalRelease()
-{
-}
-
 BOOL CPlugin::Init(CEAFApp* pParent)
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   m_DocumentationImpl.Init(this);
+   auto plugin = std::dynamic_pointer_cast<WBFL::EAF::IPluginApp>(shared_from_this());
+   m_DocumentationImpl.Init(plugin);
    return TRUE;
 }
 
@@ -81,7 +63,8 @@ std::vector<CEAFDocTemplate*> CPlugin::CreateDocTemplates()
 		RUNTIME_CLASS(CBarlistTreeView),
       nullptr,1);
 
-   pDocTemplate->SetPlugin(this);
+    auto pluginApp = std::dynamic_pointer_cast<WBFL::EAF::IPluginApp>(shared_from_this());
+    pDocTemplate->SetPluginApp(pluginApp);
 
    templates.push_back(pDocTemplate);
 
@@ -93,7 +76,7 @@ std::vector<CEAFDocTemplate*> CPlugin::CreateDocTemplates()
       RUNTIME_CLASS(CBarlistTreeView),
       nullptr, 1);
 
-   pDocTemplate->SetPlugin(this);
+   pDocTemplate->SetPluginApp(pluginApp);
 
    templates.push_back(pDocTemplate);
 
@@ -133,8 +116,8 @@ void CPlugin::LoadDocumentationMap()
    return m_DocumentationImpl.LoadDocumentationMap();
 }
 
-eafTypes::HelpResult CPlugin::GetDocumentLocation(LPCTSTR lpszDocSetName,UINT nID,CString& strURL)
+std::pair<WBFL::EAF::HelpResult,CString> CPlugin::GetDocumentLocation(LPCTSTR lpszDocSetName,UINT nID)
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   return m_DocumentationImpl.GetDocumentLocation(lpszDocSetName,nID,strURL);
+   return m_DocumentationImpl.GetDocumentLocation(lpszDocSetName,nID);
 }

@@ -33,7 +33,7 @@ public:
 	COptionsDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~COptionsDlg();
 
-   eafTypes::UnitMode m_UnitMode;
+   WBFL::EAF::UnitMode m_UnitMode;
    UINT m_MarkIncrement;
 
 // Dialog Data

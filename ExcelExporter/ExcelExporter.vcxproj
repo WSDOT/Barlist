@@ -187,18 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ExcelExporter.def" />
-    <CustomBuild Include="ExcelExporterAddin.rgs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="ExcelExporter.idl">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\ExcelExporter.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ExcelExporter_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ExcelExporter_i.c</InterfaceIdentifierFileName>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateStublessProxies>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ExcelExporter_i.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ExcelExporter_i.c</InterfaceIdentifierFileName>
-    </Midl>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ExcelExporter.rc">
@@ -208,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Formatter.h" />
+    <ClInclude Include="CLSID.h" />
     <ClInclude Include="ExcelExporterAddin.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="StdAfx.h" />

@@ -15,7 +15,6 @@
 #define IDR_BARRECORDCOLLECTION         110
 #define IDR_STATUSMESSAGECOLLECTION     111
 #define IDR_STATUSMESSAGE               112
-#define IDR_ADDINMGR                    113
 #define IDR_TYPE50                      114
 #define IDR_TYPE51                      115
 #define IDR_TYPE52                      116

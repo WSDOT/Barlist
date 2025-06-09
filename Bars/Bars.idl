@@ -32,7 +32,6 @@
 import "oaidl.idl";
 import "ocidl.idl";
 import "Barlst.idl";
-import "AddinMgr.idl";
 
 [
 	uuid(F1F5C05B-12AA-11D3-8932-006097C68A9C),
@@ -145,14 +144,6 @@ library BARSLib
 	coclass StatusMessage
 	{
 		[default] interface IStatusMessage;
-	};
-	[
-		uuid(12FCFC9B-1F41-11D3-8941-006097C68A9C),
-		helpstring("AddinMgr Class")
-	]
-	coclass AddinMgr
-	{
-		[default] interface IAddinMgr;
 	};
 
 	[

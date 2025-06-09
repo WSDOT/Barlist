@@ -35,18 +35,13 @@
 #include <initguid.h>
 #include "Bars.h"
 
-#include "BarlistAddinCatid.h"
-
 #include "Bars_i.c"
 #include "Barlist_i.c"
-#include "BarlistAddin_i.c"
-#include "AddinMgr_i.c"
 
 #include "BarInfoMgr.h"
 #include "BarRecord.h"
 #include "BarRecordCollection.h"
 #include "Barlist.h"
-#include "AddinMgrImp.h"
 #include "Type50.h"
 #include "Type51.h"
 #include "Type52.h"
@@ -100,7 +95,6 @@ OBJECT_ENTRY(CLSID_BarInfoMgr, CBarInfoMgr)
 OBJECT_ENTRY(CLSID_BarRecord, CBarRecord)
 OBJECT_ENTRY(CLSID_BarRecordCollection, CBarRecordCollection)
 OBJECT_ENTRY(CLSID_Barlist, CBarlist)
-OBJECT_ENTRY(CLSID_AddinMgr, CAddinMgr)
 OBJECT_ENTRY(CLSID_Type50, CType50)
 OBJECT_ENTRY(CLSID_Type51, CType51)
 OBJECT_ENTRY(CLSID_Type52, CType52)
@@ -189,29 +183,6 @@ STDAPI DllRegisterServer(void)
     HRESULT hr = _Module.RegisterServer(TRUE);
     if ( FAILED(hr) )
        return hr;
-
-   // Register the component category for Barlist Add-ins since the VB progam
-   // will have trouble doing it.
-   
-   // Create the standard COM Category Manager
-   ICatRegister* pICatReg = NULL;
-   hr = ::CoCreateInstance( CLSID_StdComponentCategoriesMgr,
-                            NULL,
-                            CLSCTX_ALL,
-                            IID_ICatRegister,
-                            (void**)&pICatReg );
-   if ( FAILED(hr) )
-      return hr;
-
-   // Fill in CATEGORYINFO struct
-   CATEGORYINFO CatInfo;
-   CatInfo.catid = CATID_BarlistAddin;
-   CatInfo.lcid = LOCALE_SYSTEM_DEFAULT;
-   wcscpy_s(CatInfo.szDescription,_countof(CatInfo.szDescription),L"BarList Addin Component");
-
-   // Register the category
-   hr = pICatReg->RegisterCategories(1,&CatInfo);
-   pICatReg->Release();
    
    return hr;
 }
@@ -224,32 +195,6 @@ STDAPI DllUnregisterServer(void)
    HRESULT hr = _Module.UnregisterServer(TRUE);
    if ( FAILED(hr) )
       return hr;
-
-   // Create the standard COM Category Manager
-   CComPtr<ICatRegister> pICatReg = NULL;
-   hr = ::CoCreateInstance( CLSID_StdComponentCategoriesMgr,
-                            NULL,
-                            CLSCTX_ALL,
-                            IID_ICatRegister,
-                            (void**)&pICatReg );
-   if ( FAILED(hr) )
-      return hr;
-
-   const int nID = 1;
-   CATID ID[nID];
-   ID[0] = CATID_BarlistAddin;
-
-   CComPtr<ICatInformation> pICatInfo = NULL;
-   hr = pICatReg->QueryInterface( IID_ICatInformation, (void**)&pICatInfo );
-
-   CComPtr<IEnumCLSID> pIEnumCLSID = NULL;
-   hr = pICatInfo->EnumClassesOfCategories( nID, ID, 0, NULL, &pIEnumCLSID );
-
-   CLSID clsid;
-   while( pIEnumCLSID->Next(1,&clsid,NULL) != S_FALSE )
-   {
-      pICatReg->UnRegisterCategories(nID,ID);
-   }
    
    return S_OK;
 }

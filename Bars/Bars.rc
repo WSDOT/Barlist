@@ -114,8 +114,6 @@ IDR_STATUSMESSAGECOLLECTION REGISTRY                "StatusMessageCollection.rgs
 
 IDR_STATUSMESSAGE       REGISTRY                "StatusMessage.rgs"
 
-IDR_ADDINMGR            REGISTRY                "AddinMgr.rgs"
-
 IDR_TYPE50              REGISTRY                "Type50.rgs"
 
 IDR_TYPE51              REGISTRY                "Type51.rgs"

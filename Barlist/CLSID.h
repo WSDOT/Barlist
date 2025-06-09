@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-// BXF - Barlist Exchange File
+// Barlist
 // Copyright © 1999-2025  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
@@ -20,32 +20,16 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
-// BXF.idl : IDL source for BXF.dll
-//
+#pragma once
 
-// This file will be processed by the MIDL tool to
-// produce the type library (Addin.tlb) and marshalling code.
+#include <guiddef.h>
 
-import "oaidl.idl";
-import "ocidl.idl";
-import "BarlistAddin.idl";
 
-[
-	uuid(12FCFC87-1F41-11D3-8941-006097C68A9C),
-	version(1.0),
-	helpstring("BXF 1.0 Type Library")
-]
-library BXFLib
-{
-	importlib("stdole32.tlb");
-	importlib("stdole2.tlb");
+// {3968162D-9F85-42EC-AF6B-19D544832B28}
+DEFINE_GUID(CLSID_BarlistComponentInfo,
+   0x3968162d, 0x9f85, 0x42ec, 0xaf, 0x6b, 0x19, 0xd5, 0x44, 0x83, 0x2b, 0x28);
 
-	[
-		uuid(B026E9AF-CCE7-41D4-AFBF-E2DEF7528EDA),
-		helpstring("BXFAddin Class")
-	]
-	coclass BXFAddin
-	{
-		[default] interface IBarlistAddin;
-	};
-};
+// {CFD04C61-6C91-42ED-8CAB-33DB07D08069}
+DEFINE_GUID(CLSID_BarlistPluginApp,
+   0xCFD04C61, 0x6C91, 0x42ED, 0x8C, 0xAB, 0x33, 0xDB, 0x07, 0xD0, 0x80, 0x69);
+

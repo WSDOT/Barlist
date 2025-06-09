@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="AddinMgr.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
-    <Midl Include="..\SDK\Include\BarlistAddin.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
     <Midl Include="..\SDK\Include\Barlst.idl">
       <Filter>Source Files</Filter>
     </Midl>
@@ -29,9 +23,6 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AddinMgrImp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BarCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -413,9 +404,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AddinMgrImp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BarCollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>

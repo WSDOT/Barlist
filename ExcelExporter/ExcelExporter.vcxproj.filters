@@ -29,11 +29,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="ExcelExporter.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="ExcelExporter.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
@@ -51,13 +46,13 @@
     <ClInclude Include="..\Common\Formatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CLSID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ExcelExporter.def">
       <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ExcelExporterAddin.rgs">
-      <Filter>Resource Files</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

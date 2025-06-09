@@ -23,16 +23,17 @@
 // ExcelExporterAddin.cpp : Implementation of CExcelExporterAddin
 #include "stdafx.h"
 
-#include "ExcelExporter_i.h"
 #include "ExcelExporterAddin.h"
 
 #include <EAF\EAFApp.h>
 #include <EAF\EAFDocument.h>
 
 #include "..\Common\Formatter.h"
+#include "CLSID.h"
 
+#include <EAF\ComponentModule.h>
 CExcelExporterApp theApp;
-CComModule _Module;
+WBFL::EAF::ComponentModule _Module;
 
 // Some constants to make the IDispatch calls easier
 COleVariant ovOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);  // optional parameter
@@ -74,33 +75,33 @@ CString GetMaterialDesignation(MaterialType material)
 
 CString GetMaterialGrade(MaterialType material)
 {
-   eafTypes::UnitMode unitMode = EAFGetApp()->GetUnitsMode();
+   WBFL::EAF::UnitMode unitMode = EAFGetApp()->GetUnitsMode();
    CString strGrade;
    switch (material)
    {
    case A706_Grade60:
    case A767_A1094_Grade60:
    case A955_Grade60:
-      strGrade = (unitMode == eafTypes::umUS ? _T("  ") : _T("41"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("  ") : _T("41"));
       break;
 
    case A955_Grade75:
-      strGrade = (unitMode == eafTypes::umUS ? _T("75") : _T("52"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("75") : _T("52"));
       break;
 
    case A706_Grade80:
    case A767_A1094_Grade80:
    case A955_Grade80:
-      strGrade = (unitMode == eafTypes::umUS ? _T("80") : _T("55"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("80") : _T("55"));
       break;
 
    case A1035_Grade100:
    case A767_A1094_Grade100:
-      strGrade = (unitMode == eafTypes::umUS ? _T("1X") : _T("69"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("1X") : _T("69"));
       break;
 
    case A1035_Grade120:
-      strGrade = (unitMode == eafTypes::umUS ? _T("12") : _T("83"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("12") : _T("83"));
       break;
 
    case D7957:
@@ -116,14 +117,14 @@ CString GetMaterialGrade(MaterialType material)
 }
 
 
-BEGIN_OBJECT_MAP(ObjectMap)
-   OBJECT_ENTRY(CLSID_ExcelExporterAddin, CExcelExporterAddin)
-END_OBJECT_MAP()
+EAF_BEGIN_OBJECT_MAP(ObjectMap)
+   EAF_OBJECT_ENTRY(CLSID_ExcelExporterAddin, CExcelExporterAddin)
+EAF_END_OBJECT_MAP()
 
 BOOL CExcelExporterApp::InitInstance()
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   _Module.Init(ObjectMap, m_hInstance);
+   _Module.Init(ObjectMap);
 
    if (!Formatter::Init())
    {
@@ -160,7 +161,7 @@ inline TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c)
 /////////////////////////////////////////////////////////////////////////////
 // CExcelExporterAddin
 
-HRESULT CExcelExporterAddin::FinalConstruct()
+CExcelExporterAddin::CExcelExporterAddin()
 {
    // Get the Excel template file folder
    CEAFApp* pApp = EAFGetApp();
@@ -192,17 +193,22 @@ HRESULT CExcelExporterAddin::FinalConstruct()
    }
 
    m_MaxRows = 56;
-
-   return S_OK;
 }
 
-STDMETHODIMP CExcelExporterAddin::Go(IBarlist* pBarlist)
+void CExcelExporterAddin::Init(CEAFDocument* pDoc)
+{
+}
+
+void CExcelExporterAddin::Terminate()
+{
+}
+
+void CExcelExporterAddin::Go(IBarlist* pBarlist)
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    if (pBarlist == NULL)
    {
       ::MessageBox(0, _T("An invalid barlist was provided."), _T(""), MB_OK);
-      return S_FALSE;
    }
 
    CString strBarlistFile;
@@ -234,14 +240,11 @@ STDMETHODIMP CExcelExporterAddin::Go(IBarlist* pBarlist)
       //strMsg.Format(_T("Barlist exported to Excel\r\n%s"),strFile);
       //AfxMessageBox(strMsg,MB_ICONINFORMATION | MB_OK);
    }
-   return S_OK;
 }
 
-STDMETHODIMP CExcelExporterAddin::get_MenuItem(BSTR *pVal)
+CString CExcelExporterAddin::GetMenuItem() const
 {
-   CComBSTR menuItem("Export Barlist to Excel");
-   *pVal = menuItem.Copy();
-   return S_OK;
+   return CString("Export Barlist to Excel");
 }
 
 void CExcelExporterAddin::ExportToExcel(const CString& strFilename, IBarlist* pBarlist)

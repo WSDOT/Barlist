@@ -43,7 +43,7 @@
 #include "Events.h"
 
 #include <EAF\EAFMainFrame.h>
-#include <EAF\EAFToolBar.h>
+#include <EAF\ToolBar.h>
 
 #include <MFCTools\Prompts.h>
 
@@ -68,11 +68,6 @@
 #include <xalanc/XalanTransformer/XalanTransformer.hpp>
 
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 //XALAN_USING_XERCES(DOMDocument)
 
@@ -144,7 +139,7 @@ CBarlistDoc::CBarlistDoc()
 CBarlistDoc::~CBarlistDoc()
 {
    m_BarInfoMgr.Release();
-   m_AddinMgr.Release();
+   m_PluginMgr.UnloadPlugins();
 }
 
 BOOL CBarlistDoc::Init()
@@ -163,10 +158,9 @@ BOOL CBarlistDoc::Init()
       return FALSE;
    }
 
-   hr = m_AddinMgr.CoCreateInstance(CLSID_AddinMgr);
-   if (FAILED(hr))
+   if (!m_PluginMgr.LoadPlugins())
    {
-      AfxMessageBox(_T("Failed to create addin manager. Proceeding without Add-ins."));
+      AfxMessageBox(_T("Failed to load plug-ins"));
       return FALSE;
    }
 
@@ -200,7 +194,7 @@ void CBarlistDoc::DoIntegrateWithUI(BOOL bIntegrate)
          // Setup the toolbar
          AFX_MANAGE_STATE(AfxGetStaticModuleState());
          m_ToolbarID = CreateToolBar(_T("Barlist"));
-         CEAFToolBar* pToolbar = GetToolBar(m_ToolbarID);
+         auto pToolbar = GetToolBar(m_ToolbarID);
          pToolbar->LoadToolBar(GetToolbarResourceID(), nullptr);
          pToolbar->CreateDropDownButton(ID_FILE_OPEN, nullptr, BTNS_DROPDOWN);
 
@@ -208,29 +202,26 @@ void CBarlistDoc::DoIntegrateWithUI(BOOL bIntegrate)
       }
 
       // Setup the Add-Ins menu
-      CEAFMenu* pMainMenu = GetMainMenu();
+      auto pMainMenu = GetMainMenu();
       UINT addinsPos = pMainMenu->FindMenuItem(_T("Add-Ins"));
-      CEAFMenu* pAddins = pMainMenu->GetSubMenu(addinsPos);
+      auto pAddins = pMainMenu->GetSubMenu(addinsPos);
       UINT cmdID = FIRST_ADDIN_COMMAND;
       if (pAddins)
       {
-         long nAddins;
-         m_AddinMgr->get_Count(&nAddins);
-         nAddins = Min(nAddins, (long)MAX_ADDIN_COUNT);
+         auto nAddins = m_PluginMgr.GetPluginCount();
+         nAddins = Min(nAddins, (IndexType)MAX_ADDIN_COUNT);
          if (0 < nAddins)
          {
             pAddins->RemoveMenu(0, MF_BYPOSITION, nullptr); // remove the placeholder
          }
 
-         for (long i = 0; i < nAddins; i++)
+         for (auto i = 0; i < nAddins; i++)
          {
-            CComPtr<IBarlistAddin> addin;
-            m_AddinMgr->get_Item((short)i, &addin);
+            auto plugin = m_PluginMgr.GetPlugin(i);
 
-            CComBSTR bstrName;
-            addin->get_MenuItem(&bstrName);
+            auto strName = plugin->GetMenuItem();
 
-            pAddins->AppendMenu(cmdID++, OLE2T(bstrName), nullptr);
+            pAddins->AppendMenu(cmdID++, strName, nullptr);
          }
       }
 
@@ -245,16 +236,15 @@ void CBarlistDoc::DoIntegrateWithUI(BOOL bIntegrate)
       DestroyToolBar(m_ToolbarID);
 
       // be a good citizen and clean up our add-ins from the menu
-      CEAFMenu* pMainMenu = GetMainMenu();
+      auto pMainMenu = GetMainMenu();
       UINT addinsPos = pMainMenu->FindMenuItem(_T("Add-Ins"));
-      CEAFMenu* pAddins = pMainMenu->GetSubMenu(addinsPos);
+      auto pAddins = pMainMenu->GetSubMenu(addinsPos);
       UINT cmdID = FIRST_ADDIN_COMMAND;
       if (pAddins)
       {
-         long nAddins;
-         m_AddinMgr->get_Count(&nAddins);
-         nAddins = Min(nAddins, (long)MAX_ADDIN_COUNT);
-         for (long i = 0; i < nAddins; i++)
+         auto nAddins = m_PluginMgr.GetPluginCount();
+         nAddins = Min(nAddins, (IndexType)MAX_ADDIN_COUNT);
+         for (auto i = 0; i < nAddins; i++)
          {
             pAddins->RemoveMenu(cmdID++, MF_BYCOMMAND, nullptr);
          }
@@ -721,7 +711,7 @@ void CBarlistDoc::LoadDocumentSettings()
    CWinApp* pApp = AfxGetApp();
    m_MarkIncrement = pApp->GetProfileInt(_T("Settings"), _T("MarkIncrement"), 1);
 
-   eafTypes::UnitMode unitMode = (eafTypes::UnitMode)(pApp->GetProfileInt(_T("Settings"), _T("Units"), (int)eafTypes::umUS));
+   WBFL::EAF::UnitMode unitMode = (WBFL::EAF::UnitMode)(pApp->GetProfileInt(_T("Settings"), _T("Units"), (int)WBFL::EAF::UnitMode::US));
    EAFGetApp()->SetUnitsMode(unitMode);
 
    auto report_options_string = pApp->GetProfileString(_T("Settings"), _T("ReportOptions"),_T("Report Total Quantities"));
@@ -909,9 +899,8 @@ void CBarlistDoc::OnViewReport()
 void CBarlistDoc::OnAddin(UINT cmd)
 {
    short idx = (short)(cmd - FIRST_ADDIN_COMMAND);
-   CComPtr<IBarlistAddin> addin;
-   m_AddinMgr->get_Item(idx, &addin);
-   addin->Go(m_Barlist);
+   auto plugin = m_PluginMgr.GetPlugin(idx);
+   plugin->Go(m_Barlist);
 }
 
 HINSTANCE CBarlistDoc::GetResourceInstance()
@@ -938,7 +927,7 @@ void CBarlistDoc::GetBarlistEvents(BOOL bListenForEvents)
    }
 }
 
-void CBarlistDoc::OnUnitsModeChanged(eafTypes::UnitMode newUnitMode)
+void CBarlistDoc::OnUnitsModeChanged(WBFL::EAF::UnitMode newUnitMode)
 {
    m_bDirtyReport = true;
    __super::OnUnitsModeChanged(newUnitMode);

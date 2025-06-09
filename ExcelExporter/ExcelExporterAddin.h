@@ -20,15 +20,14 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
+#pragma once
 
 // ExcelExporterAddin.h : Declaration of the CExcelExporterAddin
 
-#ifndef __ExcelExporterADDIN_H_
-#define __ExcelExporterADDIN_H_
-
-#include "resource.h"       // main symbols
-
-#include "BarlistAddinCatid.h"
+#include "BarlistPlugin.h"
+#include <MfcTools\ExcelWrapper.h>
+#include <EAF\ComponentObject.h>
+#include "..\Bars\Bars.h"
 
 class CExcelExporterApp : public CWinApp
 {
@@ -37,39 +36,20 @@ public:
    virtual int ExitInstance() override;
 };
 
-#include <MfcTools\ExcelWrapper.h>
-
 /////////////////////////////////////////////////////////////////////////////
 // CExcelExporterAddin
-class ATL_NO_VTABLE CExcelExporterAddin : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CExcelExporterAddin, &CLSID_ExcelExporterAddin>,
-   public IBarlistAddin
+class CExcelExporterAddin : public WBFL::EAF::ComponentObject,
+   public IBarlistPlugin
 {
 public:
-	CExcelExporterAddin()
-	{
-	}
+   CExcelExporterAddin();
 
-DECLARE_REGISTRY_RESOURCEID(IDR_EXCELEXPORTERADDIN)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-   HRESULT FinalConstruct();
-
-BEGIN_COM_MAP(CExcelExporterAddin)
-	COM_INTERFACE_ENTRY(IBarlistAddin)
-END_COM_MAP()
-
-BEGIN_CATEGORY_MAP(CExcelExporterAddin)
-   IMPLEMENTED_CATEGORY(CATID_BarlistAddin)
-END_CATEGORY_MAP()
-
-
-// IBarlistAddin
+// IBarlistPlugin
 public:
-   STDMETHOD(Go)(/*[in]*/ IBarlist* pBarlist);
-   STDMETHOD(get_MenuItem)(/*[out, retval]*/ BSTR *pVal);
+   void Init(CEAFDocument* pDoc) override;
+   void Terminate() override;
+   void Go(IBarlist* pBarlist) override;
+   CString GetMenuItem() const override;
 
 private:
    void ExportToExcel(const CString& strFile, IBarlist* pBarlist);
@@ -97,5 +77,3 @@ private:
    Range GetRangeAtLocation(IndexType worksheetIdx, LPCTSTR strRangeName, IndexType rowIdx, IndexType nRows = INVALID_INDEX);
    void WriteStringToCell(LPCTSTR strRangeName, LPCTSTR strString);
 };
-
-#endif //__ExcelExporterADDIN_H_

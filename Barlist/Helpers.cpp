@@ -26,11 +26,6 @@
 #include <Units\Units.h>
 #include <EAF\EAFApp.h>
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 static LPCTSTR gs_Material_US[] =
 {
@@ -64,7 +59,7 @@ static LPCTSTR gs_Material_SI[] =
 
 LPCTSTR GetMaterialSpecification(MaterialType material)
 {
-   return (EAFGetApp()->GetUnitsMode() == eafTypes::umUS ? gs_Material_US[material] : gs_Material_SI[material]);
+   return (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::US ? gs_Material_US[material] : gs_Material_SI[material]);
 }
 
 LPCTSTR GetMaterialCommonName(MaterialType material)
@@ -123,33 +118,33 @@ CString GetMaterialDesignation(MaterialType material)
 
 CString GetMaterialGrade(MaterialType material)
 {
-   eafTypes::UnitMode unitMode = EAFGetApp()->GetUnitsMode();
+   WBFL::EAF::UnitMode unitMode = EAFGetApp()->GetUnitsMode();
    CString strGrade;
    switch (material)
    {
    case A706_Grade60:
    case A767_A1094_Grade60:
    case A955_Grade60:
-      strGrade = (unitMode == eafTypes::umUS ? _T("  ") : _T("41"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("  ") : _T("41"));
       break;
 
    case A955_Grade75: 
-      strGrade = (unitMode == eafTypes::umUS ? _T("75") : _T("52"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("75") : _T("52"));
       break;
 
    case A706_Grade80:
    case A767_A1094_Grade80:
    case A955_Grade80:
-      strGrade = (unitMode == eafTypes::umUS ? _T("80") : _T("55"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("80") : _T("55"));
       break;
 
    case A1035_Grade100:
    case A767_A1094_Grade100:
-      strGrade = (unitMode == eafTypes::umUS ? _T("1X") : _T("69"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("1X") : _T("69"));
       break;
 
    case A1035_Grade120:
-      strGrade = (unitMode == eafTypes::umUS ? _T("12") : _T("83"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("12") : _T("83"));
       break;
 
    case D7957:

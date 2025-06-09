@@ -22,33 +22,15 @@
 
 
 #pragma once
-#include <EAF\EAFComponentInfo.h>
-#include "resource.h"
 
-class ATL_NO_VTABLE CBarlistComponentInfo : 
-   public CComObjectRootEx<CComSingleThreadModel>,
-   public CComCoClass<CBarlistComponentInfo, &CLSID_BarlistComponentInfo>,
-   public IEAFComponentInfo
+#include <EAF\ApplicationComponentInfo.h>
+
+class CBarlistComponentInfo : public WBFL::EAF::ApplicationComponentInfo
 {
 public:
-   CBarlistComponentInfo()
-   {
-   }
+   CBarlistComponentInfo() = default;
 
-DECLARE_REGISTRY_RESOURCEID(IDR_COMPONENTINFO)
-DECLARE_CLASSFACTORY_SINGLETON(CBarlistComponentInfo)
-
-BEGIN_COM_MAP(CBarlistComponentInfo)
-   COM_INTERFACE_ENTRY(IEAFComponentInfo)
-END_COM_MAP()
-
-BEGIN_CONNECTION_POINT_MAP(CBarlistComponentInfo)
-END_CONNECTION_POINT_MAP()
-
-   HRESULT FinalConstruct();
-   void FinalRelease();
-
-// IEAFComponentInfo
+// IComponentInfo
 public:
    virtual BOOL Init(CEAFApp* pApp) override;
    virtual void Terminate() override;
@@ -58,5 +40,3 @@ public:
    virtual bool HasMoreInfo() override;
    virtual void OnMoreInfo() override;
 };
-
-OBJECT_ENTRY_AUTO(__uuidof(BarlistComponentInfo), CBarlistComponentInfo)
