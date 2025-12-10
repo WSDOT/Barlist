@@ -19,3 +19,4 @@ SET REGFREECOM=%ARPDIR%\BridgeLink\RegFreeCOM
 REM - Application files
 xcopy /Y /d %REGFREECOM%\x64\Release\Barlist.dll 	%BINTARGET%\x64\
 xcopy /Y /d %REGFREECOM%\x64\Release\Barlist.exe 	%BINTARGET%\x64\
+xcopy /Y /d %REGFREECOM%\x64\Release\Application.Manifest.Barlist 	%BINTARGET%\x64\
