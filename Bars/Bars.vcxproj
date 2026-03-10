@@ -182,16 +182,6 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Midl Include="..\SDK\Include\BarlistAddin.idl">
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BarlistAddin.h</HeaderFileName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BarlistAddin.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BarlistAddin_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">BarlistAddin_i.c</InterfaceIdentifierFileName>
-    </Midl>
     <Midl Include="..\SDK\Include\Barlst.idl">
       <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </TypeLibraryName>
@@ -199,14 +189,6 @@
       </TypeLibraryName>
       <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Barlist_i.c</InterfaceIdentifierFileName>
       <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Barlist_i.c</InterfaceIdentifierFileName>
-    </Midl>
-    <Midl Include="AddinMgr.idl">
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </TypeLibraryName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AddinMgr_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AddinMgr_i.c</InterfaceIdentifierFileName>
     </Midl>
     <Midl Include="Bars.idl">
       <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateStublessProxies>
@@ -220,7 +202,6 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AddinMgrImp.cpp" />
     <ClCompile Include="BarCollection.cpp" />
     <ClCompile Include="BarComponent.cpp" />
     <ClCompile Include="BarData.cpp" />
@@ -358,7 +339,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AddinMgrImp.h" />
     <ClInclude Include="BarCollection.h" />
     <ClInclude Include="BarComponent.h" />
     <ClInclude Include="BarData.h" />

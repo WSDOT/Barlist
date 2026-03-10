@@ -21,29 +21,12 @@
 ///////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "Barlist_i.h"
 #include "ComponentInfo.h"
 #include "resource.h"
 #include <EAF\EAFApp.h>
 #include <EAF\EAFUtilities.h>
 #include <EAF\EAFDocument.h>
 #include <MFCTools\VersionInfo.h>
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-
-HRESULT CBarlistComponentInfo::FinalConstruct()
-{
-   return S_OK;
-}
-
-void CBarlistComponentInfo::FinalRelease()
-{
-}
 
 BOOL CBarlistComponentInfo::Init(CEAFApp* pApp)
 {

@@ -41,7 +41,7 @@ CReport::~CReport()
 CString CReport::GetReportHeader()
 {
    CString strHeader;
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       strHeader =
          CString("                                             +-------- T = Transverse, S = Seismic\r\n") +
@@ -220,7 +220,7 @@ void CReport::ReportBarRecord(IBarRecord* pBarRecord)
 
    Float64 mass;
    pBarRecord->get_Mass(&mass);
-   strBarRecord += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("   ") : _T("  ")) + Formatter::FormatMass(mass, false);
+   strBarRecord += (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("   ") : _T("  ")) + Formatter::FormatMass(mass, false);
    strBarRecord += _T("\n");
 
    m_vReportLines.push_back(strBarRecord);
@@ -258,8 +258,8 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
 
    strBend += Formatter::FormatLength(u, false);
 
-   CString strLengthSpace(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("  ") : _T(" "));
-   CString strSkipLength(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("       ") : _T("        "));
+   CString strLengthSpace(EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("  ") : _T(" "));
+   CString strSkipLength(EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("       ") : _T("        "));
 
    VARIANT_BOOL vbSupported;
    pBend->get_SupportsDimension(dimW, &vbSupported);

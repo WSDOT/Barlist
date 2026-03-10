@@ -4,10 +4,8 @@
 //
 #define IDS_PROJNAME                    100
 #define IDR_BARLIST_10_TO_20_XSLT       101
-#define IDR_PLUGIN                      102
 #define IDR_BARLIST                     129
 #define IDR_COLLABORATION               130
-#define IDR_COMPONENTINFO               131
 #define IDC_SI                          201
 #define IDC_US                          202
 #define IDC_INCREMENT                   203

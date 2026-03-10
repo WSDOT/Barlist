@@ -31,9 +31,7 @@
 #include "resource.h"
 #include <initguid.h>
 
-#include <EAF\EAFAppPlugin.h>
-#include "Barlist_i.h"
-#include "Barlist_i.c"
+#include <EAF\PluginApp.h>
 #include "Plugin.h"
 
 #include <WBFLUnitServer.h>
@@ -41,25 +39,19 @@
 
 #include "..\Include\BarlistCATID.h"
 #include <BridgeLinkCATID.h>
-#include <System\ComCatMgr.h>
 
 #include "BarlistApp.h"
 
 #include "ComponentInfo.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
-
-CComModule _Module;
-
-BEGIN_OBJECT_MAP(ObjectMap)
-OBJECT_ENTRY(CLSID_Plugin, CPlugin)
-OBJECT_ENTRY(CLSID_BarlistComponentInfo, CBarlistComponentInfo)
-END_OBJECT_MAP()
+#include <EAF\EAFApp.h>
+#include <EAF\ComponentModule.h>
+#include "CLSID.h"
+WBFL::EAF::ComponentModule Module_;
+EAF_BEGIN_OBJECT_MAP(ObjectMap2)
+   EAF_OBJECT_ENTRY(CLSID_BarlistComponentInfo, CBarlistComponentInfo)
+   EAF_OBJECT_ENTRY(CLSID_BarlistPluginApp, CPlugin)
+EAF_END_OBJECT_MAP()
 
 BEGIN_MESSAGE_MAP(CBarlistPluginApp, CWinApp)
 	//{{AFX_MSG_MAP(CBarlistPluginApp)
@@ -81,7 +73,10 @@ BOOL CBarlistPluginApp::InitInstance()
    free((void*)m_pszProfileName);
    m_pszProfileName = _tcsdup(_T("Barlist"));
 
-   _Module.Init(ObjectMap, m_hInstance, &LIBID_BARLISTLib);
+   Module_.Init(ObjectMap2);
+
+   EAFGetApp()->LoadManifest(_T("Manifest.Barlist"));
+
    return CWinApp::InitInstance();
 }
 
@@ -91,7 +86,7 @@ int CBarlistPluginApp::ExitInstance()
    // release the shared menu
    //::DestroyMenu( m_hSharedMenu );
 
-   _Module.Term();
+   Module_.Term();
    return CWinApp::ExitInstance();
 }
 
@@ -105,56 +100,4 @@ BOOL CBarlistPluginApp::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDL
 void CBarlistPluginApp::OnNewView() 
 {
    AfxMessageBox(_T("Handling OnNewView from CBarlistPluginApp"));
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Used to determine whether the DLL can be unloaded by OLE
-
-STDAPI DllCanUnloadNow(void)
-{
-    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-    return (AfxDllCanUnloadNow()==S_OK && _Module.GetLockCount()==0) ? S_OK : S_FALSE;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Returns a class factory to create an object of the requested type
-
-STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID* ppv)
-{
-    return _Module.GetClassObject(rclsid, riid, ppv);
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// DllRegisterServer - Adds entries to the system registry
-
-STDAPI DllRegisterServer(void)
-{
-    // registers object, typelib and all interfaces in typelib
-
-   HRESULT hr = _Module.RegisterServer(TRUE);
-   if ( FAILED(hr) )
-      return hr;
-
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, true);
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,true);
-
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, true);
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, true);
-
-   return S_OK;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// DllUnregisterServer - Removes entries from the system registry
-
-STDAPI DllUnregisterServer(void)
-{
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BarlistAppPlugin, false);
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo,CATID_BarlistComponentInfo,false);
-
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_Plugin, CATID_BridgeLinkAppPlugin, false);
-   WBFL::System::ComCatMgr::RegWithCategory(CLSID_BarlistComponentInfo, CATID_BridgeLinkComponentInfo, false);
-
-   return _Module.UnregisterServer(TRUE);
 }

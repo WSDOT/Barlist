@@ -44,7 +44,7 @@
 #include <afxpriv.h>        // Private MFC extensions
 
 #include <EAF\EAF.h>
-#include <EAF\EAFHelp.h>
+#include <EAF\Help.h>
 #include <MFCtools\MFCtools.h>
 #include <afxdlgs.h>
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-// Barlist
+// ExcelExporter - Barlist Exchange File
 // Copyright © 1999-2025  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
@@ -20,40 +20,10 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
-// BarlistPlugin.idl : IDL source for BarlistPlugin.dll
-//
+#pragma once
 
-// This file will be processed by the MIDL tool to
-// produce the type library (BarlistPlugin.tlb) and marshalling code.
+#include <initguid.h>
 
-import "oaidl.idl";
-import "ocidl.idl";
-
-
-[
-	uuid(77FB7C53-6E92-4823-81F2-04073D827555),
-	version(1.0),
-	helpstring("BarlistPlugin 1.0 Type Library")
-]
-library BARLISTLib
-{
-	importlib("stdole32.tlb");
-	importlib("stdole2.tlb");
-
-	[
-		uuid(CFD04C61-6C91-42ED-8CAB-33DB07D08069),
-		helpstring("Plugin Class")
-	]
-	coclass Plugin
-	{
-		[default] interface IUnknown;
-	};
-
-   [
-      uuid(C357C429-FEB4-4CB9-87A9-A07DE7EE3D3F)
-   ]
-   coclass BarlistComponentInfo
-   {
-      interface IUnknown;
-   }
-};
+// {91584911-73FD-4FDE-A674-111A2F5D886E}
+DEFINE_GUID(CLSID_ExcelExporterAddin,
+   0x91584911, 0x73fd, 0x4fde, 0xa6, 0x74, 0x11, 0x1a, 0x2f, 0x5d, 0x88, 0x6e);

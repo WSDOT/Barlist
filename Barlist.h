@@ -50,8 +50,8 @@ public:
 
 // CEAFPluginApp overrides
 public:
-   virtual LPCTSTR GetAppPluginCategoryName() override;
-   virtual CATID GetAppPluginCategoryID() override;
+   virtual LPCTSTR GetPluginAppCategoryName() override;
+   virtual CATID GetPluginAppCategoryID() override;
    virtual LPCTSTR GetPluginCategoryName() override;
    virtual CATID GetPluginCategoryID() override;
 

@@ -37,7 +37,7 @@ IMPLEMENT_DYNAMIC(COptionsDlg, CDialog)
 COptionsDlg::COptionsDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_OPTIONS, pParent)
 {
-   m_UnitMode = eafTypes::umUS;
+   m_UnitMode = WBFL::EAF::UnitMode::US;
    m_MarkIncrement = 1;
 }
 
@@ -49,11 +49,11 @@ void COptionsDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 
-   int i = (m_UnitMode == eafTypes::umSI ? 0 : 1);
+   int i = (m_UnitMode == WBFL::EAF::UnitMode::SI ? 0 : 1);
    DDX_Radio(pDX, IDC_SI, i);
    if (pDX->m_bSaveAndValidate)
    {
-      m_UnitMode = (eafTypes::UnitMode)(i + 1);
+      m_UnitMode = (WBFL::EAF::UnitMode)(i + 1);
    }
 
    DDX_Text(pDX, IDC_INCREMENT, m_MarkIncrement);

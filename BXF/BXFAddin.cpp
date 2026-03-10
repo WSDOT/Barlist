@@ -23,16 +23,17 @@
 // BXFAddin.cpp : Implementation of CBXFAddin
 #include "stdafx.h"
 
-#include "BXF.h"
 #include "BXFAddin.h"
+#include "CLSID.h"
 
 #include <EAF\EAFApp.h>
 #include <WBFLUnitServer.h>
 
 #include "..\Common\Formatter.h"
+#include <EAF\ComponentModule.h>
 
 CBXFApp theApp;
-CComModule _Module;
+WBFL::EAF::ComponentModule _Module;
 CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
 
 inline bool IsA706(MaterialType material) { return (int)A706_Grade60 <= (int)material && (int)material <= (int)A706_Grade80; }
@@ -70,33 +71,33 @@ CString GetMaterialDesignation(MaterialType material)
 
 CString GetMaterialGrade(MaterialType material)
 {
-   eafTypes::UnitMode unitMode = EAFGetApp()->GetUnitsMode();
+   WBFL::EAF::UnitMode unitMode = EAFGetApp()->GetUnitsMode();
    CString strGrade;
    switch (material)
    {
    case A706_Grade60:
    case A767_A1094_Grade60:
    case A955_Grade60:
-      strGrade = (unitMode == eafTypes::umUS ? _T("  ") : _T("41"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("  ") : _T("41"));
       break;
 
    case A955_Grade75:
-      strGrade = (unitMode == eafTypes::umUS ? _T("75") : _T("52"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("75") : _T("52"));
       break;
 
    case A706_Grade80:
    case A767_A1094_Grade80:
    case A955_Grade80:
-      strGrade = (unitMode == eafTypes::umUS ? _T("80") : _T("55"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("80") : _T("55"));
       break;
 
    case A1035_Grade100:
    case A767_A1094_Grade100:
-      strGrade = (unitMode == eafTypes::umUS ? _T("1X") : _T("69"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("1X") : _T("69"));
       break;
 
    case A1035_Grade120:
-      strGrade = (unitMode == eafTypes::umUS ? _T("12") : _T("83"));
+      strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("12") : _T("83"));
       break;
 
    case D7957:
@@ -112,14 +113,14 @@ CString GetMaterialGrade(MaterialType material)
 }
 
 
-BEGIN_OBJECT_MAP(ObjectMap)
-   OBJECT_ENTRY(CLSID_BXFAddin, CBXFAddin)
-END_OBJECT_MAP()
+EAF_BEGIN_OBJECT_MAP(ObjectMap)
+   EAF_OBJECT_ENTRY(CLSID_BXFAddin, CBXFAddin)
+EAF_END_OBJECT_MAP()
 
 BOOL CBXFApp::InitInstance()
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   _Module.Init(ObjectMap, m_hInstance);
+   _Module.Init(ObjectMap);
 
    if (!Formatter::Init())
    {
@@ -154,13 +155,22 @@ inline TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c)
 
 /////////////////////////////////////////////////////////////////////////////
 // CBXFAddin
-STDMETHODIMP CBXFAddin::Go(IBarlist* pBarlist)
+
+void CBXFAddin::Init(CEAFDocument* pDoc)
+{
+}
+
+void CBXFAddin::Terminate()
+{
+}
+
+void CBXFAddin::Go(IBarlist* pBarlist)
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    if (pBarlist == NULL)
    {
       ::MessageBox(0, _T("An invalid barlist was provided."), _T(""), MB_OK);
-      return S_FALSE;
+      return;
    }
 
    CString strFile;
@@ -178,14 +188,12 @@ STDMETHODIMP CBXFAddin::Go(IBarlist* pBarlist)
       strMsg.Format(_T("Barlist Exchange File Saved\r\n%s"),strFile);
       AfxMessageBox(strMsg,MB_ICONINFORMATION | MB_OK);
    }
-   return S_OK;
+   return;
 }
 
-STDMETHODIMP CBXFAddin::get_MenuItem(BSTR *pVal)
+CString CBXFAddin::GetMenuItem() const
 {
-   CComBSTR menuItem("Create Barlist Exchange File (BXF)");
-   *pVal = menuItem.Copy();
-   return S_OK;
+   return CString("Create Barlist Exchange File (BXF)");
 }
 
 void CBXFAddin::CreateBarlistExchangeFile(const CString& strFile, IBarlist* pBarlist)
@@ -294,7 +302,7 @@ void CBXFAddin::ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord)
 
    Float64 mass;
    pBarRecord->get_Mass(&mass);
-   strBarRecord += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("   ") : _T("   ")) + Formatter::FormatMass(mass, false);
+   strBarRecord += (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("   ") : _T("   ")) + Formatter::FormatMass(mass, false);
    strBarRecord += _T("\n");
 
    pFile->WriteString(strBarRecord);
@@ -333,8 +341,8 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    pBend->get_T1(&t1);
    pBend->get_T2(&t2);
 
-   CString strLengthSpace(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("  ") : _T(" "));
-   CString strSkipLength(EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T("       ") : _T("        "));
+   CString strLengthSpace(EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("  ") : _T(" "));
+   CString strSkipLength(EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("       ") : _T("        "));
 
    if (90 <= bendType && bendType <= 99)
    {
@@ -351,7 +359,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    pBend->get_SupportsDimension(dimW, &vbSupported);
    strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + Formatter::FormatLength(w, true, false)) : strLengthSpace + strSkipLength;
 
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       strBend += _T("  ");
    }
@@ -359,7 +367,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    pBend->get_SupportsDimension(dimX, &vbSupported);
    strBend += (vbSupported == VARIANT_TRUE) ? Formatter::FormatLength(x, true, false) : strSkipLength;
 
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       strBend += _T(" ");
    }
@@ -367,7 +375,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
    pBend->get_SupportsDimension(dimY, &vbSupported);
    strBend += (vbSupported == VARIANT_TRUE) ? Formatter::FormatLength(y, true, false) : strSkipLength;
 
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       strBend += _T(" ");
    }
@@ -404,7 +412,7 @@ CString CBXFAddin::ReportBend(IBend* pBend, bool bVaries)
 
    Float64 length;
    pBend->get_Length(&length);
-   strBend += (EAFGetApp()->GetUnitsMode() == eafTypes::umSI ? _T(" ") : _T("  ")) + Formatter::FormatLength(length, false, false);
+   strBend += (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T(" ") : _T("  ")) + Formatter::FormatLength(length, false, false);
 
    return strBend;
 }

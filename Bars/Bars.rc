@@ -51,8 +51,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 8,0,9,0
- PRODUCTVERSION 8,0,9,0
+ FILEVERSION 9,0,0,1
+ PRODUCTVERSION 9,0,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -70,12 +70,12 @@ BEGIN
             VALUE "Comments", "A member of the Alternate Route Project"
             VALUE "CompanyName", "Washington State Department of Transportation"
             VALUE "FileDescription", "Bars Module"
-            VALUE "FileVersion", "8.0.9.0"
+            VALUE "FileVersion", "9.0.0.1"
             VALUE "InternalName", "Bars"
             VALUE "LegalCopyright", "Copyright © 1999-2025, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Bars.DLL"
             VALUE "ProductName", "Bars Module"
-            VALUE "ProductVersion", "8.0.9.0"
+            VALUE "ProductVersion", "9.0.0.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -113,8 +113,6 @@ IDR_BARRECORDCOLLECTION REGISTRY                "BarRecordCollection.rgs"
 IDR_STATUSMESSAGECOLLECTION REGISTRY                "StatusMessageCollection.rgs"
 
 IDR_STATUSMESSAGE       REGISTRY                "StatusMessage.rgs"
-
-IDR_ADDINMGR            REGISTRY                "AddinMgr.rgs"
 
 IDR_TYPE50              REGISTRY                "Type50.rgs"
 
@@ -222,6 +220,7 @@ BEGIN
     WARN_DIMLESSTHANHOOK    "WARNING : %1 is smaller than standard hook %2"
     WARN_DUPMARKNUMBER      "WARNING : Mark Number %1 is currently in use"
     WARN_SHOULDBEGREATERTHAN "WARNING: %1 should be greater than %2"
+    WARN_LARGEBAR           "WARNING: Due to safety concerns, CRSI does not recommend bending bars larger than #14 with grade designation of Grade 75 or higher"
 END
 
 STRINGTABLE

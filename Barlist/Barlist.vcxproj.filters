@@ -150,7 +150,7 @@
     <ClInclude Include="QuantitiesDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\SDK\Include\BarlistAddinCatid.h">
+    <ClInclude Include="..\SDK\Include\BarlistPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GenerateMarkNumbersDlg.h">
@@ -183,22 +183,14 @@
     <ClInclude Include="..\Common\Formatter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PluginManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CLSID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="Barlist.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
-    <Midl Include="..\SDK\Include\BarlistAddin.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ComponentInfo.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Plugin.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Barlist.def">
       <Filter>Source Files</Filter>
     </None>

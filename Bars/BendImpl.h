@@ -117,7 +117,9 @@ public:
 	STDMETHOD(put_BarRecord)(/*[in]*/ IBarRecord* newVal)
    {
       m_pBarRecord = newVal;
-	   return S_OK;
+      m_bIsDirty = true;
+      this->Fire_OnBendChanged();
+      return S_OK;
    }
 
    STDMETHOD(get_U)(/*[out,retval]*/ Float64* pVal)

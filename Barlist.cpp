@@ -30,6 +30,7 @@
 #include "Barlist.h"
 #include "AboutDlg.h"
 
+#include "SDK/Include/BarlistPlugin.h"
 #include "BarlistCATID.h"
 #include "BarlistCommandIDs.h"
 #include "MainFrm.h"
@@ -47,11 +48,6 @@
 // Barlist itself can accept plug-in commands. We have to carve out a little bit of the range defined above for our use.
 #define BARLIST_PLUGIN_COMMAND_COUNT 0x0100 // we'll reserve 256 command IDs for direct Barlist plug-in commands
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarlistApp
@@ -147,12 +143,12 @@ LPCTSTR CBarlistApp::GetRegistryKey()
    return _T("Washington State Department of Transportation");
 }
 
-LPCTSTR CBarlistApp::GetAppPluginCategoryName()
+LPCTSTR CBarlistApp::GetPluginAppCategoryName()
 {
    return _T("Barlist Application Plugin");
 }
 
-CATID CBarlistApp::GetAppPluginCategoryID()
+CATID CBarlistApp::GetPluginAppCategoryID()
 {
    return CATID_BarlistAppPlugin;
 }
@@ -245,7 +241,7 @@ BOOL CBarlistApp::InitInstance()
    // ALL means all commands added to the menus of the main executable, the 
    // EAFAppPlugin document and view menus, and plugin supplied menus,
    // toolbars, and accelerator tables
-   CEAFPluginCommandManager::ReserveTotalCommandIDRange(BARLIST_FIRST_PLUGIN_COMMAND,BARLIST_LAST_PLUGIN_COMMAND);
+   WBFL::EAF::PluginCommandManager::ReserveTotalCommandIDRange(BARLIST_FIRST_PLUGIN_COMMAND,BARLIST_LAST_PLUGIN_COMMAND);
 
    // Reserve BARLIST_PLUGIN_COMMAND_COUNT command IDs for commands that get added
    // to the main application
@@ -259,11 +255,6 @@ BOOL CBarlistApp::InitInstance()
    {
       return FALSE;
    }
-
-   // Must be done after call to base class InitInstance because OLE has not been
-   // initialized yet.
-   //WBFL::System::ComCatMgr::CreateCategory(_T("Barlist Application Plugin"),CATID_BarlistAppPlugin); // this is done by the base class
-   WBFL::System::ComCatMgr::CreateCategory(_T("Barlist Components"),CATID_BarlistComponentInfo);
 
    // Need to let drag and drop messages through
    // See http://helgeklein.com/blog/2010/03/how-to-enable-drag-and-drop-for-an-elevated-mfc-application-on-vistawindows-7/

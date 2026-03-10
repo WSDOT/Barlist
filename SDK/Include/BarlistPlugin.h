@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////
-// ExcelExporter - Barlist Exchange File
+// Barlist
 // Copyright © 1999-2025  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
@@ -20,32 +20,23 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
-// ExcelExporter.idl : IDL source for ExcelExporter.dll
-//
+#pragma once
 
-// This file will be processed by the MIDL tool to
-// produce the type library (Addin.tlb) and marshalling code.
+#include <initguid.h>
+#include <afxstr.h>
 
-import "oaidl.idl";
-import "ocidl.idl";
-import "BarlistAddin.idl";
+// {88FF9D4E-1F47-11d3-8941-006097C68A9C}
+DEFINE_GUID(CATID_BarlistPlugin, 
+0x88ff9d4e, 0x1f47, 0x11d3, 0x89, 0x41, 0x0, 0x60, 0x97, 0xc6, 0x8a, 0x9c);
 
-[
-	uuid(C3487A48-A7CB-4F8F-BF4B-F83EC7F69973),
-	version(1.0),
-	helpstring("ExcelExporter 1.0 Type Library")
-]
-library ExcelExporterLib
+interface IBarlist;
+class CEAFDocument;
+
+class IBarlistPlugin
 {
-	importlib("stdole32.tlb");
-	importlib("stdole2.tlb");
-
-	[
-		uuid(344436BE-AB02-47A2-919F-9E45DD33DFF2),
-		helpstring("ExcelExporterAddin Class")
-	]
-	coclass ExcelExporterAddin
-	{
-		[default] interface IBarlistAddin;
-	};
+public:
+   virtual void Init(CEAFDocument* pDoc) = 0;
+   virtual void Terminate() = 0;
+   virtual void Go(IBarlist* pBarlist) = 0;
+   virtual CString GetMenuItem() const = 0;
 };

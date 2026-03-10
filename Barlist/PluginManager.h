@@ -22,45 +22,15 @@
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
+#pragma once
 
-// AddinMgrImp.h : Declaration of the CAddinMgr
+#include <EAF\PluginManagerBase.h>
+#include <SDK/Include/BarlistPlugin.h>
 
-#ifndef __ADDINMGR_H_
-#define __ADDINMGR_H_
-
-#include "resource.h"       // main symbols
-#include <vector>
-
-typedef CComEnumOnSTL<IEnumVARIANT,&IID_IEnumVARIANT, VARIANT, _Copy<VARIANT>, std::vector<CComVariant> > VecEnum;
-typedef ICollectionOnSTLImpl<IAddinMgr,std::vector<CComVariant>,VARIANT,_Copy<VARIANT>,VecEnum> IAddinManager;
-
-/////////////////////////////////////////////////////////////////////////////
-// CAddinMgr
-class ATL_NO_VTABLE CAddinMgr : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CAddinMgr, &CLSID_AddinMgr>,
-	public IDispatchImpl<IAddinManager, &IID_IAddinMgr, &LIBID_BARSLib>
-//	public IDispatchImpl<IAddinMgr, &IID_IAddinMgr, &LIBID_BARSLib>
+class PluginManager : public WBFL::EAF::PluginManagerBase<IBarlistPlugin, CEAFDocument>
 {
 public:
-	CAddinMgr()
-	{
-	}
-
-   HRESULT FinalConstruct();
-
-DECLARE_REGISTRY_RESOURCEID(IDR_ADDINMGR)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CAddinMgr)
-	COM_INTERFACE_ENTRY(IAddinMgr)
-	COM_INTERFACE_ENTRY(IDispatch)
-END_COM_MAP()
-
-// IAddinMgr
-public:
-   STDMETHOD(get_Item)(/*[in]*/ short index, /*[out, retval]*/ IBarlistAddin* *pVal);
+   PluginManager() {
+      m_CATID = CATID_BarlistPlugin;
+   }
 };
-
-#endif //__ADDINMGR_H_

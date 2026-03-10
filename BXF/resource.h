@@ -2,8 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by BXF.rc
 //
-#define IDS_PROJNAME                    100
-#define IDR_BXFADDIN                    101
 
 // Next default values for new objects
 // 

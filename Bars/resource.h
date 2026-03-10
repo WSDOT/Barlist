@@ -15,7 +15,6 @@
 #define IDR_BARRECORDCOLLECTION         110
 #define IDR_STATUSMESSAGECOLLECTION     111
 #define IDR_STATUSMESSAGE               112
-#define IDR_ADDINMGR                    113
 #define IDR_TYPE50                      114
 #define IDR_TYPE51                      115
 #define IDR_TYPE52                      116
@@ -73,6 +72,7 @@
 #define WARN_DIMLESSTHANHOOK            2002
 #define WARN_DUPMARKNUMBER              2003
 #define WARN_SHOULDBEGREATERTHAN        2004
+#define WARN_LARGEBAR                   2005
 #define ERR_EXCEEDSMAX                  3000
 #define ERR_NOTLONGITUDINAL             3001
 #define ERR_NOTTRANSVERSE               3002

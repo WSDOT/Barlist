@@ -22,11 +22,6 @@
 
 #pragma once
 
-// CATID for plug-ins that extend Barlist itself
-// {37E8EB8B-571F-46E1-8596-8BAD977F2638}
-DEFINE_GUID(CATID_BarlistPlugin, 
-0x37e8eb8b, 0x571f, 0x46e1, 0x85, 0x96, 0x8b, 0xad, 0x97, 0x7f, 0x26, 0x38);
-
 // CATID for plug-ins that provide Barlist applications
 // {AFBC445E-98FB-43C1-AD02-6AF599903BD9}
 DEFINE_GUID(CATID_BarlistAppPlugin, 

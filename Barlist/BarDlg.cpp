@@ -46,11 +46,6 @@
 
 #include <afxpriv.h> // for AfxSetWindowText
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 void DDX_Text(CDataExchange* pDX, int nIDC, CComBSTR& bstr)
 {
@@ -348,7 +343,7 @@ BOOL CBarDlg::OnInitDialog()
 
    CWnd* pWnd = GetDlgItem(IDC_DIMENSIONS_GROUP);
    CEAFApp* pApp = EAFGetApp();
-   if (pApp->GetUnitsMode() == eafTypes::umUS)
+   if (pApp->GetUnitsMode() == WBFL::EAF::UnitMode::US)
    {
       pWnd->SetWindowText(_T("Dimensions (Length in feet [space] inches, Angles in degrees)"));
    }

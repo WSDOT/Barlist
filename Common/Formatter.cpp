@@ -54,7 +54,7 @@ BOOL Formatter::Init()
 CString Formatter::FormatMass(Float64 mass, bool bUnits)
 {
    CString strMass;
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       if (bUnits)
       {
@@ -81,7 +81,7 @@ CString Formatter::FormatMass(Float64 mass, bool bUnits)
 
 CString Formatter::FormatLength(Float64 length, bool bUnits)
 {
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       CString strLength;
       if (bUnits)
@@ -130,7 +130,7 @@ CString Formatter::FormatLength(Float64 length, bool bUnits)
 
 CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnits)
 {
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       CString strLength;
       if (bUnits)
@@ -217,7 +217,7 @@ bool Formatter::ParseLength(const CString& strValue, Float64* pValue)
    }
 
    WBFL::Units::LengthData* pLength;
-   if (EAFGetApp()->GetUnitsMode() == eafTypes::umSI)
+   if (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI)
    {
       pLength = &gs_LengthUnit[0];
    }
