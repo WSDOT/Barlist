@@ -40,6 +40,7 @@ void CGroupCollection::FinalRelease()
    for(const auto& pair : m_Cookies)
    {
       long index = GetIndex(CComBSTR(pair.first.c_str()));
+
       DWORD cookie = pair.second; 
       CComQIPtr<IGroup> pGroup( m_coll[index].pdispVal );
 
@@ -132,16 +133,16 @@ STDMETHODIMP CGroupCollection::get_Item(VARIANT varIndex, IGroup **pVal)
 
 STDMETHODIMP CGroupCollection::Add(BSTR bstrGroup)
 {
-	// TODO: Add your implementation code here
+   // TODO: Add your implementation code here
    USES_CONVERSION;
 
    // You forgot to set the barlist.
-   ATLASSERT(m_pBarlist != 0 );
+   ATLASSERT(m_pBarlist != 0);
 
-   if ( m_pBarlist->DoesGroupExist( OLE2A(bstrGroup) ) )
+   if (m_pBarlist->DoesGroupExist(OLE2A(bstrGroup)))
    {
       // This group already exists.  There can't be duplicate groups
-      return Error(IDS_E_DUPGROUP,IID_IGroupCollection);
+      return Error(IDS_E_DUPGROUP, IID_IGroupCollection);
    }
 
    CComObject<CGroup>* pGroup;
@@ -201,6 +202,43 @@ long CGroupCollection::GetIndex(BSTR bstrGroup)
    }
 
    return -1;
+}
+
+STDMETHODIMP CGroupCollection::RenameGroup(VARIANT varIndex, BSTR newName)
+{
+   long index = -1;
+   if (varIndex.vt == VT_BSTR)
+   {
+      index = GetIndex(varIndex.bstrVal);
+   }
+   else if (varIndex.vt == VT_I2 || varIndex.vt == VT_I4)
+   {
+      index = (varIndex.vt == VT_I2 ? varIndex.iVal : varIndex.lVal);
+   }
+   else
+   {
+      return E_INVALIDARG;
+   }
+
+   if (index < 0 || m_coll.size() <= index)
+   {
+      return E_INVALIDARG;
+   }
+
+   CComQIPtr<IGroup> pGroup(m_coll[index].pdispVal);
+   CComBSTR oldName;
+   pGroup->get_Name(&oldName);
+   auto result = pGroup->put_Name(newName);
+   if (SUCCEEDED(result))
+   {
+      auto found = m_Cookies.find(ConvertName(oldName));
+      ATLASSERT(found != m_Cookies.end()); // must be found
+      auto value = std::move(found->second);
+      m_Cookies.erase(found);
+      m_Cookies.emplace(ConvertName(newName), std::move(value));
+   }
+
+   return result;
 }
 
 STDMETHODIMP CGroupCollection::Remove(VARIANT varIndex)

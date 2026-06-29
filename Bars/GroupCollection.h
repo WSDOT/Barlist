@@ -90,7 +90,7 @@ private:
    CBarlist* m_pBarlist;
    std::map<std::string,DWORD> m_Cookies;
    std::string ConvertName(BSTR group);
-   long GetIndex(BSTR bstrGroup);
+	long GetIndex(BSTR bstrGroup);
    HRESULT GetGroup(VARIANT key,IGroup** ppGroup);
 
 public:
@@ -108,6 +108,7 @@ public :
 	STDMETHOD(MoveDown)(/*[in]*/ VARIANT grp);
 	STDMETHOD(MoveUp)(/*[in]*/ VARIANT grp);
 	STDMETHOD(Move)(/*[in]*/ VARIANT grp,/*[in]*/ MoveType mt,/*[in]*/ VARIANT target);
+	STDMETHOD(RenameGroup)(/*[in]*/VARIANT varIndex, /*[in]*/ BSTR newName);
 
 BEGIN_CONNECTION_POINT_MAP(CGroupCollection)
 	CONNECTION_POINT_ENTRY(IID_IGroupCollectionEvents)

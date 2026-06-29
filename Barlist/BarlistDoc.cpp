@@ -797,7 +797,13 @@ void CBarlistDoc::OnAddGroup()
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    CString strGroup;
-   BOOL bResult = AfxQuestion(_T("New Group"),_T("Group Name:"),_T(""),strGroup);
+   BOOL bResult = AfxQuestion(_T("New Group"), _T("Group Name:"), _T("Unnamed"), strGroup);
+   if (bResult && strGroup == "")
+   {
+      AfxMessageBox(_T("The group must have a name"), MB_ICONINFORMATION | MB_OK);
+      bResult = false;
+   }
+
    if (bResult)
    {
       CComPtr<IGroupCollection> groups;

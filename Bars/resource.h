@@ -67,6 +67,7 @@
 #define IDR_TYPE99                      163
 #define IDS_E_DUPGROUP                  512
 #define IDS_E_DUPMARK                   513
+#define IDS_E_GROUPNAME                 514
 #define WARN_EXCEEDSNORMAL              2000
 #define WARN_MINRADIUS                  2001
 #define WARN_DIMLESSTHANHOOK            2002
