@@ -294,6 +294,7 @@ interface IStatusMessageCollection;
 		[id(4), helpstring("method Move")] HRESULT Move([in] VARIANT grp,[in] MoveType mt,[in] VARIANT target);
 		[id(5), helpstring("method MoveUp")] HRESULT MoveUp([in] VARIANT grp);
 		[id(6), helpstring("method MoveDown")] HRESULT MoveDown([in] VARIANT grp);
+		[id(7), helpstring("method RenameGroup")] HRESULT RenameGroup(VARIANT varIndex, [in] BSTR newName);
 	};
 	[
 		object,

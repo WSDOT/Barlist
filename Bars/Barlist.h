@@ -195,6 +195,7 @@ END_CONNECTION_POINT_MAP()
 
       m_GroupNames.insert( strName );
 
+      Update();
       Fire_OnGroupAdded(pGroup);
       return S_OK;
 	}
@@ -226,6 +227,7 @@ END_CONNECTION_POINT_MAP()
       ATLASSERT( DoesGroupExist( strName ) );
 #endif
 
+      Update();
       Fire_OnGroupChanged(pGroup);
       return S_OK;
    }

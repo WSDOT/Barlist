@@ -249,6 +249,7 @@ STRINGTABLE
 BEGIN
     IDS_E_DUPGROUP          "DUPLICATE GROUP : Group already exists"
     IDS_E_DUPMARK           "DUPLICATE MARK NUMBER : Mark Number already exists"
+    IDS_E_GROUPNAME         "INVALID GROUP NAME : Group name cannot be empty"
 END
 
 #endif    // English (United States) resources

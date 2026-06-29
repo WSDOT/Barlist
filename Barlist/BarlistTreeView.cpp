@@ -296,9 +296,11 @@ void CBarlistTreeView::OnGroupRenamed(NMHDR* pNMHDR, LRESULT* pResult)
       barlist->get_Groups(&groups);
       CComPtr<IGroup> group;
       groups->get_Item(CComVariant(groupIdx), &group);
-      if (FAILED(group->put_Name(CComBSTR(pInfo->item.pszText))))
+      CComBSTR newName(pInfo->item.pszText);
+
+      if (FAILED(groups->RenameGroup(CComVariant(groupIdx), CComBSTR(pInfo->item.pszText))))
       {
-         AfxMessageBox(_T("That group name already exists."), MB_ICONINFORMATION | MB_OK);
+         AfxMessageBox(_T("That group name already exists or the group name is invalid."), MB_ICONINFORMATION | MB_OK);
       }
    }
 }

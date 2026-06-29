@@ -88,12 +88,16 @@ void CGroup::FinalRelease()
 
 void CGroup::UpdateStatus()
 {
+   USES_CONVERSION;
    m_Superstructure.fill(0);
    m_SuperstructureEpoxy.fill(0);
    m_Substructure.fill(0);
    m_SubstructureEpoxy.fill(0);
 
    m_Status = stOK;
+
+   if (std::string(OLE2A(m_Name)).empty())
+      m_Status = stError;
 
    long cBars;
    m_Bars->get_Count( &cBars );
@@ -188,6 +192,11 @@ STDMETHODIMP CGroup::put_Name(BSTR newVal)
    {
       USES_CONVERSION;
       std::string strName( OLE2A(newVal) );
+      if (strName.empty())
+      {
+         return Error(IDS_E_GROUPNAME, IID_IGroup);
+      }
+
       if ( m_pBarlist->DoesGroupExist( strName ) )
       {
          // This group already exists.  There can't be duplicate groups

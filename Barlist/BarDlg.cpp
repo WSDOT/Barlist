@@ -633,7 +633,7 @@ void CBarDlg::OnClickedAddGroup()
       m_Barlist->get_Groups(&groups);
       if (FAILED(groups->Add(CComBSTR(strGroup))))
       {
-         AfxMessageBox(_T("The barlist already contains a group with the same name."), MB_ICONINFORMATION | MB_OK);
+         AfxMessageBox(_T("The barlist already contains a group with the same name or the group name is invalid."), MB_ICONINFORMATION | MB_OK);
       }
       else
       {
