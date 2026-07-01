@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,128 +23,71 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// GroupCollection.h : Declaration of the CGroupCollection
+// GroupCollection.h : Declaration of CGroupCollection (native, replaces
+// the IGroupCollection/IGroupEvents ATL/COM coclass).
+//
+// The per-group name-keyed cookie map (std::map<std::string,DWORD>
+// m_Cookies) used to Advise/Unadvise each CGroup's connection point is
+// gone entirely -- CGroupCollection connects a lambda (capturing the
+// group's shared_ptr) to each CGroup's Signals when the group is added,
+// and since the group's Signals are destroyed along with the group
+// itself, there is nothing to explicitly unsubscribe on removal.
 
-#ifndef __GROUPCOLLECTION_H_
-#define __GROUPCOLLECTION_H_
+#pragma once
 
-#include "resource.h"       // main symbols
+#include "BarsExport.h"
+#include "Signal.h"
+#include "Enums.h"
+#include "Group.h"
+#include <WBFLTypes.h>
 #include <vector>
-#include <map>
+#include <memory>
 #include <string>
-#include "BarsCP.h"
-#include "Barlist.h"
+#include <cstddef>
 
-typedef CComEnumOnSTL<IEnumVARIANT,&IID_IEnumVARIANT,VARIANT,_Copy<VARIANT>,std::vector<CComVariant> > GroupEnum;
-typedef ICollectionOnSTLImpl<IGroupCollection,std::vector<CComVariant>,VARIANT,_Copy<VARIANT>, GroupEnum> IGroupColl;
+class CBarlist;
 
-/////////////////////////////////////////////////////////////////////////////
-// CGroupCollection
-class ATL_NO_VTABLE CGroupCollection : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CGroupCollection, &CLSID_GroupCollection>,
-	public IDispatchImpl<IGroupColl, &IID_IGroupCollection, &LIBID_BARSLib>,
-	public CProxyIGroupCollectionEvents< CGroupCollection >,
-	public IConnectionPointContainerImpl<CGroupCollection>,
-   public ISupportErrorInfo,
-	public IGroupEvents
-	//public IDispatchImpl<IGroupCollection, &IID_IGroupCollection, &LIBID_BARSLib>
+class BARS_API CGroupCollection
 {
 public:
-	CGroupCollection()
-	{
-      m_pBarlist = 0;
-	}
+    CGroupCollection() = default;
 
-   virtual ~CGroupCollection()
-   {
-   }
+    // Add() connects [this]-capturing lambdas to each new group's signals
+    // (to re-fire them as this collection's own) -- a copy would carry
+    // subscriptions that still call back into the original instance.
+    CGroupCollection(const CGroupCollection&) = delete;
+    CGroupCollection& operator=(const CGroupCollection&) = delete;
 
-   void FinalRelease();
+    void SetBarlist(CBarlist* pBarlist);
+    CBarlist* GetBarlist() const;
 
-   void SetBarlist( CBarlist* pBarlist) 
-   {
-      m_pBarlist = pBarlist;
-   }
+    std::size_t Count() const;
+    std::shared_ptr<CGroup> Item(std::size_t index) const; // nullptr if index out of range
+    std::shared_ptr<CGroup> Find(const std::_tstring& name) const; // nullptr if not found
+    long IndexOf(const CGroup* group) const; // -1 if not found
 
-   CBarlist* GetBarlist()
-   {
-      // If this ASSERT fires, you forget to call SetBarlist for this object
-      ATLASSERT( m_pBarlist != 0 );
-      return m_pBarlist;
-   }
+    std::shared_ptr<CGroup> Add(std::_tstring name); // throws CBarException: empty/duplicate name
+    void Remove(long index);
+    void Move(long index, MoveType mt, long targetIndex);
+    void MoveUp(long index);
+    void MoveDown(long index);
+    void RenameGroup(long index, std::_tstring newName); // throws CBarException
 
-DECLARE_REGISTRY_RESOURCEID(IDR_GROUPCOLLECTION)
+    using const_iterator = std::vector<std::shared_ptr<CGroup>>::const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
 
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CGroupCollection)
-	COM_INTERFACE_ENTRY(IGroupCollection)
-	COM_INTERFACE_ENTRY(IDispatch)
-	COM_INTERFACE_ENTRY_IMPL(IConnectionPointContainer)
-	COM_INTERFACE_ENTRY(IGroupEvents)
-	COM_INTERFACE_ENTRY(ISupportErrorInfo)
-END_COM_MAP()
+    Signal<CGroup&> OnGroupAdded;
+    Signal<const std::_tstring&> OnGroupRemoved;
+    Signal<CGroup&> OnGroupChanged;
+    Signal<CGroup&, long, long> OnGroupMoved;
+    Signal<CGroup&, CBarRecord&> OnBarRecordAdded;
+    Signal<CGroup&, CBarRecord&> OnBarRecordChanged;
+    Signal<CGroup&, const std::_tstring&> OnBarRecordRemoved;
+    Signal<CGroup&> OnBarRecordsSorted;
+    Signal<CGroup&, CBarRecord&, long, long> OnBarRecordMoved;
 
 private:
-   CBarlist* m_pBarlist;
-   std::map<std::string,DWORD> m_Cookies;
-   std::string ConvertName(BSTR group);
-	long GetIndex(BSTR bstrGroup);
-   HRESULT GetGroup(VARIANT key,IGroup** ppGroup);
-
-public:
-// ISupportsErrorInfo
-	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
-
-// IGroupCollection
-public:
-	STDMETHOD(Remove)(/*[in]*/ VARIANT varIndex);
-	STDMETHOD(Add)(/*[in]*/ BSTR group);
-	STDMETHOD(get_Item)(/*[in]*/ VARIANT varIndex, /*[out, retval]*/ IGroup* *pVal);
-//	STDMETHOD(get__NewEnum)(/*[out, retval]*/ LPUNKNOWN *pVal);
-//	STDMETHOD(get_Count)(/*[out, retval]*/ long *pVal);
-public :
-	STDMETHOD(MoveDown)(/*[in]*/ VARIANT grp);
-	STDMETHOD(MoveUp)(/*[in]*/ VARIANT grp);
-	STDMETHOD(Move)(/*[in]*/ VARIANT grp,/*[in]*/ MoveType mt,/*[in]*/ VARIANT target);
-	STDMETHOD(RenameGroup)(/*[in]*/VARIANT varIndex, /*[in]*/ BSTR newName);
-
-BEGIN_CONNECTION_POINT_MAP(CGroupCollection)
-	CONNECTION_POINT_ENTRY(IID_IGroupCollectionEvents)
-END_CONNECTION_POINT_MAP()
-
-// IGroupEvents
-	STDMETHOD(OnGroupChanged)(IGroup* pGroup)
-	{
-      Fire_OnGroupChanged( pGroup );
-      return S_OK;
-	}
-	STDMETHOD(OnBarRecordAdded)(IGroup* pGroup,IBarRecord * pNewRecord)
-	{
-      Fire_OnBarRecordAdded( pGroup, pNewRecord );
-		return S_OK;
-	}
-	STDMETHOD(OnBarRecordChanged)(IGroup* pGroup,IBarRecord * pBarRecord)
-	{
-      Fire_OnBarRecordChanged(pGroup,pBarRecord);
-		return S_OK;
-	}
-	STDMETHOD(OnBarRecordRemoved)(IGroup* pGroup,BSTR bstrMark)
-	{
-      Fire_OnBarRecordRemoved(pGroup,bstrMark);
-		return S_OK;
-	}
-   STDMETHOD(OnBarRecordsSorted)(/*[in]*/ IGroup* pGroup)
-   {
-      Fire_OnBarRecordsSorted(pGroup);
-      return S_OK;
-   }
-	STDMETHOD(OnBarRecordMoved)(IGroup* pGroup,IBarRecord * pBarRecord,long idxFrom,long idxTo)
-	{
-      Fire_OnBarRecordMoved(pGroup,pBarRecord,idxFrom,idxTo);
-		return S_OK;
-	}
+    std::vector<std::shared_ptr<CGroup>> m_Groups;
+    CBarlist* m_pBarlist = nullptr;
 };
-
-#endif //__GROUPCOLLECTION_H_

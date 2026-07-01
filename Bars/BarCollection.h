@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,61 +23,47 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// BarCollection.h : Declaration of the CBarCollection
+// BarCollection.h : Declaration of CBarCollection (native, replaces the
+// IBarCollection ATL/COM coclass, which used ICollectionOnSTLImpl<...>/
+// CComEnumOnSTL over std::vector<CComVariant>).
+//
+// Stores CBarData by value: this is immutable static reference data
+// (standard bar size tables) built once and never removed/reordered,
+// so no shared ownership is needed for its elements.
 
-#ifndef __BARCOLLECTION_H_
-#define __BARCOLLECTION_H_
+#pragma once
 
-#include "resource.h"       // main symbols
+#include "BarsExport.h"
+#include "BarData.h"
+#include <WBFLTypes.h>
 #include <vector>
+#include <cstddef>
 
-typedef CComEnumOnSTL<IEnumVARIANT,&IID_IEnumVARIANT, VARIANT, _Copy<VARIANT>, std::vector<CComVariant> > VecEnum;
-typedef ICollectionOnSTLImpl<IBarCollection,std::vector<CComVariant>, CComVariant, _Copy<CComVariant>, VecEnum> IBarColl;
-
-struct BarInfo;
-struct BendInfo;
-struct HookInfo;
-
-
-/////////////////////////////////////////////////////////////////////////////
-// CBarCollection
-class ATL_NO_VTABLE CBarCollection : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CBarCollection, &CLSID_BarCollection>,
-   public IDispatchImpl<IBarColl, &IID_IBarCollection, &LIBID_BARSLib>
-//	public IDispatchImpl<IBarCollection, &IID_IBarCollection, &LIBID_BARSLib>
+class BARS_API CBarCollection
 {
 public:
-	CBarCollection()
-	{
-	}
+    CBarCollection() = default;
 
-   HRESULT InitSteelBars();
-   HRESULT InitGalvanizedBars();
-   HRESULT InitGFRPBars();
+    void InitSteelBars();
+    void InitGalvanizedBars();
+    void InitGFRPBars();
 
-protected:
-   HRESULT Init(const BarInfo barInfo[], int cBars, const BendInfo bendInfo[], int cBends, const HookInfo hookInfo[], int cHooks);
+    std::size_t Count() const;
+    const CBarData* Item(std::size_t index) const; // nullptr if index out of range
+    const CBarData* Find(const std::_tstring& name) const; // nullptr if not found, e.g. "#5"
 
-DECLARE_REGISTRY_RESOURCEID(IDR_BARCOLLECTION)
+    using const_iterator = std::vector<CBarData>::const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
 
-DECLARE_PROTECT_FINAL_CONSTRUCT()
+    // Implementation detail, public only so the static reference-data tables
+    // in BarCollection.cpp can be declared at file scope.
+    struct BarInfo;
+    struct BendInfo;
+    struct HookInfo;
 
-BEGIN_COM_MAP(CBarCollection)
-	COM_INTERFACE_ENTRY(IBarCollection)
-	COM_INTERFACE_ENTRY(IDispatch)
-END_COM_MAP()
+private:
+    void Init(const BarInfo barInfo[], int cBars, const BendInfo bendInfo[], int cBends, const HookInfo hookInfo[], int cHooks);
 
-// IBarCollection
-public:
-// ICollectionOnSTLImpl<> implements get_Item(long Index, ItemType* pvar) but
-// I want to be able to index with a zero based index or bar number ("#3"),
-// so I replace it with this.
-	STDMETHOD(get_Item)(/*[in]*/ VARIANT varIndex, /*[out, retval]*/ IBarData** pVal);
-
-// the following two are implemented by ICollectionOnSTLImpl<>
-//	STDMETHOD(get__NewEnum)(/*[out, retval]*/ LPUNKNOWN *pVal);
-//	STDMETHOD(get_Count)(/*[out, retval]*/ long *pVal);
+    std::vector<CBarData> m_Bars;
 };
-
-#endif //__BARCOLLECTION_H_

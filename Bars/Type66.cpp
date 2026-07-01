@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -24,9 +24,9 @@
 
 
 // Type66.cpp : Implementation of CType66
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type66.h"
+#include <tchar.h>
+#include "BarData.h"
 #include "LineComponent.h"
 #include "HelixComponent.h"
 #include <MathEx.h>
@@ -35,34 +35,29 @@
 // CType66
 void CType66::BuildBend()
 {
-   CBendImpl<CType66,&CLSID_Type66>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
    // Error check data
-   if ( use == utTransverse )
+   if ( use == UseType::utTransverse )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_NOTTRANSVERSE );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Bend cannot be designated as Transverse"));
    }
 
-   if ( use == utSeismic )
+   if ( use == UseType::utSeismic )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_NOTSEISMIC );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Bend cannot be designated as Seismic"));
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Build the bend
@@ -70,15 +65,14 @@ void CType66::BuildBend()
    Float64 radius;
    Float64 nTurns;
 
-   pBarData->get_Diameter(&db);
+   db = barData.GetDiameter();
    radius = (GetU() - db)/2;
    nTurns = 1.0 + GetW()/(radius*TWO_PI);
 
-   CHelixComponent* pHelix = new CHelixComponent( radius, nTurns );
-   AddBarComponent( pHelix );
+   AddBarComponent( std::make_unique<CHelixComponent>( radius, nTurns ) );
 }
 
 void CType66::PreValidateBend()
 {
-   CBendImpl<CType66,&CLSID_Type66>::PreValidateBend();
+   CBend::PreValidateBend();
 }

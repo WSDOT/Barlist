@@ -24,9 +24,8 @@
 
 
 // Type96.cpp : Implementation of CType96
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type96.h"
+#include <tchar.h>
 #include "LineComponent.h"
 #include <MathEx.h>
 
@@ -34,13 +33,12 @@
 // CType96
 void CType96::BuildBend()
 {
-   CBendImpl<CType96,&CLSID_Type96>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -49,5 +47,5 @@ void CType96::BuildBend()
    // Build the bend
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(GetU()) );
+   AddBarComponent( std::make_unique<CLineComponent>(GetU()) );
 }

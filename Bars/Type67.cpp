@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -24,9 +24,9 @@
 
 
 // Type67.cpp : Implementation of CType67
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type67.h"
+#include <tchar.h>
+#include "BarData.h"
 #include "LineComponent.h"
 #include "HelixComponent.h"
 #include <MathEx.h>
@@ -35,34 +35,29 @@
 // CType67
 void CType67::BuildBend()
 {
-   CBendImpl<CType67,&CLSID_Type67>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
    // Error check data
-   if ( use == utTransverse )
+   if ( use == UseType::utTransverse )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_NOTTRANSVERSE );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Bend cannot be designated as Transverse"));
    }
 
-   if ( use == utSeismic )
+   if ( use == UseType::utSeismic )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_NOTSEISMIC );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Bend cannot be designated as Seismic"));
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Build the bend
@@ -71,58 +66,50 @@ void CType67::BuildBend()
    Float64 nTurns;
    Float64 pitch;
 
-   pBarData->get_Diameter(&db);
+   db = barData.GetDiameter();
    radius = (GetU() - db)/2;
    pitch = GetX();
    nTurns = GetW()/GetX();
 
-   CHelixComponent* pHelix = new CHelixComponent( radius, nTurns, pitch );
-   AddBarComponent( pHelix );
-
+   auto pHelix = std::make_unique<CHelixComponent>( radius, nTurns, pitch );
    Float64 length = pHelix->Length();
+   AddBarComponent( std::move(pHelix) );
+
    Float64 splice_length;
    if ( IsZero(GetZ()) )
       splice_length = 0;
    else
       splice_length = GetY() * length / GetZ();
 
-   AddBarComponent( new CLineComponent(splice_length) );
+   AddBarComponent( std::make_unique<CLineComponent>(splice_length) );
 }
 
 void CType67::PreValidateBend()
 {
-   CBendImpl<CType67,&CLSID_Type67>::PreValidateBend();
+   CBend::PreValidateBend();
 
    if ( GetW() <= 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), 0.00);
    }
 
    if ( GetX() <= 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("X"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("X"), 0.00);
    }
 
    if ( IsZero(GetZ()) && GetY() > 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEEQUALTO );
-      AddStatusMsg( msg, CComVariant("Y"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be equal to %2"), _T("Y"), 0.00);
    }
 
    if ( GetX() >= GetW() )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_XLESSTHANW );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : X must be less than W"));
    }
 
 }
@@ -131,5 +118,5 @@ void CType67::PostValidateBend()
 {
    // NOTE: Don't call base class PostValidateBend().  We don't want
    //       the maximum lengths to be checked.
-   //CBendImpl<CType67,&CLSID_Type67>::PostValidateBend();
+   //CBend::PostValidateBend();
 }

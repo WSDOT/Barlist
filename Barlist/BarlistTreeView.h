@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -24,12 +24,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_BarlistView_H__536DF63B_D04E_4BD4_A347_53ADDDDA2863__INCLUDED_)
-#define AFX_BarlistView_H__536DF63B_D04E_4BD4_A347_53ADDDDA2863__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "BarlistDoc.h"
 #include "QuantitiesDlg.h"
@@ -137,5 +132,3 @@ inline CBarlistDoc* CBarlistTreeView::GetDocument()
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_BarlistView_H__536DF63B_D04E_4BD4_A347_53ADDDDA2863__INCLUDED_)

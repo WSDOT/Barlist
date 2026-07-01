@@ -24,9 +24,8 @@
 
 
 // Type58.cpp : Implementation of CType58
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type58.h"
+#include <tchar.h>
 #include "LineComponent.h"
 #include "HookComponent.h"
 #include "FabricationConstraints.h"
@@ -35,37 +34,34 @@
 // CType58
 void CType58::BuildBend()
 {
-   CBendImpl<CType58,&CLSID_Type58>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
-   Float64 deduct90 = CFabricationConstraints::GetHookDeduction(pBarData, use, ht90);
-   Float64 deduct135 = CFabricationConstraints::GetHookDeduction(pBarData, use, ht135);
-   Float64 radius = CFabricationConstraints::GetHookRadius(pBarData, use);
-   Float64 tail90 = CFabricationConstraints::GetTailLength(pBarData, use, ht90);
-   Float64 tail135 = CFabricationConstraints::GetTailLength(pBarData, use, ht135);
+   Float64 deduct90 = CFabricationConstraints::GetHookDeduction(barData, use, HookType::ht90);
+   Float64 deduct135 = CFabricationConstraints::GetHookDeduction(barData, use, HookType::ht135);
+   Float64 radius = CFabricationConstraints::GetHookRadius(barData, use);
+   Float64 tail90 = CFabricationConstraints::GetTailLength(barData, use, HookType::ht90);
+   Float64 tail135 = CFabricationConstraints::GetTailLength(barData, use, HookType::ht135);
 
    // Error check data
    if ( (GetU() - (deduct90+deduct135)) < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("U"), CComVariant(deduct90+deduct135));
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), deduct90+deduct135);
 
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Build bend
-   AddBarComponent( new CLineComponent( GetU() - (deduct90+deduct135) ) );
-   AddBarComponent( new CHook135(radius,tail135) );
-   AddBarComponent( new CHook90(radius,tail90) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetU() - (deduct90+deduct135) ) );
+   AddBarComponent( std::make_unique<CHook135>(radius,tail135) );
+   AddBarComponent( std::make_unique<CHook90>(radius,tail90) );
 }

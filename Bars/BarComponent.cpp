@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -27,7 +27,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "BarComponent.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -46,12 +45,6 @@ CBarComponent::~CBarComponent()
 
 void CBarComponent::Clear()
 {
-   std::vector<CBarComponent*>::iterator iter;
-   for ( iter = m_Components.begin(); iter != m_Components.end(); iter++ )
-   {
-      CBarComponent* pComponent = *iter;
-      delete pComponent;
-   }
    m_Components.clear();
 }
 
@@ -61,9 +54,9 @@ bool CBarComponent::Build()
    return BuildComponent();
 }
 
-void CBarComponent::AddBarComponent(CBarComponent* pComponent)
+void CBarComponent::AddBarComponent(std::unique_ptr<CBarComponent> pComponent)
 {
-   m_Components.push_back(pComponent);
+   m_Components.push_back(std::move(pComponent));
 }
 
 Float64 CBarComponent::Length()
@@ -71,11 +64,8 @@ Float64 CBarComponent::Length()
    Build();
 
    Float64 length = 0;
-   std::vector<CBarComponent*>::iterator iter = m_Components.begin();
-   std::vector<CBarComponent*>::iterator end = m_Components.end();
-   for ( ; iter != end; iter++)
+   for (const auto& pComponent : m_Components)
    {
-      CBarComponent* pComponent = *iter;
       length += pComponent->Length();
    }
 

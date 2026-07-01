@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,8 @@
 #pragma once
 
 #include "resource.h"
+#include <string>
+#include <WBFLTypes.h>
 
 // CPropertiesDlg dialog
 
@@ -34,11 +36,11 @@ public:
 	CPropertiesDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CPropertiesDlg();
 
-   CComBSTR m_Project;
-   CComBSTR m_JobNumber;
-   CComBSTR m_Engineer;
-   CComBSTR m_Company;
-   CComBSTR m_Comments;
+   std::_tstring m_Project;
+   std::_tstring m_JobNumber;
+   std::_tstring m_Engineer;
+   std::_tstring m_Company;
+   std::_tstring m_Comments;
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME

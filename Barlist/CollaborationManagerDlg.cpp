@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,6 @@ CCollaborationManagerDlg::~CCollaborationManagerDlg()
 
 void CCollaborationManagerDlg::DoDataExchange(CDataExchange* pDX)
 {
-   USES_CONVERSION;
    CDialog::DoDataExchange(pDX);
    DDX_Control(pDX, IDC_FILES, m_lbFiles);
 
@@ -61,7 +60,7 @@ void CCollaborationManagerDlg::DoDataExchange(CDataExchange* pDX)
       {
          CString strFile;
          m_lbFiles.GetText(i, strFile);
-         m_vFiles.push_back(std::string(T2A(strFile.GetBuffer())));
+         m_vFiles.push_back(std::_tstring(strFile.GetBuffer()));
       }
    }
    else
@@ -69,7 +68,7 @@ void CCollaborationManagerDlg::DoDataExchange(CDataExchange* pDX)
       m_lbFiles.ResetContent();
       for (const auto& strFile : m_vFiles)
       {
-         m_lbFiles.AddString(A2T(strFile.c_str()));
+         m_lbFiles.AddString(strFile.c_str());
       }
    }
 }

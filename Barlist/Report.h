@@ -1,28 +1,33 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright Â© 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
-// published by the Washington State Department of Transportation, 
+// it under the terms of the Alternate Route Open Source License as
+// published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
-// This program is distributed in the hope that it will be useful, but 
-// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// This program is distributed in the hope that it will be useful, but
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 // the Alternate Route Open Source License for more details.
 //
-// You should have received a copy of the Alternate Route Open Source 
-// License along with this program; if not, write to the Washington 
-// State Department of Transportation, Bridge and Structures Office, 
-// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// You should have received a copy of the Alternate Route Open Source
+// License along with this program; if not, write to the Washington
+// State Department of Transportation, Bridge and Structures Office,
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include <Bars\Bars.h>
+#include <Bars\Enums.h>
 #include <vector>
+
+class CBarlist;
+class CGroup;
+class CBarRecord;
+class CBend;
 
 class CReport
 {
@@ -34,7 +39,7 @@ public:
 
 
 
-   void BuildReport(IBarlist* pBarlist);
+   void BuildReport(CBarlist& barlist);
 
    const std::vector<CString>& GetReport();
 
@@ -45,20 +50,20 @@ public:
 private:
    void PageHeader(CDC* pDC, CPrintInfo* pInfo);
    void PrintCoverPage(CDC* pDC, CPrintInfo* pInfo);
-   void ReportGroups(IBarlist* pBarlist);
+   void ReportGroups(CBarlist& barlist);
    void AddReportHeader();
    void AddMaterialDataToReport(MaterialType material, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy);
-   void ReportQuantities(IBarlist* pBarlist);
-   void ReportQuantitiesByGroup(IBarlist* pBarlist);
-   void ReportBarRecords(IGroup* pGroup);
-   void ReportBarRecord(IBarRecord* pBarRecord);
-   CString ReportBend(IBend* pBend, bool bVaries);
-   void ReportErrors(IBend* pBend);
+   void ReportQuantities(CBarlist& barlist);
+   void ReportQuantitiesByGroup(CBarlist& barlist);
+   void ReportBarRecords(CGroup& group);
+   void ReportBarRecord(CBarRecord& barRecord);
+   CString ReportBend(CBend& bend, bool bVaries);
+   void ReportErrors(CBend* bend);
 
 
    TCHAR GetUse(UseType use);
-   TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c);
-   CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
+   TCHAR GetFlag(bool bFlag, TCHAR c);
+   CString GetMaterial(MaterialType material, bool bEpoxy);
 
 
 
@@ -78,4 +83,3 @@ private:
    CRect m_Border;
    CRect m_Rect;
 };
-

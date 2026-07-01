@@ -24,9 +24,8 @@
 
 
 // Type90.cpp : Implementation of CType90
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type90.h"
+#include <tchar.h>
 #include "LineComponent.h"
 #include <MathEx.h>
 
@@ -34,13 +33,12 @@
 // CType90
 void CType90::BuildBend()
 {
-   CBendImpl<CType90,&CLSID_Type90>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -49,5 +47,5 @@ void CType90::BuildBend()
    // Build the bend
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(GetU()) );
+   AddBarComponent( std::make_unique<CLineComponent>(GetU()) );
 }

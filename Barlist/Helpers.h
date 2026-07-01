@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <Bars\Barlst.h>
+#include <Bars\Enums.h>
 
 // Returns a text string for the material specification, such as A615 Grade 40
 LPCTSTR GetMaterialSpecification(MaterialType material);
@@ -36,9 +36,9 @@ CString GetMaterialDesignation(MaterialType material);
 // Returns the material grade code
 CString GetMaterialGrade(MaterialType material);
 
-inline bool CanBeEpoxyCoated(MaterialType material) { return (int)material < (int)A1035_Grade100; }
-inline bool IsA706(MaterialType material) { return (int)A706_Grade60 <= (int)material && (int)material <= (int)A706_Grade80; }
-inline bool IsMMFX(MaterialType material) { return (int)A1035_Grade100 <= (int)material && (int)material <= (int)A1035_Grade120; }
-inline bool IsGalvanized(MaterialType material) { return (int)A767_A1094_Grade60 <= (int)material && (int)material <= (int)A767_A1094_Grade100; }
-inline bool IsStainless(MaterialType material) { return (int)A955_Grade60 <= (int)material && (int)material <= (int)A955_Grade80; }
-inline bool IsGFRP(MaterialType materialType) { return (int)D7957 == (int)materialType; }
+inline bool CanBeEpoxyCoated(MaterialType material) { return (int)material < (int)MaterialType::A1035_Grade100; }
+inline bool IsA706(MaterialType material) { return (int)MaterialType::A706_Grade60 <= (int)material && (int)material <= (int)MaterialType::A706_Grade80; }
+inline bool IsMMFX(MaterialType material) { return (int)MaterialType::A1035_Grade100 <= (int)material && (int)material <= (int)MaterialType::A1035_Grade120; }
+inline bool IsGalvanized(MaterialType material) { return (int)MaterialType::A767_A1094_Grade60 <= (int)material && (int)material <= (int)MaterialType::A767_A1094_Grade100; }
+inline bool IsStainless(MaterialType material) { return (int)MaterialType::A955_Grade60 <= (int)material && (int)material <= (int)MaterialType::A955_Grade80; }
+inline bool IsGFRP(MaterialType materialType) { return (int)MaterialType::D7957 == (int)materialType; }

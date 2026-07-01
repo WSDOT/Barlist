@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -27,7 +27,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "HookComponent.h"
 #include "LineComponent.h"
 #include "HelixComponent.h"
@@ -60,8 +59,8 @@ CHook90::~CHook90()
 bool CHook90::BuildComponent()
 {
    Float64 nTurns = 0.25;
-   AddBarComponent(new CLineComponent(m_Tail));
-   AddBarComponent(new CHelixComponent(m_Radius,nTurns));
+   AddBarComponent( std::make_unique<CLineComponent>(m_Tail));
+   AddBarComponent( std::make_unique<CHelixComponent>(m_Radius,nTurns));
    return true;
 }
 
@@ -78,8 +77,8 @@ CHook135::~CHook135()
 bool CHook135::BuildComponent()
 {
    Float64 nTurns = 0.375;
-   AddBarComponent(new CLineComponent(m_Tail));
-   AddBarComponent(new CHelixComponent(m_Radius,nTurns));
+   AddBarComponent( std::make_unique<CLineComponent>(m_Tail));
+   AddBarComponent( std::make_unique<CHelixComponent>(m_Radius,nTurns));
    return true;
 }
 
@@ -96,7 +95,7 @@ CHook180::~CHook180()
 bool CHook180::BuildComponent()
 {
    Float64 nTurns = 0.50;
-   AddBarComponent(new CLineComponent(m_Tail));
-   AddBarComponent(new CHelixComponent(m_Radius,nTurns));
+   AddBarComponent( std::make_unique<CLineComponent>(m_Tail));
+   AddBarComponent( std::make_unique<CHelixComponent>(m_Radius,nTurns));
    return true;
 }

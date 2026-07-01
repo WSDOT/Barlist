@@ -1,22 +1,22 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright Â© 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
-// published by the Washington State Department of Transportation, 
+// it under the terms of the Alternate Route Open Source License as
+// published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
-// This program is distributed in the hope that it will be useful, but 
-// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// This program is distributed in the hope that it will be useful, but
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 // the Alternate Route Open Source License for more details.
 //
-// You should have received a copy of the Alternate Route Open Source 
-// License along with this program; if not, write to the Washington 
-// State Department of Transportation, Bridge and Structures Office, 
-// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// You should have received a copy of the Alternate Route Open Source
+// License along with this program; if not, write to the Washington
+// State Department of Transportation, Bridge and Structures Office,
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
@@ -33,14 +33,19 @@
 
 #include "Barlist.hxx"
 
-#include "mfcdual.h"
-
 #include "OptionsDlg.h"
 #include "BarDlg.h"
 #include "PropertiesDlg.h"
 #include "ReportDlg.h"
 
 #include "Events.h"
+
+#include <Bars\Group.h>
+#include <Bars\GroupCollection.h>
+#include <Bars\BarRecordCollection.h>
+#include <Bars\BarRecord.h>
+#include <Bars\BendImpl.h>
+#include <Bars\BarException.h>
 
 #include <EAF\EAFMainFrame.h>
 #include <EAF\ToolBar.h>
@@ -93,12 +98,6 @@ BEGIN_MESSAGE_MAP(CBarlistDoc, CEAFDocument)
    ON_COMMAND(ID_VIEW_REPORT, &CBarlistDoc::OnViewReport)
 END_MESSAGE_MAP()
 
-BEGIN_INTERFACE_MAP(CBarlistDoc,CEAFDocument)
-   INTERFACE_PART(CBarlistDoc,IID_IBarlistEvents, Events)
-END_INTERFACE_MAP()
-
-DELEGATE_CUSTOM_INTERFACE(CBarlistDoc, Events);
-
 #define ID_MYTOOLBAR ID_MAINFRAME_TOOLBAR+1
 #define PLUGIN_COMMAND_COUNT 256
 
@@ -129,8 +128,6 @@ CBarlistDoc::CBarlistDoc()
 
    m_MarkIncrement = 1;
 
-   m_dwBarlistEventCookie = 0;
-
    m_reportOptions = ReportOptions::REPORT_TOTAL_QUANTITIES;
 
    EAFGetApp()->RemoveUnitModeListener(this); // hold off on listening for unit mode change events until after the document is loaded
@@ -138,25 +135,13 @@ CBarlistDoc::CBarlistDoc()
 
 CBarlistDoc::~CBarlistDoc()
 {
-   m_BarInfoMgr.Release();
    m_PluginMgr.UnloadPlugins();
 }
 
 BOOL CBarlistDoc::Init()
 {
-   HRESULT hr = m_BarInfoMgr.CoCreateInstance(CLSID_BarInfoMgr);
-   if (FAILED(hr))
-   {
-      AfxMessageBox(_T("Failed to create bar information manager"));
-      return FALSE;
-   }
-
-   hr = m_Barlist.CoCreateInstance(CLSID_Barlist);
-   if (FAILED(hr))
-   {
-      AfxMessageBox(_T("Failed to create barlist"));
-      return FALSE;
-   }
+   m_BarInfoMgr = std::make_unique<CBarInfoMgr>();
+   m_Barlist = std::make_unique<CBarlist>();
 
    if (!m_PluginMgr.LoadPlugins())
    {
@@ -164,18 +149,18 @@ BOOL CBarlistDoc::Init()
       return FALSE;
    }
 
-   if (!Formatter::Init())
-   {
-      return FALSE;
-   }
-
    return __super::Init();
 }
 
 
-void CBarlistDoc::GetBarlist(IBarlist** ppBarlist)
+CBarlist& CBarlistDoc::GetBarlist()
 {
-   m_Barlist.CopyTo(ppBarlist);
+   return *m_Barlist;
+}
+
+CBarInfoMgr& CBarlistDoc::GetBarInfoMgr()
+{
+   return *m_BarInfoMgr;
 }
 
 UINT CBarlistDoc::GetToolbarResourceID()
@@ -267,7 +252,7 @@ BOOL CBarlistDoc::OnNewDocument()
    return TRUE;
 }
 
-BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist)
+BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, CBarlist& barlist)
 {
    USES_CONVERSION;
 
@@ -282,18 +267,6 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
       strMsg.Format(_T("Error opening %s\n\nBarlist files cannot have %% in the name or directory path."), lpszPathName);
       AfxMessageBox(strMsg);
       return FALSE;
-   }
-
-
-   CComPtr<IBarlist> barlist;
-   if (*ppBarlist == nullptr)
-   {
-      barlist.CoCreateInstance(CLSID_Barlist);
-      barlist.CopyTo(ppBarlist);
-   }
-   else
-   {
-      barlist = *ppBarlist;
    }
 
    std::auto_ptr<Barlist> barlist_xml;
@@ -401,149 +374,96 @@ BOOL CBarlistDoc::ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist
       return FALSE;
    }
 
-   CreateBarlist(*barlist_xml, &barlist.p);
+   CreateBarlist(*barlist_xml, barlist);
    return TRUE;
 }
 
 BOOL CBarlistDoc::OpenTheDocument(LPCTSTR lpszPathName)
 {
-   if (!ReadBarlistFromFile(lpszPathName, &m_Barlist.p))
+   if (!ReadBarlistFromFile(lpszPathName, *m_Barlist))
    {
       return FALSE;
    }
 
    // start getting events after the barlist is loaded, otherwise
    // there will be tons of events fired during loading (we don't want that)
-   GetBarlistEvents(TRUE); 
+   GetBarlistEvents(TRUE);
 
    EAFGetApp()->AddUnitModeListener(this); // resume listening for unit mode change events (see constructor)
 
    return TRUE;
 }
 
-Barlist CBarlistDoc::CreateXML(IBarlist* pBarlist)
+Barlist CBarlistDoc::CreateXML(CBarlist& barlist)
 {
-   CComBSTR bstr;
+   // The XSD-generated types below are unconditionally wide (wstring),
+   // regardless of this app's TCHAR-ness -- that was a fixed choice by the
+   // CodeSynthesis XSD generator. CT2CW adapts our native std::_tstring
+   // (TCHAR, varies with the build) to the always-wide XSD side.
+   USES_CONVERSION;
 
    // Properties
    PropertiesType properties(_T(""), _T(""), _T(""), _T(""), _T(""));
-   pBarlist->get_Project(&bstr);
-   properties.Project() = OLE2T(bstr);
+   properties.Project() = CT2CW(barlist.GetProject().c_str());
+   properties.JobNumber() = CT2CW(barlist.GetJobNumber().c_str());
+   properties.Engineer() = CT2CW(barlist.GetEngineer().c_str());
+   properties.Company() = CT2CW(barlist.GetCompany().c_str());
+   properties.Comments() = CT2CW(barlist.GetComments().c_str());
 
-   pBarlist->get_JobNumber(&bstr);
-   properties.JobNumber() = OLE2T(bstr);
+   Barlist barlistXML(properties);
 
-   pBarlist->get_Engineer(&bstr);
-   properties.Engineer() = OLE2T(bstr);
-
-   pBarlist->get_Company(&bstr);
-   properties.Company() = OLE2T(bstr);
-
-   pBarlist->get_Comments(&bstr);
-   properties.Comments() = OLE2T(bstr);
-
-   Barlist barlist(properties);
-
-   CComPtr<IGroupCollection> groups;
-   pBarlist->get_Groups(&groups);
-   long nGroups;
-   groups->get_Count(&nGroups);
-   for (long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+   for (auto& group : barlist.GetGroups())
    {
-      CComPtr<IGroup> pGroup;
-      groups->get_Item(CComVariant(groupIdx), &pGroup);
+      barlistXML.Group().push_back(GroupType((LPCWSTR)CT2CW(group->GetName().c_str())));
 
-      pGroup->get_Name(&bstr);
-      barlist.Group().push_back(GroupType(OLE2T(bstr)));
+      auto& groupXML = barlistXML.Group().back();
 
-      auto& group = barlist.Group().back();
-
-      CComPtr<IBarRecordCollection> bars;
-      pGroup->get_BarRecords(&bars);
-      long nBars;
-      bars->get_Count(&nBars);
-      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      for (auto& bar : group->GetBarRecords())
       {
-         CComPtr<IBarRecord> pBar;
-         bars->get_Item(CComVariant(barIdx), &pBar);
-
-         MaterialType material;
-         pBar->get_Material(&material);
+         MaterialType material = bar->GetMaterial();
          BarRecordType::Material_type mat((BarRecordType::Material_type::value)material);
 
-         pBar->get_Mark(&bstr);
-         BarRecordType::Mark_type mark = OLE2T(bstr);
+         BarRecordType::Mark_type mark = (LPCWSTR)CT2CW(bar->GetMark().c_str());
+         BarRecordType::Location_type location = (LPCWSTR)CT2CW(bar->GetLocation().c_str());
+         BarRecordType::Size_type size = (LPCWSTR)CT2CW(bar->GetSize().c_str());
+         BarRecordType::NoReqd_type nReqd = bar->GetNumReqd();
+         BarRecordType::BendType_type bendType = bar->GetBendType();
 
-         pBar->get_Location(&bstr);
-         BarRecordType::Location_type location = OLE2T(bstr);
-
-         pBar->get_Size(&bstr);
-         BarRecordType::Size_type size = OLE2T(bstr);
-
-         long lValue;
-         pBar->get_NumReqd(&lValue);
-         BarRecordType::NoReqd_type nReqd = lValue;
-
-         pBar->get_BendType(&lValue);
-         BarRecordType::BendType_type bendType = lValue;
-
-         UseType bar_usage;
-         pBar->get_Use(&bar_usage);
+         UseType bar_usage = bar->GetUse();
          BarRecordType::Use_type use((BarRecordType::Use_type)bar_usage);
 
-         VARIANT_BOOL vb;
-         pBar->get_Substructure(&vb);
-         BarRecordType::Substructure_type substructure(vb == VARIANT_TRUE ? _T("True") : _T("False"));
+         // "True"/"False" are compared against the XSD's (always-wide)
+         // Substructure_type/Epoxy_type/Varies_type below -- use plain wide
+         // literals here rather than _T(), since that boundary is fixed-wide
+         // independent of this app's TCHAR-ness.
+         BarRecordType::Substructure_type substructure(bar->GetSubstructure() ? L"True" : L"False");
+         BarRecordType::Epoxy_type epoxy(bar->GetEpoxy() ? L"True" : L"False");
+         bool bVaries = bar->GetVaries();
+         BarRecordType::Varies_type varies(bVaries ? L"True" : L"False");
 
-         pBar->get_Epoxy(&vb);
-         BarRecordType::Epoxy_type epoxy(vb == VARIANT_TRUE ? _T("True") : _T("False"));
+         BarRecordType::NoEach_type nEach = bar->GetNumEach();
 
-         VARIANT_BOOL vbVaries;
-         pBar->get_Varies(&vbVaries);
-         BarRecordType::Varies_type varies(vbVaries == VARIANT_TRUE ? _T("True") : _T("False"));
+         auto primaryBend = bar->GetPrimaryBend();
+         BarRecordType::PrimaryBend_type primaryBendXML(primaryBend->GetU(), primaryBend->GetW(), primaryBend->GetX(), primaryBend->GetY(), primaryBend->GetZ(), primaryBend->GetT1(), primaryBend->GetT2());
 
-         pBar->get_NumEach(&lValue);
-         BarRecordType::NoEach_type nEach = lValue;
+         BarRecordType barRecordXML(mat, mark, location, size, nReqd, bendType, use, substructure, epoxy, varies, nEach, primaryBendXML);
 
-         Float64 u, w, x, y, z, t1, t2;
-         CComPtr<IBend> pPrimaryBend;
-         pBar->get_PrimaryBend(&pPrimaryBend);
-         pPrimaryBend->get_U(&u);
-         pPrimaryBend->get_W(&w);
-         pPrimaryBend->get_X(&x);
-         pPrimaryBend->get_Y(&y);
-         pPrimaryBend->get_Z(&z);
-         pPrimaryBend->get_T1(&t1);
-         pPrimaryBend->get_T2(&t2);
-
-         BarRecordType::PrimaryBend_type primaryBend(u, w, x, y, z, t1, t2);
-
-         BarRecordType barRecord(mat, mark, location, size, nReqd, bendType, use, substructure, epoxy, varies, nEach, primaryBend);
-
-         if (vbVaries == VARIANT_TRUE)
+         if (bVaries)
          {
-            CComPtr<IBend> pVariesBend;
-            pBar->get_VariesBend(&pVariesBend);
-            pVariesBend->get_U(&u);
-            pVariesBend->get_W(&w);
-            pVariesBend->get_X(&x);
-            pVariesBend->get_Y(&y);
-            pVariesBend->get_Z(&z);
-            pVariesBend->get_T1(&t1);
-            pVariesBend->get_T2(&t2);
-            BarRecordType::VariesBend_type variesBend(u, w, x, y, z, t1, t2);
+            auto variesBend = bar->GetVariesBend();
+            BarRecordType::VariesBend_type variesBendXML(variesBend->GetU(), variesBend->GetW(), variesBend->GetX(), variesBend->GetY(), variesBend->GetZ(), variesBend->GetT1(), variesBend->GetT2());
 
-            barRecord.VariesBend() = variesBend;
+            barRecordXML.VariesBend() = variesBendXML;
          }
 
-         group.BarRecord().push_back(barRecord);
+         groupXML.BarRecord().push_back(barRecordXML);
       }
    }
 
-   return barlist;
+   return barlistXML;
 }
 
-BOOL CBarlistDoc::CreateBarlist(LPCSTR strXML, IBarlist** ppBarlist)
+BOOL CBarlistDoc::CreateBarlist(LPCSTR strXML, CBarlist& barlist)
 {
    xml_schema::properties props;
    CEAFApp* pApp = EAFGetApp();
@@ -552,110 +472,87 @@ BOOL CBarlistDoc::CreateBarlist(LPCSTR strXML, IBarlist** ppBarlist)
    props.no_namespace_schema_location(strSchemaFile.GetBuffer());
    std::istringstream is(strXML);
    std::auto_ptr<Barlist> barlistXML = Barlist_(is, 0, props);
-   return CreateBarlist(*barlistXML, ppBarlist);
+   return CreateBarlist(*barlistXML, barlist);
 }
 
-BOOL CBarlistDoc::CreateBarlist(Barlist& barlistXML, IBarlist** ppBarlist)
+BOOL CBarlistDoc::CreateBarlist(Barlist& barlistXML, CBarlist& barlist)
 {
-   CComPtr<IBarlist> barlist;
-   if (*ppBarlist == nullptr)
-   {
-      barlist.CoCreateInstance(CLSID_Barlist);
-      barlist.CopyTo(ppBarlist);
-   }
-   else
-   {
-      barlist = *ppBarlist;
-   }
+   USES_CONVERSION;
 
    auto properties = barlistXML.Properties();
-   barlist->put_Project(CComBSTR(properties.Project().c_str()));
-   barlist->put_JobNumber(CComBSTR(properties.JobNumber().c_str()));
-   barlist->put_Engineer(CComBSTR(properties.Engineer().c_str()));
-   barlist->put_Company(CComBSTR(properties.Company().c_str()));
-   barlist->put_Comments(CComBSTR(properties.Comments().c_str()));
+   barlist.SetProject(std::_tstring((LPCTSTR)CW2CT(properties.Project().c_str())));
+   barlist.SetJobNumber(std::_tstring((LPCTSTR)CW2CT(properties.JobNumber().c_str())));
+   barlist.SetEngineer(std::_tstring((LPCTSTR)CW2CT(properties.Engineer().c_str())));
+   barlist.SetCompany(std::_tstring((LPCTSTR)CW2CT(properties.Company().c_str())));
+   barlist.SetComments(std::_tstring((LPCTSTR)CW2CT(properties.Comments().c_str())));
 
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   int nGroups = 0;
+   auto& groups = barlist.GetGroups();
    auto& grps = barlistXML.Group();
    for (auto& grp : grps)
    {
-      groups->Add(CComBSTR(grp.Name().c_str()));
+      auto group = groups.Add(std::_tstring((LPCTSTR)CW2CT(grp.Name().c_str())));
 
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(nGroups++), &group);
-
-      CComPtr<IBarRecordCollection> barRecords;
-      group->get_BarRecords(&barRecords);
+      auto& barRecords = group->GetBarRecords();
 
       auto& barrecs = grp.BarRecord();
       for (auto& barrec : barrecs)
       {
-         CComPtr<IBarRecord> barRecord;
-         barRecord.CoCreateInstance(CLSID_BarRecord);
+         auto barRecord = std::make_shared<CBarRecord>();
 
          MaterialType material = (MaterialType)(BarRecordType::Material_type::value)barrec.Material();
 
-         CComPtr<IBarCollection> bars;
-         m_BarInfoMgr->get_Bars(material, &bars);
+         const CBarCollection& bars = m_BarInfoMgr->GetBars(material);
+         const CBarData* barData = bars.Find(std::_tstring((LPCTSTR)CW2CT(barrec.Size().c_str())));
+         barRecord->SetBarData(barData);
 
-         CComPtr<IBarData> barData;
-         bars->get_Item(CComVariant(barrec.Size().c_str()), &barData);
-         barRecord->put_BarData(barData);
+         barRecord->SetMaterial(material);
 
-         barRecord->put_Material(material);
-
-         barRecord->put_Mark(CComBSTR(barrec.Mark().c_str()));
-         barRecord->put_Location(CComBSTR(barrec.Location().c_str()));
-         barRecord->put_NumReqd((long)barrec.NoReqd());
+         barRecord->SetMark(std::_tstring((LPCTSTR)CW2CT(barrec.Mark().c_str())));
+         barRecord->SetLocation(std::_tstring((LPCTSTR)CW2CT(barrec.Location().c_str())));
+         barRecord->SetNumReqd((long)barrec.NoReqd());
 
          UseType use = (UseType)barrec.Use();
-         barRecord->put_Use(use);
+         barRecord->SetUse(use);
 
+         // Compared against the XSD's (always-wide) Substructure_type/
+         // Epoxy_type/Varies_type -- plain wide literal, not _T(), matches
+         // the fixed-wide boundary (see CreateXML above).
+         bool bSubstructure = (barrec.Substructure() == L"True");
+         barRecord->SetSubstructure(bSubstructure);
 
-         LCID lcid = 0x0409; // US English
-         VARIANT_BOOL vbSubstructure;
-         VarBoolFromStr(CComBSTR(barrec.Substructure().c_str()), lcid, VAR_LOCALBOOL, &vbSubstructure);
-         barRecord->put_Substructure(vbSubstructure);
+         bool bEpoxy = (barrec.Epoxy() == L"True");
+         barRecord->SetEpoxy(bEpoxy);
 
-         VARIANT_BOOL vbEpoxy;
-         VarBoolFromStr(CComBSTR(barrec.Epoxy().c_str()), lcid, VAR_LOCALBOOL, &vbEpoxy);
-         barRecord->put_Epoxy(vbEpoxy);
-
-         CComPtr<IBend> primaryBend;
-         CBendFactory::CreateBend((long)barrec.BendType(), &primaryBend);
+         auto primaryBend = CBendFactory::CreateBend((long)barrec.BendType());
          auto& primaryBendDimensions = barrec.PrimaryBend();
-         primaryBend->put_U(primaryBendDimensions.U());
-         primaryBend->put_W(primaryBendDimensions.W());
-         primaryBend->put_X(primaryBendDimensions.X());
-         primaryBend->put_Y(primaryBendDimensions.Y());
-         primaryBend->put_Z(primaryBendDimensions.Z());
-         primaryBend->put_T1(primaryBendDimensions.T1());
-         primaryBend->put_T2(primaryBendDimensions.T2());
-         barRecord->put_PrimaryBend(primaryBend);
+         primaryBend->SetU(primaryBendDimensions.U());
+         primaryBend->SetW(primaryBendDimensions.W());
+         primaryBend->SetX(primaryBendDimensions.X());
+         primaryBend->SetY(primaryBendDimensions.Y());
+         primaryBend->SetZ(primaryBendDimensions.Z());
+         primaryBend->SetT1(primaryBendDimensions.T1());
+         primaryBend->SetT2(primaryBendDimensions.T2());
+         barRecord->SetPrimaryBend(primaryBend);
 
-         VARIANT_BOOL vbVaries;
-         VarBoolFromStr(CComBSTR(barrec.Varies().c_str()), lcid, VAR_LOCALBOOL, &vbVaries);
-         if (vbVaries == VARIANT_TRUE)
+         bool bVaries = (barrec.Varies() == L"True");
+         if (bVaries)
          {
-            CComPtr<IBend> variesBend;
-            CBendFactory::CreateBend((long)barrec.BendType(), &variesBend);
+            auto variesBend = CBendFactory::CreateBend((long)barrec.BendType());
             auto& variesBendDimensions = barrec.VariesBend();
             ATLASSERT(variesBendDimensions.present());
-            variesBend->put_U(variesBendDimensions.get().U());
-            variesBend->put_W(variesBendDimensions.get().W());
-            variesBend->put_X(variesBendDimensions.get().X());
-            variesBend->put_Y(variesBendDimensions.get().Y());
-            variesBend->put_Z(variesBendDimensions.get().Z());
-            variesBend->put_T1(variesBendDimensions.get().T1());
-            variesBend->put_T2(variesBendDimensions.get().T2());
-            barRecord->put_VariesBend(variesBend);
+            variesBend->SetU(variesBendDimensions.get().U());
+            variesBend->SetW(variesBendDimensions.get().W());
+            variesBend->SetX(variesBendDimensions.get().X());
+            variesBend->SetY(variesBendDimensions.get().Y());
+            variesBend->SetZ(variesBendDimensions.get().Z());
+            variesBend->SetT1(variesBendDimensions.get().T1());
+            variesBend->SetT2(variesBendDimensions.get().T2());
+            barRecord->SetVariesBend(variesBend);
 
-            barRecord->put_NumEach((long)barrec.NoEach());
+            barRecord->SetNumEach((long)barrec.NoEach());
          }
 
-         barRecords->Add(barRecord);
+         barRecords.Add(barRecord);
       }
    }
 
@@ -675,7 +572,7 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
    }
    else
    {
-      Barlist barlist = CreateXML(m_Barlist);
+      Barlist barlist = CreateXML(*m_Barlist);
 
       // the no_xml_declaration flag prevents the <?xml...?> processing instruction from being written at the top of the
       // file. the processing instruction was not used in version 4 so we will skip it here so previous versions can open files
@@ -688,7 +585,7 @@ BOOL CBarlistDoc::SaveTheDocument(LPCTSTR lpszPathName)
 
 CString CBarlistDoc::GetToolbarSectionName()
 {
-   return "Barlist";
+   return _T("Barlist");
 }
 
 BOOL CBarlistDoc::GetStatusBarMessageString(UINT nID,CString& rMessage) const
@@ -716,11 +613,11 @@ void CBarlistDoc::LoadDocumentSettings()
 
    auto report_options_string = pApp->GetProfileString(_T("Settings"), _T("ReportOptions"),_T("Report Total Quantities"));
 
-   if (report_options_string == L"Report Total Quantities")
+   if (report_options_string == _T("Report Total Quantities"))
    {
        m_reportOptions = ReportOptions::REPORT_TOTAL_QUANTITIES;
    }
-   else if (report_options_string == L"Report Total and Group Quantities")
+   else if (report_options_string == _T("Report Total and Group Quantities"))
    {
        m_reportOptions = ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES;
    }
@@ -745,7 +642,7 @@ void CBarlistDoc::SaveDocumentSettings()
    }
 
 
-   
+
 }
 
 void CBarlistDoc::SetModifiedFlag(BOOL bModified)
@@ -798,7 +695,7 @@ void CBarlistDoc::OnAddGroup()
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    CString strGroup;
    BOOL bResult = AfxQuestion(_T("New Group"), _T("Group Name:"), _T("Unnamed"), strGroup);
-   if (bResult && strGroup == "")
+   if (bResult && strGroup == _T(""))
    {
       AfxMessageBox(_T("The group must have a name"), MB_ICONINFORMATION | MB_OK);
       bResult = false;
@@ -806,9 +703,11 @@ void CBarlistDoc::OnAddGroup()
 
    if (bResult)
    {
-      CComPtr<IGroupCollection> groups;
-      m_Barlist->get_Groups(&groups);
-      if (FAILED(groups->Add(CComBSTR(strGroup))))
+      try
+      {
+         m_Barlist->GetGroups().Add(std::_tstring((LPCTSTR)strGroup));
+      }
+      catch (const CBarException&)
       {
          AfxMessageBox(_T("The barlist already contains a group with the same name."), MB_ICONINFORMATION | MB_OK);
       }
@@ -835,18 +734,14 @@ void CBarlistDoc::OnAddBar()
 
    if (groupIdx == -1)
    {
-      CComPtr<IGroupCollection> groups;
-      m_Barlist->get_Groups(&groups);
-      long nGroups;
-      groups->get_Count(&nGroups);
-      if (nGroups == 0)
+      if (m_Barlist->GetGroups().Count() == 0)
       {
          AFX_MANAGE_STATE(AfxGetStaticModuleState());
          CString strGroup;
          BOOL bResult = AfxQuestion(_T("New Group"), _T("The barlist must have at least one group before bars can be added.\nGroup Name:"), _T("Unnamed"), strGroup);
          if (bResult)
          {
-            VERIFY(SUCCEEDED(groups->Add(CComBSTR(strGroup))));
+            m_Barlist->GetGroups().Add(std::_tstring((LPCTSTR)strGroup));
          }
          else
          {
@@ -862,7 +757,7 @@ void CBarlistDoc::OnAddBar()
 void CBarlistDoc::EditBar(long groupIdx, long barIdx)
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   CBarDlg dlg(m_BarInfoMgr,m_Barlist,groupIdx,barIdx);
+   CBarDlg dlg(*m_BarInfoMgr, *m_Barlist, groupIdx, barIdx);
    dlg.DoModal();
 }
 
@@ -872,18 +767,18 @@ void CBarlistDoc::OnProperties()
    {
       AFX_MANAGE_STATE(AfxGetStaticModuleState()); // this is scoped intentionally
       CPropertiesDlg dlg;
-      m_Barlist->get_Project(&dlg.m_Project);
-      m_Barlist->get_JobNumber(&dlg.m_JobNumber);
-      m_Barlist->get_Engineer(&dlg.m_Engineer);
-      m_Barlist->get_Company(&dlg.m_Company);
-      m_Barlist->get_Comments(&dlg.m_Comments);
+      dlg.m_Project = m_Barlist->GetProject();
+      dlg.m_JobNumber = m_Barlist->GetJobNumber();
+      dlg.m_Engineer = m_Barlist->GetEngineer();
+      dlg.m_Company = m_Barlist->GetCompany();
+      dlg.m_Comments = m_Barlist->GetComments();
       if (dlg.DoModal() == IDOK)
       {
-         m_Barlist->put_Project(dlg.m_Project);
-         m_Barlist->put_JobNumber(dlg.m_JobNumber);
-         m_Barlist->put_Engineer(dlg.m_Engineer);
-         m_Barlist->put_Company(dlg.m_Company);
-         m_Barlist->put_Comments(dlg.m_Comments);
+         m_Barlist->SetProject(dlg.m_Project);
+         m_Barlist->SetJobNumber(dlg.m_JobNumber);
+         m_Barlist->SetEngineer(dlg.m_Engineer);
+         m_Barlist->SetCompany(dlg.m_Company);
+         m_Barlist->SetComments(dlg.m_Comments);
          bUpdate = true;
       }
    }
@@ -906,7 +801,7 @@ void CBarlistDoc::OnAddin(UINT cmd)
 {
    short idx = (short)(cmd - FIRST_ADDIN_COMMAND);
    auto plugin = m_PluginMgr.GetPlugin(idx);
-   plugin->Go(m_Barlist);
+   plugin->Go(*m_Barlist);
 }
 
 HINSTANCE CBarlistDoc::GetResourceInstance()
@@ -917,19 +812,43 @@ HINSTANCE CBarlistDoc::GetResourceInstance()
 
 void CBarlistDoc::GetBarlistEvents(BOOL bListenForEvents)
 {
-   CComQIPtr<IConnectionPointContainer> pCPC(m_Barlist);
-   CComPtr<IConnectionPoint> pCP;
-   HRESULT hr = pCPC->FindConnectionPoint(IID_IBarlistEvents, &pCP);
    if (bListenForEvents)
    {
-      hr = pCP->Advise(GetControllingUnknown(), &m_dwBarlistEventCookie);
+      if (m_bListeningForBarlistEvents)
+      {
+         return;
+      }
+
+      m_GroupAddedToken = m_Barlist->OnGroupAdded.Connect([this](CGroup& g) { OnGroupAdded(g); });
+      m_GroupRemovedToken = m_Barlist->OnGroupRemoved.Connect([this](const std::_tstring& n) { OnGroupRemoved(n); });
+      m_GroupChangedToken = m_Barlist->OnGroupChanged.Connect([this](CGroup& g) { OnGroupChanged(g); });
+      m_GroupMovedToken = m_Barlist->OnGroupMoved.Connect([this](CGroup& g, long f, long t) { OnGroupMoved(g, f, t); });
+      m_BarRecordAddedToken = m_Barlist->OnBarRecordAdded.Connect([this](CGroup& g, CBarRecord& r) { OnBarRecordAdded(g, r); });
+      m_BarRecordChangedToken = m_Barlist->OnBarRecordChanged.Connect([this](CGroup& g, CBarRecord& r) { OnBarRecordChanged(g, r); });
+      m_BarRecordRemovedToken = m_Barlist->OnBarRecordRemoved.Connect([this](CGroup& g, const std::_tstring& m) { OnBarRecordRemoved(g, m); });
+      m_BarRecordsSortedToken = m_Barlist->OnBarRecordsSorted.Connect([this](CGroup& g) { OnBarRecordsSorted(g); });
+      m_BarRecordMovedToken = m_Barlist->OnBarRecordMoved.Connect([this](CGroup& g, CBarRecord& r, long f, long t) { OnBarRecordMoved(g, r, f, t); });
+
+      m_bListeningForBarlistEvents = true;
    }
    else
    {
-      if (0 < m_dwBarlistEventCookie)
+      if (!m_bListeningForBarlistEvents)
       {
-         hr = pCP->Unadvise(m_dwBarlistEventCookie);
+         return;
       }
+
+      m_Barlist->OnGroupAdded.Disconnect(m_GroupAddedToken);
+      m_Barlist->OnGroupRemoved.Disconnect(m_GroupRemovedToken);
+      m_Barlist->OnGroupChanged.Disconnect(m_GroupChangedToken);
+      m_Barlist->OnGroupMoved.Disconnect(m_GroupMovedToken);
+      m_Barlist->OnBarRecordAdded.Disconnect(m_BarRecordAddedToken);
+      m_Barlist->OnBarRecordChanged.Disconnect(m_BarRecordChangedToken);
+      m_Barlist->OnBarRecordRemoved.Disconnect(m_BarRecordRemovedToken);
+      m_Barlist->OnBarRecordsSorted.Disconnect(m_BarRecordsSortedToken);
+      m_Barlist->OnBarRecordMoved.Disconnect(m_BarRecordMovedToken);
+
+      m_bListeningForBarlistEvents = false;
    }
 }
 
@@ -945,7 +864,7 @@ void CBarlistDoc::DeleteContents()
    if (m_Barlist)
    {
       GetBarlistEvents(FALSE);
-      m_Barlist.Release();
+      m_Barlist.reset();
    }
 
    __super::DeleteContents();
@@ -1001,94 +920,50 @@ void CBarlistDoc::SelectGroup(long groupIdx)
    }
 }
 
-void CBarlistDoc::CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const
+std::shared_ptr<CBarRecord> CBarlistDoc::CopyBar(CBarRecord& source) const
 {
-   CComPtr<IBarRecord> clone;
-   clone.CoCreateInstance(CLSID_BarRecord);
+   auto clone = std::make_shared<CBarRecord>();
 
-   MaterialType material;
-   CComBSTR bstrMark;
-   CComBSTR bstrLocation;
-   long nReqd;
-   long nEach;
-   UseType use;
-   VARIANT_BOOL vbSubstructure;
-   VARIANT_BOOL vbEpoxy;
-   VARIANT_BOOL vbVaries;
-   pSource->get_Material(&material);
-   pSource->get_Mark(&bstrMark);
-   pSource->get_Location(&bstrLocation);
-   pSource->get_NumReqd(&nReqd);
-   pSource->get_Use(&use);
-   pSource->get_Substructure(&vbSubstructure);
-   pSource->get_Epoxy(&vbEpoxy);
-   pSource->get_Varies(&vbVaries);
-   pSource->get_NumEach(&nEach);
+   clone->SetMaterial(source.GetMaterial());
+   clone->SetMark(source.GetMark());
+   clone->SetLocation(source.GetLocation());
+   clone->SetNumReqd(source.GetNumReqd());
+   clone->SetUse(source.GetUse());
+   clone->SetSubstructure(source.GetSubstructure());
+   clone->SetEpoxy(source.GetEpoxy());
+   clone->SetNumEach(source.GetNumEach());
 
-   clone->put_Material(material);
-   clone->put_Mark(bstrMark);
-   clone->put_Location(bstrLocation);
-   clone->put_NumReqd(nReqd);
-   clone->put_Use(use);
-   clone->put_Substructure(vbSubstructure);
-   clone->put_Epoxy(vbEpoxy);
-   clone->put_NumEach(nEach);
+   clone->SetBarData(source.GetBarData());
 
+   auto primaryBend = source.GetPrimaryBend();
+   long bendType = primaryBend->GetBendType();
 
-   CComPtr<IBarData> barData;
-   pSource->get_BarData(&barData);
-   clone->put_BarData(barData);
+   auto clonePrimaryBend = CBendFactory::CreateBend(bendType);
+   clonePrimaryBend->SetU(primaryBend->GetU());
+   clonePrimaryBend->SetW(primaryBend->GetW());
+   clonePrimaryBend->SetX(primaryBend->GetX());
+   clonePrimaryBend->SetY(primaryBend->GetY());
+   clonePrimaryBend->SetZ(primaryBend->GetZ());
+   clonePrimaryBend->SetT1(primaryBend->GetT1());
+   clonePrimaryBend->SetT2(primaryBend->GetT2());
+   clone->SetPrimaryBend(clonePrimaryBend);
 
-   CComPtr<IBend> primaryBend;
-   long bendType;
-   Float64 u, w, x, y, z, t1, t2;
-   pSource->get_PrimaryBend(&primaryBend);
-   primaryBend->get_BendType(&bendType);
-   primaryBend->get_U(&u);
-   primaryBend->get_W(&w);
-   primaryBend->get_X(&x);
-   primaryBend->get_Y(&y);
-   primaryBend->get_Z(&z);
-   primaryBend->get_T1(&t1);
-   primaryBend->get_T2(&t2);
-
-   CComPtr<IBend> clonePrimaryBend;
-   CBendFactory::CreateBend(bendType, &clonePrimaryBend);
-   clonePrimaryBend->put_U(u);
-   clonePrimaryBend->put_W(w);
-   clonePrimaryBend->put_X(x);
-   clonePrimaryBend->put_Y(y);
-   clonePrimaryBend->put_Z(z);
-   clonePrimaryBend->put_T1(t1);
-   clonePrimaryBend->put_T2(t2);
-   clone->put_PrimaryBend(clonePrimaryBend);
-
-   if (vbVaries == VARIANT_TRUE)
+   if (source.GetVaries())
    {
-      CComPtr<IBend> variesBend;
-      pSource->get_VariesBend(&variesBend);
+      auto variesBend = source.GetVariesBend();
 
-      variesBend->get_U(&u);
-      variesBend->get_W(&w);
-      variesBend->get_X(&x);
-      variesBend->get_Y(&y);
-      variesBend->get_Z(&z);
-      variesBend->get_T1(&t1);
-      variesBend->get_T2(&t2);
-
-      CComPtr<IBend> cloneVariesBend;
-      CBendFactory::CreateBend(bendType, &cloneVariesBend);
-      cloneVariesBend->put_U(u);
-      cloneVariesBend->put_W(w);
-      cloneVariesBend->put_X(x);
-      cloneVariesBend->put_Y(y);
-      cloneVariesBend->put_Z(z);
-      cloneVariesBend->put_T1(t1);
-      cloneVariesBend->put_T2(t2);
-      clone->put_VariesBend(cloneVariesBend);
+      auto cloneVariesBend = CBendFactory::CreateBend(bendType);
+      cloneVariesBend->SetU(variesBend->GetU());
+      cloneVariesBend->SetW(variesBend->GetW());
+      cloneVariesBend->SetX(variesBend->GetX());
+      cloneVariesBend->SetY(variesBend->GetY());
+      cloneVariesBend->SetZ(variesBend->GetZ());
+      cloneVariesBend->SetT1(variesBend->GetT1());
+      cloneVariesBend->SetT2(variesBend->GetT2());
+      clone->SetVariesBend(cloneVariesBend);
    }
 
-   clone.CopyTo(ppClone);
+   return clone;
 }
 
 void CBarlistDoc::SetReportOptions(const CBarlistDoc::ReportOptions& reportOptions)
@@ -1105,89 +980,70 @@ CReport& CBarlistDoc::GetReport()
 {
    if (m_bDirtyReport)
    {
-      m_Report.BuildReport(m_Barlist);
+      m_Report.BuildReport(*m_Barlist);
       m_bDirtyReport = true;
    }
    return m_Report;
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnGroupAdded(IGroup* pGroup)
+void CBarlistDoc::OnGroupAdded(CGroup& group)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CGroupEventHint hint(pGroup);
-   pThis->UpdateAllViews(nullptr, HINT_GROUP_ADDED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CGroupEventHint hint(&group);
+   UpdateAllViews(nullptr, HINT_GROUP_ADDED, &hint);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnGroupRemoved(BSTR Name)
+void CBarlistDoc::OnGroupRemoved(const std::_tstring& name)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   pThis->UpdateAllViews(nullptr, HINT_GROUP_REMOVED, (CObject*)Name);
-   return S_OK;
+   SetModifiedFlag();
+   UpdateAllViews(nullptr, HINT_GROUP_REMOVED, nullptr);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnGroupChanged(IGroup* pGroup)
+void CBarlistDoc::OnGroupChanged(CGroup& group)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CGroupEventHint hint(pGroup);
-   pThis->UpdateAllViews(nullptr, HINT_GROUP_CHANGED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CGroupEventHint hint(&group);
+   UpdateAllViews(nullptr, HINT_GROUP_CHANGED, &hint);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnGroupMoved(IGroup* pGroup, long idxFrom, long idxTo)
+void CBarlistDoc::OnGroupMoved(CGroup& group, long idxFrom, long idxTo)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CGroupEventHint hint(pGroup,idxFrom,idxTo);
-   pThis->UpdateAllViews(nullptr, HINT_GROUP_MOVED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CGroupEventHint hint(&group, idxFrom, idxTo);
+   UpdateAllViews(nullptr, HINT_GROUP_MOVED, &hint);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnBarRecordAdded(IGroup* pGroup, IBarRecord* pNewRecord)
+void CBarlistDoc::OnBarRecordAdded(CGroup& group, CBarRecord& newRecord)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CBarRecordEventHint hint(pGroup, pNewRecord);
-   pThis->UpdateAllViews(nullptr, HINT_BAR_ADDED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CBarRecordEventHint hint(&group, &newRecord);
+   UpdateAllViews(nullptr, HINT_BAR_ADDED, &hint);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnBarRecordChanged(IGroup* pGroup, IBarRecord* pBarRecord)
+void CBarlistDoc::OnBarRecordChanged(CGroup& group, CBarRecord& barRecord)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CBarRecordEventHint hint(pGroup, pBarRecord);
-   pThis->UpdateAllViews(nullptr, HINT_BAR_CHANGED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CBarRecordEventHint hint(&group, &barRecord);
+   UpdateAllViews(nullptr, HINT_BAR_CHANGED, &hint);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnBarRecordRemoved(IGroup* pGroup, BSTR bstrMark)
+void CBarlistDoc::OnBarRecordRemoved(CGroup& group, const std::_tstring& mark)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CGroupEventHint hint(pGroup);
-   pThis->UpdateAllViews(nullptr, HINT_BAR_REMOVED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CGroupEventHint hint(&group);
+   UpdateAllViews(nullptr, HINT_BAR_REMOVED, &hint);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnBarRecordsSorted(IGroup* pGroup)
+void CBarlistDoc::OnBarRecordsSorted(CGroup& group)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CGroupEventHint hint(pGroup);
-   pThis->UpdateAllViews(nullptr, HINT_GROUP_SORTED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CGroupEventHint hint(&group);
+   UpdateAllViews(nullptr, HINT_GROUP_SORTED, &hint);
 }
 
-STDMETHODIMP CBarlistDoc::XEvents::OnBarRecordMoved(IGroup* pGroup, IBarRecord* pBarRecord, long idxFrom, long idxTo) 
+void CBarlistDoc::OnBarRecordMoved(CGroup& group, CBarRecord& barRecord, long idxFrom, long idxTo)
 {
-   METHOD_PROLOGUE(CBarlistDoc, Events);
-   pThis->SetModifiedFlag();
-   CBarRecordEventHint hint(pGroup, pBarRecord, idxFrom, idxTo);
-   pThis->UpdateAllViews(nullptr, HINT_BAR_MOVED, &hint);
-   return S_OK;
+   SetModifiedFlag();
+   CBarRecordEventHint hint(&group, &barRecord, idxFrom, idxTo);
+   UpdateAllViews(nullptr, HINT_BAR_MOVED, &hint);
 }
-

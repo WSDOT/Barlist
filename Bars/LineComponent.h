@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -27,12 +27,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_LINECOMPONENT_H__D6F6D550_1514_11D3_8937_006097C68A9C__INCLUDED_)
-#define AFX_LINECOMPONENT_H__D6F6D550_1514_11D3_8937_006097C68A9C__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include "BarComponent.h"
 
@@ -53,4 +48,3 @@ private:
    Float64 m_Dz;
 };
 
-#endif // !defined(AFX_LINECOMPONENT_H__D6F6D550_1514_11D3_8937_006097C68A9C__INCLUDED_)

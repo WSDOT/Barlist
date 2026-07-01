@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -25,30 +25,27 @@
 #include <MfcTools\Format.h>
 #include <EAF\EAFUtilities.h>
 #include <EAF\EAFApp.h>
+#include <Units\AnnotatedDisplayUnitFormatter.h>
 
 WBFL::Units::MassData Formatter::gs_MassUnit(WBFL::Units::Measure::Kilogram, 0.001, 9, 0);
 WBFL::Units::ForceData Formatter::gs_WeightUnit(WBFL::Units::Measure::Pound, 0.001, 9, 0);
 std::array<WBFL::Units::LengthData, 2> Formatter::gs_LengthUnit{ WBFL::Units::LengthData(WBFL::Units::Measure::Meter,0.001,9,0),WBFL::Units::LengthData(WBFL::Units::Measure::Feet,0.001,9,0) };
-CComPtr<IAnnotatedDisplayUnitFormatter> Formatter::g_formatter;
 
-BOOL Formatter::Init()
+namespace
 {
-   if (g_formatter == nullptr)
+   const WBFL::Units::AnnotatedDisplayUnitFormatter& GetLengthFormatter()
    {
-      HRESULT hr = g_formatter.CoCreateInstance(CLSID_AnnotatedDisplayUnitFormatter);
-      if (FAILED(hr))
+      static WBFL::Units::AnnotatedDisplayUnitFormatter formatter = []
       {
-         CString strMessage;
-         strMessage.Format(_T("Failed to initialize unit system (%0#x)"), hr);
-         AfxMessageBox(strMessage);
-         return FALSE;
-      }
-      g_formatter->put_Annotation(CComBSTR("'-,\""));
-      g_formatter->put_Multiplier(12.0);
-      g_formatter->put_OffsetDigits(0);
-      g_formatter->FormatSpecifiers(7, 1, tjRight, nftFixed, 0.0001);
+         WBFL::Units::AnnotatedDisplayUnitFormatter f;
+         f.SetAnnotation(_T("'-,\""));
+         f.SetMultiplier(12.0);
+         f.SetOffsetDigits(0);
+         f.SetFormatSpecifiers(7, 1, WBFL::Units::AnnotatedDisplayUnitFormatter::Justify::Right, WBFL::System::NumericFormatTool::Format::Fixed, 0.0001);
+         return f;
+      }();
+      return formatter;
    }
-   return TRUE;
 }
 
 CString Formatter::FormatMass(Float64 mass, bool bUnits)
@@ -98,10 +95,7 @@ CString Formatter::FormatLength(Float64 length, bool bUnits)
    {
       if (bUnits)
       {
-         USES_CONVERSION;
-         CComBSTR bstr;
-         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), CComBSTR(""), &bstr);
-         return OLE2T(bstr);
+         return CString(GetLengthFormatter().AsString(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure)).c_str());
       }
       else
       {
@@ -147,17 +141,12 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
    {
       if (bUnits)
       {
-         USES_CONVERSION;
-         CComBSTR bstr;
-         g_formatter->Format(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure), CComBSTR(""), &bstr);
-         return OLE2T(bstr);
+         return CString(GetLengthFormatter().AsString(WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure)).c_str());
       }
       else
       {
          // convert from system units
-         Int32 feet;
-         Float64 inches;
-         USLength(length, &feet, &inches);
+         auto [feet, inches] = USLength(length);
          int sign = BinarySign(length);
          feet = abs(feet);
 
@@ -178,7 +167,7 @@ CString Formatter::FormatLength(Float64 length, bool bFractionInches, bool bUnit
    }
 }
 
-bool Formatter::IsValidLength(const CString& strValue, Float64* pValue)
+std::pair<bool, Float64> Formatter::IsValidLength(const CString& strValue)
 {
    WBFL::System::Tokenizer tokenizer(_T(" "));
    tokenizer.push_back(strValue);
@@ -186,7 +175,9 @@ bool Formatter::IsValidLength(const CString& strValue, Float64* pValue)
    if (size == 1)
    {
       // there is only one token so strValue must be decimal length
-      return WBFL::System::Tokenizer::ParseDouble(tokenizer[0].c_str(), pValue);
+      Float64 value = 0.0;
+      bool bValid = WBFL::System::Tokenizer::ParseDouble(tokenizer[0].c_str(), &value);
+      return { bValid, value };
    }
    else if (size == 2)
    {
@@ -194,26 +185,25 @@ bool Formatter::IsValidLength(const CString& strValue, Float64* pValue)
       Float64 ft, in;
       if (!WBFL::System::Tokenizer::ParseDouble(tokenizer[0].c_str(), &ft))
       {
-         return false;
+         return { false, 0.0 };
       }
 
       if (!WBFL::System::Tokenizer::ParseDouble(tokenizer[1].c_str(), &in))
       {
-         return false;
+         return { false, 0.0 };
       }
 
-      *pValue = ft + in / 12.0;
-      return true;
+      return { true, ft + in / 12.0 };
    }
-   return false;
+   return { false, 0.0 };
 }
 
-bool Formatter::ParseLength(const CString& strValue, Float64* pValue)
+std::pair<bool, Float64> Formatter::ParseLength(const CString& strValue)
 {
-   Float64 value;
-   if (!IsValidLength(strValue, &value))
+   auto [bValid, value] = IsValidLength(strValue);
+   if (!bValid)
    {
-      return false;
+      return { false, 0.0 };
    }
 
    WBFL::Units::LengthData* pLength;
@@ -226,37 +216,35 @@ bool Formatter::ParseLength(const CString& strValue, Float64* pValue)
       pLength = &gs_LengthUnit[1];
    }
 
-   *pValue = WBFL::Units::ConvertToSysUnits(value, pLength->UnitOfMeasure);
-   return true;
+   return { true, WBFL::Units::ConvertToSysUnits(value, pLength->UnitOfMeasure) };
 }
 
-CString Formatter::FormatStatusValue(CComVariant& var)
+CString Formatter::FormatStatusValue(const StatusValue& var)
 {
    CString strValue;
-   if (var.vt == VT_R8)
+   if (std::holds_alternative<double>(var))
    {
-      strValue.Format(_T("%s"), FormatLength(var.dblVal));
+      strValue.Format(_T("%s"), (LPCTSTR)FormatLength(std::get<double>(var)));
    }
-   else
+   else if (std::holds_alternative<long>(var))
    {
-      USES_CONVERSION;
-      var.ChangeType(VT_BSTR);
-      strValue.Format(_T("%s"), OLE2T(var.bstrVal));
+      // matches the original VariantChangeType(..., VT_BSTR) behavior for
+      // a numeric value -- stringify as decimal text
+      strValue.Format(_T("%d"), std::get<long>(var));
+   }
+   else if (std::holds_alternative<std::_tstring>(var))
+   {
+      strValue = CString(std::get<std::_tstring>(var).c_str());
    }
    return strValue;
 }
 
-CString Formatter::FormatStatusMessage(IStatusMessage* pStatusMessage)
+CString Formatter::FormatStatusMessage(const CStatusMessage& statusMessage)
 {
-   CComBSTR bstrText;
-   pStatusMessage->get_Text(&bstrText);
-   CString strMsg(bstrText);
+   CString strMsg(statusMessage.GetText().c_str());
 
-   CComVariant val1, val2;
-   pStatusMessage->get_Val1(&val1);
-   pStatusMessage->get_Val2(&val2);
-   CString strVal1 = FormatStatusValue(val1);
-   CString strVal2 = FormatStatusValue(val2);
+   CString strVal1 = FormatStatusValue(statusMessage.GetVal1());
+   CString strVal2 = FormatStatusValue(statusMessage.GetVal2());
 
    strMsg.Replace(_T("%1"), strVal1);
    strMsg.Replace(_T("%2"), strVal2);
@@ -264,7 +252,7 @@ CString Formatter::FormatStatusMessage(IStatusMessage* pStatusMessage)
    return strMsg;
 }
 
-void Formatter::USLength(Float64 length, Int32* pFt, Float64* pInch)
+std::pair<Int32, Float64> Formatter::USLength(Float64 length)
 {
    length = WBFL::Units::ConvertFromSysUnits(length, gs_LengthUnit[1].UnitOfMeasure);
    int sign = BinarySign(length);
@@ -278,6 +266,5 @@ void Formatter::USLength(Float64 length, Int32* pFt, Float64* pInch)
       inches = 0;
    }
 
-   *pFt = sign*feet;
-   *pInch = inches;
+   return { sign * feet, inches };
 }

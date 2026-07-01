@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 #include "PropertiesDlg.h"
 #include "afxdialogex.h"
 
-#include "BarDlg.h" // for DDX_Text - bstring version
+#include <MfcTools\CustomDDX.h>
 
 
 // CPropertiesDlg dialog
@@ -48,10 +48,10 @@ void CPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 
-   DDX_Text(pDX, IDC_PROJECT_NAME, m_Project);
+   DDX_String(pDX, IDC_PROJECT_NAME, m_Project);
    if (pDX->m_bSaveAndValidate)
    {
-      if (m_Project.Length() == 0 || m_Project == CComBSTR(_T("")))
+      if (m_Project.empty())
       {
          pDX->PrepareEditCtrl(IDC_PROJECT_NAME);
          AfxMessageBox(_T("Project Name is required"), MB_ICONEXCLAMATION | MB_OK);
@@ -59,10 +59,10 @@ void CPropertiesDlg::DoDataExchange(CDataExchange* pDX)
       }
    }
 
-   DDX_Text(pDX, IDC_JOB_NUMBER, m_JobNumber);
-   DDX_Text(pDX, IDC_ENGINEER, m_Engineer);
-   DDX_Text(pDX, IDC_COMPANY, m_Company);
-   DDX_Text(pDX, IDC_COMMENTS, m_Comments);
+   DDX_String(pDX, IDC_JOB_NUMBER, m_JobNumber);
+   DDX_String(pDX, IDC_ENGINEER, m_Engineer);
+   DDX_String(pDX, IDC_COMPANY, m_Company);
+   DDX_String(pDX, IDC_COMMENTS, m_Comments);
 }
 
 

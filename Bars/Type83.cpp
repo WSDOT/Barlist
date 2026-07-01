@@ -24,9 +24,8 @@
 
 
 // Type83.cpp : Implementation of CType83
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type83.h"
+#include <tchar.h>
 #include "FabricationConstraints.h"
 #include "LineComponent.h"
 #include "BendComponent.h"
@@ -37,13 +36,12 @@
 // CType83
 void CType83::BuildBend()
 {
-   CBendImpl<CType83,&CLSID_Type83>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -58,12 +56,12 @@ void CType83::BuildBend()
    Float64 deduct135;
    Float64 u1, u2, w1, w2;
 
-   oRadius   = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
-   cRadius   = CFabricationConstraints::GetCenterlineBendRadius( pBarData, use );
+   oRadius   = CFabricationConstraints::GetOutsideBendRadius( barData, use );
+   cRadius   = CFabricationConstraints::GetCenterlineBendRadius( barData, use );
    deduct90  = CFabricationConstraints::GetBendDeduction( oRadius, PI_OVER_2 );
-   deduct135 = CFabricationConstraints::GetHookDeduction( pBarData, use, ht135 );
-   hRadius   = CFabricationConstraints::GetHookRadius( pBarData, use );
-   tail      = CFabricationConstraints::GetTailLength( pBarData, use, ht135 );
+   deduct135 = CFabricationConstraints::GetHookDeduction( barData, use, HookType::ht135 );
+   hRadius   = CFabricationConstraints::GetHookRadius( barData, use );
+   tail      = CFabricationConstraints::GetTailLength( barData, use, HookType::ht135 );
 
    u1 = GetU() - 2*deduct90;
    u2 = GetU() - deduct90 - deduct135;
@@ -73,44 +71,38 @@ void CType83::BuildBend()
    // Some additional error checking
    if ( u1 < 0 || u2 < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("U"), CComVariant(max(2*deduct90,deduct90+deduct135)) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), max(2*deduct90,deduct90+deduct135));
    }
 
    if ( w1 < 0 || w2 < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(max(2*deduct90,deduct90+deduct135)) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), max(2*deduct90,deduct90+deduct135));
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(u1) );
-   AddBarComponent( new CLineComponent(u2) );
-   AddBarComponent( new CLineComponent(w1) );
-   AddBarComponent( new CLineComponent(w2) );
-   AddBarComponent( new CBend90(cRadius) );
-   AddBarComponent( new CBend90(cRadius) );
-   AddBarComponent( new CBend90(cRadius) );
-   AddBarComponent( new CHook135(hRadius,tail) );
-   AddBarComponent( new CHook135(hRadius,tail) );
+   AddBarComponent( std::make_unique<CLineComponent>(u1) );
+   AddBarComponent( std::make_unique<CLineComponent>(u2) );
+   AddBarComponent( std::make_unique<CLineComponent>(w1) );
+   AddBarComponent( std::make_unique<CLineComponent>(w2) );
+   AddBarComponent( std::make_unique<CBend90>(cRadius) );
+   AddBarComponent( std::make_unique<CBend90>(cRadius) );
+   AddBarComponent( std::make_unique<CBend90>(cRadius) );
+   AddBarComponent( std::make_unique<CHook135>(hRadius,tail) );
+   AddBarComponent( std::make_unique<CHook135>(hRadius,tail) );
 }
 
 void CType83::PreValidateBend()
 {
-   CBendImpl<CType83,&CLSID_Type83>::PreValidateBend();
+   CBend::PreValidateBend();
 
    if ( GetW() <= 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), 0.00);
    }
 }

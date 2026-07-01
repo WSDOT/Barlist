@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,9 @@
 #include "BarlistPrintDialog.h"
 
 #include "Barlist.hxx"
+
+#include <Bars\BarRecord.h>
+#include <Bars\BarException.h>
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -123,14 +126,10 @@ void CBarlistTreeView::SelectGroup(long groupIdx)
    else
    {
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
 
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-
-      long nGroups;
-      groups->get_Count(&nGroups);
+      long nGroups = static_cast<long>(groups.Count());
       HTREEITEM hGroupItem = tree.GetNextItem(hProjectItem, TVGN_CHILD); // gets first child from root... that's the first barlist group
       for (long idx = 0; idx < groupIdx && idx < nGroups; idx++)
       {
@@ -231,7 +230,7 @@ void CBarlistTreeView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 void CBarlistTreeView::AssertValid() const
 {
    //AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   CTreeView::AssertValid();
+   //CTreeView::AssertValid();
 }
 
 void CBarlistTreeView::Dump(CDumpContext& dc) const
@@ -290,15 +289,14 @@ void CBarlistTreeView::OnGroupRenamed(NMHDR* pNMHDR, LRESULT* pResult)
       long groupIdx = (long)tree.GetItemData(pInfo->item.hItem);
 
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(groupIdx), &group);
-      CComBSTR newName(pInfo->item.pszText);
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
 
-      if (FAILED(groups->RenameGroup(CComVariant(groupIdx), CComBSTR(pInfo->item.pszText))))
+      try
+      {
+         groups.RenameGroup(groupIdx, std::_tstring(pInfo->item.pszText));
+      }
+      catch (const CBarException&)
       {
          AfxMessageBox(_T("That group name already exists or the group name is invalid."), MB_ICONINFORMATION | MB_OK);
       }
@@ -351,11 +349,9 @@ void CBarlistTreeView::OnMoveUp()
    {
       long idx = (long)tree.GetItemData(hItem);
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      groups->MoveUp(CComVariant(idx));
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
+      groups.MoveUp(idx);
    }
 }
 
@@ -375,11 +371,9 @@ void CBarlistTreeView::OnMoveDown()
    {
       long idx = (long)tree.GetItemData(hItem);
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      groups->MoveDown(CComVariant(idx));
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
+      groups.MoveDown(idx);
    }
 }
 
@@ -399,11 +393,9 @@ void CBarlistTreeView::OnDelete()
    {
       long idx = (long)tree.GetItemData(hItem);
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      groups->Remove(CComVariant(idx));
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
+      groups.Remove(idx);
 
       hItem = tree.GetSelectedItem();
       if (hItem)
@@ -443,13 +435,11 @@ void CBarlistTreeView::OnEditCut()
 
    // do the cut
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+
    long groupIdx = GetSelectedGroup();
-   groups->Remove(CComVariant(groupIdx));
+   groups.Remove(groupIdx);
 }
 
 void CBarlistTreeView::OnUpdateEditCopy(CCmdUI *pCmdUI)
@@ -485,36 +475,26 @@ void CBarlistTreeView::UpdateTree(long selectGroupIdx)
    tree.DeleteAllItems();
 
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
+   CBarlist& barlist = pDoc->GetBarlist();
 
-   CComBSTR bstrProject;
-   barlist->get_Project(&bstrProject);
-
-   HTREEITEM hProjectItem = tree.InsertItem(OLE2T(bstrProject), 0, 0);
+   HTREEITEM hProjectItem = tree.InsertItem(CString(barlist.GetProject().c_str()), 0, 0);
    tree.SetItemData(hProjectItem, -1);
 
-   StatusType status;
-   barlist->get_Status(&status);
+   StatusType status = barlist.GetStatus();
    tree.SetItemImage(hProjectItem, (int)status, (int)status);
 
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
+   CGroupCollection& groups = barlist.GetGroups();
 
-   long nGroups;
-   groups->get_Count(&nGroups);
+   long nGroups = static_cast<long>(groups.Count());
    for (long idx = 0; idx < nGroups; idx++)
    {
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(idx), &group);
+      auto group = groups.Item(idx);
+      ATLASSERT(group != nullptr);
 
-      CComBSTR bstrName;
-      group->get_Name(&bstrName);
-
-      HTREEITEM hGroupItem = tree.InsertItem(OLE2T(bstrName),/*nImage,nSelectedImage,*/ hProjectItem, TVI_LAST);
+      HTREEITEM hGroupItem = tree.InsertItem(CString(group->GetName().c_str()),/*nImage,nSelectedImage,*/ hProjectItem, TVI_LAST);
       tree.SetItemData(hGroupItem, idx);
 
-      group->get_Status(&status);
+      status = group->GetStatus();
 
       tree.SetItemImage(hGroupItem, (int)status, (int)status);
 
@@ -537,26 +517,22 @@ void CBarlistTreeView::UpdateStatus()
    CTreeCtrl& tree = GetTreeCtrl();
 
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
+   CBarlist& barlist = pDoc->GetBarlist();
 
    HTREEITEM hProjectItem = tree.GetRootItem();
 
-   StatusType status;
-   barlist->get_Status(&status);
+   StatusType status = barlist.GetStatus();
    tree.SetItemImage(hProjectItem, (int)status, (int)status);
 
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
+   CGroupCollection& groups = barlist.GetGroups();
 
-   long nGroups;
-   groups->get_Count(&nGroups);
+   long nGroups = static_cast<long>(groups.Count());
    HTREEITEM hGroupItem = tree.GetNextItem(hProjectItem, TVGN_CHILD); // gets first child from root... that's the first barlist group
    for (long idx = 0; idx < nGroups; idx++)
    {
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(idx), &group);
-      group->get_Status(&status);
+      auto group = groups.Item(idx);
+      ATLASSERT(group != nullptr);
+      status = group->GetStatus();
 
       tree.SetItemImage(hGroupItem, (int)status, (int)status);
 
@@ -673,41 +649,33 @@ DROPEFFECT CBarlistTreeView::OnDropEx(COleDataObject* pDataObject, DROPEFFECT dr
          }
 
          CBarlistDoc* pDoc = GetDocument();
-         CComPtr<IBarlist> barlist;
-         pDoc->GetBarlist(&barlist);
-
-         CComPtr<IGroupCollection> groups;
-         barlist->get_Groups(&groups);
+         CBarlist& barlist = pDoc->GetBarlist();
+         CGroupCollection& groups = barlist.GetGroups();
 
          long targetGroupIdx = (long)tree.GetItemData(hTargetItem);
-         CComPtr<IGroup> targetGroup;
-         groups->get_Item(CComVariant(targetGroupIdx), &targetGroup);
-
-         CComPtr<IBarRecordCollection> targetBars;
-         targetGroup->get_BarRecords(&targetBars);
+         auto targetGroup = groups.Item(targetGroupIdx);
+         ATLASSERT(targetGroup != nullptr);
+         CBarRecordCollection& targetBars = targetGroup->GetBarRecords();
 
          // reconstitute the source barlist data from the XML string
          HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cBarFormat);
          LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
-         CComPtr<IBarlist> source_barlist;
-         pDoc->CreateBarlist(strXML, &source_barlist);
+         CBarlist source_barlist;
+         pDoc->CreateBarlist(strXML, source_barlist);
          ::GlobalUnlock(hGlobal);
 
          // get the collection of bar records to paste
-         CComPtr<IGroupCollection> source_groups;
-         source_barlist->get_Groups(&source_groups);
-         CComPtr<IGroup> source_group;
-         source_groups->get_Item(CComVariant(0), &source_group);
-         CComPtr<IBarRecordCollection> source_bars;
-         source_group->get_BarRecords(&source_bars);
+         CGroupCollection& source_groups = source_barlist.GetGroups();
+         auto source_group = source_groups.Item(0);
+         ATLASSERT(source_group != nullptr);
+         CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
-         long nBars;
-         source_bars->get_Count(&nBars);
-         for (long barIdx = 0; barIdx < nBars; barIdx++)
+         std::size_t nBars = source_bars.Count();
+         for (std::size_t barIdx = 0; barIdx < nBars; barIdx++)
          {
-            CComPtr<IBarRecord> bar;
-            source_bars->get_Item(CComVariant(barIdx), &bar);
-            targetBars->Add(bar);
+            auto bar = source_bars.Item(barIdx);
+            ATLASSERT(bar != nullptr);
+            targetBars.Add(bar);
          }
 
          tree.SelectItem(hTargetItem);
@@ -755,59 +723,57 @@ DROPEFFECT CBarlistTreeView::OnDropEx(COleDataObject* pDataObject, DROPEFFECT dr
          pThreadID++;
 
          LPCSTR strXML = LPCSTR(pThreadID);
-         CComPtr<IBarlist> source_barlist;
+         CBarlist source_barlist;
          CBarlistDoc* pDoc = GetDocument();
-         pDoc->CreateBarlist(strXML, &source_barlist);
+         pDoc->CreateBarlist(strXML, source_barlist);
          ::GlobalUnlock(hGlobal);
 
-         CComPtr<IBarlist> target_barlist;
-         pDoc->GetBarlist(&target_barlist);
+         CBarlist& target_barlist = pDoc->GetBarlist();
+         CGroupCollection& target_groups = target_barlist.GetGroups();
+         CGroupCollection& source_groups = source_barlist.GetGroups();
 
-         CComPtr<IGroupCollection> target_groups;
-         target_barlist->get_Groups(&target_groups);
-
-         CComPtr<IGroupCollection> source_groups;
-         source_barlist->get_Groups(&source_groups);
-         long nGroups;
-         source_groups->get_Count(&nGroups);
-         for(long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+         std::size_t nGroups = source_groups.Count();
+         for (std::size_t groupIdx = 0; groupIdx < nGroups; groupIdx++)
          {
-            CComPtr<IGroup> source_group;
-            source_groups->get_Item(CComVariant(groupIdx), &source_group);
+            auto source_group = source_groups.Item(groupIdx);
+            ATLASSERT(source_group != nullptr);
 
-            // create a new group
-            CComBSTR bstrGroup;
-            source_group->get_Name(&bstrGroup);
-            CString strTargetGroupName(bstrGroup);
+            // create a new group, retrying with a "_Copy" / "_Copy(n)" suffix
+            // if the source group's name already exists in this document
+            CString strSourceGroupName(source_group->GetName().c_str());
+            CString strTargetGroupName(strSourceGroupName);
+            std::shared_ptr<CGroup> target_group;
             int trial = 0;
-            while (FAILED(target_groups->Add(CComBSTR(strTargetGroupName))))
+            for (;;)
             {
-               if (trial == 0)
+               try
                {
-                  strTargetGroupName.Format(_T("%s_Copy"), OLE2T(bstrGroup));
+                  target_group = target_groups.Add(std::_tstring((LPCTSTR)strTargetGroupName));
+                  break;
                }
-               else
+               catch (const CBarException&)
                {
-                  strTargetGroupName.Format(_T("%s_Copy(%d)"), OLE2T(bstrGroup), trial);
+                  if (trial == 0)
+                  {
+                     strTargetGroupName.Format(_T("%s_Copy"), (LPCTSTR)strSourceGroupName);
+                  }
+                  else
+                  {
+                     strTargetGroupName.Format(_T("%s_Copy(%d)"), (LPCTSTR)strSourceGroupName, trial);
+                  }
+                  trial++;
                }
-               trial++;
             }
 
-            CComPtr<IGroup> target_group;
-            target_groups->get_Item(CComVariant(CComBSTR(strTargetGroupName)), &target_group);
-            CComPtr<IBarRecordCollection> target_bars;
-            target_group->get_BarRecords(&target_bars);
+            CBarRecordCollection& target_bars = target_group->GetBarRecords();
+            CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
-            CComPtr<IBarRecordCollection> source_bars;
-            source_group->get_BarRecords(&source_bars);
-
-            long nBars;
-            source_bars->get_Count(&nBars);
-            for (long barIdx = 0; barIdx < nBars; barIdx++)
+            std::size_t nBars = source_bars.Count();
+            for (std::size_t barIdx = 0; barIdx < nBars; barIdx++)
             {
-               CComPtr<IBarRecord> bar;
-               source_bars->get_Item(CComVariant(barIdx), &bar);
-               target_bars->Add(bar);
+               auto bar = source_bars.Item(barIdx);
+               ATLASSERT(bar != nullptr);
+               target_bars.Add(bar);
             }
          }
 
@@ -825,48 +791,38 @@ DROPEFFECT CBarlistTreeView::OnDropEx(COleDataObject* pDataObject, DROPEFFECT dr
 void CBarlistTreeView::CacheBarlistClipboardData(COleDataSource& dataSource)
 {
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   long nGroups;
-   groups->get_Count(&nGroups);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   long nGroups = static_cast<long>(groups.Count());
 
-   CComPtr<IBarlist> source_barlist;
-   source_barlist.CoCreateInstance(CLSID_Barlist);
-   CComPtr<IGroupCollection> source_groups;
-   source_barlist->get_Groups(&source_groups);
+   CBarlist source_barlist;
+   CGroupCollection& source_groups = source_barlist.GetGroups();
 
    long selectedGroupIdx = GetSelectedGroup();
    long firstGroupIdx = (selectedGroupIdx < 0 ? 0 : selectedGroupIdx);
    long lastGroupIdx = (selectedGroupIdx < 0 ? nGroups - 1 : selectedGroupIdx);
    for (long groupIdx = firstGroupIdx; groupIdx <= lastGroupIdx; groupIdx++)
    {
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(groupIdx), &group);
-      CComPtr<IBarRecordCollection> bars;
-      group->get_BarRecords(&bars);
+      auto group = groups.Item(groupIdx);
+      ATLASSERT(group != nullptr);
+      CBarRecordCollection& bars = group->GetBarRecords();
 
-      CComBSTR bstrName;
-      group->get_Name(&bstrName);
+      const std::_tstring& groupName = group->GetName();
 
-      source_groups->Add(bstrName);
-      CComPtr<IGroup> source_group;
-      source_groups->get_Item(CComVariant(0), &source_group);
-      CComPtr<IBarRecordCollection> source_bars;
-      source_group->get_BarRecords(&source_bars);
+      source_groups.Add(groupName);
+      auto source_group = source_groups.Item(0);
+      ATLASSERT(source_group != nullptr);
+      CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
-      long nBars;
-      bars->get_Count(&nBars);
-      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      std::size_t nBars = bars.Count();
+      for (std::size_t barIdx = 0; barIdx < nBars; barIdx++)
       {
-         CComPtr<IBarRecord> bar;
-         bars->get_Item(CComVariant(barIdx), &bar);
+         auto bar = bars.Item(barIdx);
+         ATLASSERT(bar != nullptr);
 
-         CComPtr<IBarRecord> clone;
-         pDoc->CopyBar(bar, &clone);
+         auto clone = pDoc->CopyBar(*bar);
 
-         source_bars->Add(clone);
+         source_bars.Add(clone);
       }
    }
 
@@ -936,28 +892,31 @@ BOOL CBarlistTreeView::MouseButtonDrag(UINT nFlags, CPoint point)
                pThreadID++;
 
                LPCSTR strXML = LPCSTR(pThreadID);
-               CComPtr<IBarlist> source_barlist;
-               pDoc->CreateBarlist(strXML, &source_barlist);
+               CBarlist source_barlist;
+               pDoc->CreateBarlist(strXML, source_barlist);
                ::GlobalUnlock(hGlobal);
 
                // get the collection of bar records to paste
-               CComPtr<IGroupCollection> source_groups;
-               source_barlist->get_Groups(&source_groups);
-               long nGroups;
-               source_groups->get_Count(&nGroups);
-               for (long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+               CGroupCollection& source_groups = source_barlist.GetGroups();
+               std::size_t nGroups = source_groups.Count();
+               for (std::size_t groupIdx = 0; groupIdx < nGroups; groupIdx++)
                {
-                  CComPtr<IGroup> source_group;
-                  source_groups->get_Item(CComVariant(groupIdx), &source_group);
+                  auto source_group = source_groups.Item(groupIdx);
+                  ATLASSERT(source_group != nullptr);
 
-                  CComBSTR bstrName;
-                  source_group->get_Name(&bstrName);
+                  const std::_tstring& groupName = source_group->GetName();
 
-                  CComPtr<IBarlist> barlist;
-                  pDoc->GetBarlist(&barlist);
-                  CComPtr<IGroupCollection> groups;
-                  barlist->get_Groups(&groups);
-                  groups->Remove(CComVariant(bstrName));
+                  CBarlist& barlist = pDoc->GetBarlist();
+                  CGroupCollection& groups = barlist.GetGroups();
+                  auto targetGroup = groups.Find(groupName);
+                  if (targetGroup)
+                  {
+                     long idx = groups.IndexOf(targetGroup.get());
+                     if (idx != -1)
+                     {
+                        groups.Remove(idx);
+                     }
+                  }
                }
             }
          

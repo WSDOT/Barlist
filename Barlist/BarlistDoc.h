@@ -1,22 +1,22 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright Â© 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
-// published by the Washington State Department of Transportation, 
+// it under the terms of the Alternate Route Open Source License as
+// published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
-// This program is distributed in the hope that it will be useful, but 
-// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// This program is distributed in the hope that it will be useful, but
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 // the Alternate Route Open Source License for more details.
 //
-// You should have received a copy of the Alternate Route Open Source 
-// License along with this program; if not, write to the Washington 
-// State Department of Transportation, Bridge and Structures Office, 
-// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// You should have received a copy of the Alternate Route Open Source
+// License along with this program; if not, write to the Washington
+// State Department of Transportation, Bridge and Structures Office,
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
@@ -24,22 +24,26 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_BarlistDOC_H__A5D5FE52_139D_46C7_84CF_35817D298084__INCLUDED_)
-#define AFX_BarlistDOC_H__A5D5FE52_139D_46C7_84CF_35817D298084__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <EAF\EAFDocument.h>
-#include <Bars\Bars.h>
+#include <Bars\Barlist.h>
+#include <Bars\BarInfoMgr.h>
+#include <Bars\Signal.h>
 #include "PluginManager.h"
 
 #include <array>
+#include <memory>
 #include <Units\IndirectMeasure.h>
 
 #include "Report.h"
 #include "..\Common\Formatter.h"
+
+// Schema-generated XML DOM type (Schema\Barlist.hxx) -- only forward
+// declared here since CreateXML/CreateBarlist only need it as a
+// return/parameter type; the full definition is pulled in by whichever
+// .cpp file actually implements or calls them.
+class Barlist;
 
 class CBarlistDoc : public CEAFDocument
 {
@@ -49,7 +53,8 @@ protected: // create from serialization only
 
 // Attributes
 public:
-   void GetBarlist(IBarlist** ppBarlist);
+   CBarlist& GetBarlist();
+   CBarInfoMgr& GetBarInfoMgr();
    virtual void DoIntegrateWithUI(BOOL bIntegrate);
 
    void EditBar(long groupIdx=-1, long barIdx=-1);
@@ -75,14 +80,14 @@ public:
    void SetReportOptions(const ReportOptions& reportOptions);
    ReportOptions GetReportOptions() const;
 
-   Barlist CreateXML(IBarlist* pBarlist);
-   BOOL CreateBarlist(LPCSTR strXML, IBarlist** ppBarlist);
-   BOOL CreateBarlist(Barlist& barlistXML, IBarlist** ppBarlist);
+   Barlist CreateXML(CBarlist& barlist);
+   BOOL CreateBarlist(LPCSTR strXML, CBarlist& barlist);
+   BOOL CreateBarlist(Barlist& barlistXML, CBarlist& barlist);
 
    virtual BOOL OpenTheDocument(LPCTSTR lpszPathName) override;
    virtual BOOL SaveTheDocument(LPCTSTR lpszPathName) override;
 
-   BOOL ReadBarlistFromFile(LPCTSTR lpszPathName, IBarlist** ppBarlist);
+   BOOL ReadBarlistFromFile(LPCTSTR lpszPathName, CBarlist& barlist);
 
    virtual CString GetToolbarSectionName() override;
    virtual BOOL GetStatusBarMessageString(UINT nID,CString& rMessage) const override;
@@ -99,7 +104,7 @@ public:
 
    void SelectGroup(long groupIdx);
 
-   void CopyBar(IBarRecord* pSource, IBarRecord** ppClone) const;
+   std::shared_ptr<CBarRecord> CopyBar(CBarRecord& source) const;
 
    CReport& GetReport();
 
@@ -114,9 +119,21 @@ public:
 
 protected:
 
-   CComPtr<IBarInfoMgr> m_BarInfoMgr;
-   CComPtr<IBarlist> m_Barlist;
-   DWORD m_dwBarlistEventCookie;
+   std::unique_ptr<CBarInfoMgr> m_BarInfoMgr;
+   std::unique_ptr<CBarlist> m_Barlist;
+
+   // Tokens for this document's subscription to m_Barlist's Signals (see
+   // GetBarlistEvents) -- replaces the old IBarlistEvents connection point.
+   Signal<CGroup&>::Token m_GroupAddedToken{};
+   Signal<const std::_tstring&>::Token m_GroupRemovedToken{};
+   Signal<CGroup&>::Token m_GroupChangedToken{};
+   Signal<CGroup&, long, long>::Token m_GroupMovedToken{};
+   Signal<CGroup&, CBarRecord&>::Token m_BarRecordAddedToken{};
+   Signal<CGroup&, CBarRecord&>::Token m_BarRecordChangedToken{};
+   Signal<CGroup&, const std::_tstring&>::Token m_BarRecordRemovedToken{};
+   Signal<CGroup&>::Token m_BarRecordsSortedToken{};
+   Signal<CGroup&, CBarRecord&, long, long>::Token m_BarRecordMovedToken{};
+   bool m_bListeningForBarlistEvents{ false };
 
    PluginManager m_PluginMgr;
 
@@ -144,18 +161,15 @@ protected:
    //}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
-   DECLARE_INTERFACE_MAP()
-   BEGIN_INTERFACE_PART(Events,IBarlistEvents)
-      STDMETHOD(OnGroupAdded)(IGroup* pGroup);
-      STDMETHOD(OnGroupRemoved)(BSTR Name);
-      STDMETHOD(OnGroupChanged)(IGroup* pGroup);
-      STDMETHOD(OnGroupMoved)(IGroup* pGroup, long idxFrom, long idxTo);
-      STDMETHOD(OnBarRecordAdded)(IGroup* pGroup, IBarRecord* pNewRecord);
-      STDMETHOD(OnBarRecordChanged)(IGroup* pGroup, IBarRecord* pBarRecord);
-      STDMETHOD(OnBarRecordRemoved)(IGroup* pGroup, BSTR bstrMark);
-      STDMETHOD(OnBarRecordsSorted)(IGroup* pGroup);
-      STDMETHOD(OnBarRecordMoved)(IGroup* pGroup, IBarRecord* pBarRecord, long idxFrom, long idxTo);
-   END_INTERFACE_PART(Events)
+   void OnGroupAdded(CGroup& group);
+   void OnGroupRemoved(const std::_tstring& name);
+   void OnGroupChanged(CGroup& group);
+   void OnGroupMoved(CGroup& group, long idxFrom, long idxTo);
+   void OnBarRecordAdded(CGroup& group, CBarRecord& newRecord);
+   void OnBarRecordChanged(CGroup& group, CBarRecord& barRecord);
+   void OnBarRecordRemoved(CGroup& group, const std::_tstring& mark);
+   void OnBarRecordsSorted(CGroup& group);
+   void OnBarRecordMoved(CGroup& group, CBarRecord& barRecord, long idxFrom, long idxTo);
 
    virtual HINSTANCE GetResourceInstance() override;
    virtual void DeleteContents() override;
@@ -175,5 +189,3 @@ protected:
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_BarlistDOC_H__A5D5FE52_139D_46C7_84CF_35817D298084__INCLUDED_)

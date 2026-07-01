@@ -24,9 +24,8 @@
 
 
 // Type92.cpp : Implementation of CType92
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type92.h"
+#include <tchar.h>
 #include "LineComponent.h"
 #include <MathEx.h>
 
@@ -34,13 +33,12 @@
 // CType92
 void CType92::BuildBend()
 {
-   CBendImpl<CType92,&CLSID_Type92>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -49,5 +47,5 @@ void CType92::BuildBend()
    // Build the bend
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(GetU()) );
+   AddBarComponent( std::make_unique<CLineComponent>(GetU()) );
 }

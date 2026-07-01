@@ -24,9 +24,8 @@
 
 
 // Type98.cpp : Implementation of CType98
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type98.h"
+#include <tchar.h>
 #include "LineComponent.h"
 #include <MathEx.h>
 
@@ -34,13 +33,12 @@
 // CType98
 void CType98::BuildBend()
 {
-   CBendImpl<CType98,&CLSID_Type98>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -49,5 +47,5 @@ void CType98::BuildBend()
    // Build the bend
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(GetU()) );
+   AddBarComponent( std::make_unique<CLineComponent>(GetU()) );
 }

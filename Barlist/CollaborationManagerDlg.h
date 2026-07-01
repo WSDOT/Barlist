@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -26,6 +26,7 @@
 #include <vector>
 #include "afxwin.h"
 #include <string>
+#include <WBFLTypes.h>
 
 // CCollaborationManagerDlg dialog
 
@@ -37,7 +38,7 @@ public:
 	CCollaborationManagerDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CCollaborationManagerDlg();
 
-   std::vector<std::string> m_vFiles;
+   std::vector<std::_tstring> m_vFiles;
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME

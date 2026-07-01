@@ -15,14 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Midl Include="..\SDK\Include\Barlst.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
-    <Midl Include="Bars.idl">
-      <Filter>Source Files</Filter>
-    </Midl>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="BarCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,10 +39,10 @@
     <ClCompile Include="BarRecordCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Bars.cpp">
+    <ClCompile Include="BendComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BendComponent.cpp">
+    <ClCompile Include="BendImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BendData.cpp">
@@ -84,9 +76,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="StatusMgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StdAfx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Type50.cpp">
@@ -223,182 +212,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Bars.def">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="AddinMgr.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="BarCollection.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="BarData.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="BarInfoMgr.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Barlist.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="BarRecord.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="BarRecordCollection.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="BendData.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Group.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="GroupCollection.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="HookData.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="StatusMessage.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="StatusMessageCollection.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type50.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type51.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type52.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type53.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type54.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type55.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type56.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type57.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type58.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type59.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type60.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type61.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type62.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type63.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type66.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type67.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type68.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type69.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type70.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type71.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type72.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type73.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type74.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type75.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type76.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type77.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type78.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type79.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type80.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type81.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type82.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type83.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type84.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type89.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type90.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type91.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type92.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type93.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type94.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type95.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type96.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type97.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type98.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Type99.rgs">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Bars.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
@@ -428,7 +241,7 @@
     <ClInclude Include="BarRecordCollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BarsCP.h">
+    <ClInclude Include="BarsExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BendComponent.h">
@@ -461,7 +274,7 @@
     <ClInclude Include="LineComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="Signal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StatusMessage.h">
@@ -471,9 +284,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StatusMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StdAfx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Type50.h">

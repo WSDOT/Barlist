@@ -24,9 +24,8 @@
 
 
 // Type52.cpp : Implementation of CType52
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type52.h"
+#include <tchar.h>
 #include "LineComponent.h"
 #include "HookComponent.h"
 #include "FabricationConstraints.h"
@@ -35,33 +34,30 @@
 // CType52
 void CType52::BuildBend()
 {
-   CBendImpl<CType52,&CLSID_Type52>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
    // Error check data
-   Float64 deduct = CFabricationConstraints::GetHookDeduction( pBarData, use, ht180 );
-   Float64 radius = CFabricationConstraints::GetHookRadius( pBarData, use );
-   Float64 tail   = CFabricationConstraints::GetTailLength( pBarData, use, ht180 );
+   Float64 deduct = CFabricationConstraints::GetHookDeduction( barData, use, HookType::ht180 );
+   Float64 radius = CFabricationConstraints::GetHookRadius( barData, use );
+   Float64 tail   = CFabricationConstraints::GetTailLength( barData, use, HookType::ht180 );
 
    if ( (GetU() - 2*deduct) < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("U"), CComVariant(2*deduct));
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), 2*deduct);
 
       return;
    }
 
    // Build bend
-   AddBarComponent( new CLineComponent( GetU() - 2*deduct ) );
-   AddBarComponent( new CHook180(radius,tail) );
-   AddBarComponent( new CHook180(radius,tail) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetU() - 2*deduct ) );
+   AddBarComponent( std::make_unique<CHook180>(radius,tail) );
+   AddBarComponent( std::make_unique<CHook180>(radius,tail) );
 }

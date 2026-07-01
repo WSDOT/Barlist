@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,132 +23,65 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// Group.h : Declaration of the CGroup
+// Group.h : Declaration of CGroup (native, replaces the
+// IGroup/IBarRecordCollectionEvents ATL/COM coclass).
 
-#ifndef __GROUP_H_
-#define __GROUP_H_
+#pragma once
 
-#include "resource.h"       // main symbols
-#include "BarsCP.h"
-#include "Barlist.h"
-
+#include "BarsExport.h"
+#include "Signal.h"
+#include "Enums.h"
+#include "BarRecordCollection.h"
+#include <WBFLTypes.h>
 #include <array>
+#include <string>
 
-/////////////////////////////////////////////////////////////////////////////
-// CGroup
-class ATL_NO_VTABLE CGroup : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-   //public CComRefCountTracer<CGroup, CComObjectRootEx<CComSingleThreadModel>>,
-	public CComCoClass<CGroup, &CLSID_Group>,
-	public IDispatchImpl<IGroup, &IID_IGroup, &LIBID_BARSLib>,
-	public CProxyIGroupEvents< CGroup >,
-	public IConnectionPointContainerImpl<CGroup>,
-   public ISupportErrorInfo,
-	public IBarRecordCollectionEvents
+class CBarlist;
+
+class BARS_API CGroup
 {
 public:
-   CGroup() :
-      m_Name("")
-	{
-      m_Superstructure.fill(0);
-      m_SuperstructureEpoxy.fill(0);
-      m_Substructure.fill(0);
-      m_SubstructureEpoxy.fill(0);
+    CGroup();
 
-      m_Status = stOK;
+    // The constructor connects [this]-capturing lambdas to m_Bars's signals
+    // (to re-fire them as CGroup's own) -- a copy would carry subscriptions
+    // that still call back into the original instance.
+    CGroup(const CGroup&) = delete;
+    CGroup& operator=(const CGroup&) = delete;
 
-      m_pBarlist = nullptr;
-   }
+    // Non-owning back-reference.
+    void SetBarlist(CBarlist* pBarlist);
+    CBarlist* GetBarlist() const;
 
-   void SetBarlist(CBarlist* pBarlist);
+    const std::_tstring& GetName() const;
+    void SetName(std::_tstring val); // throws CBarException: empty name, or a duplicate within the owning CBarlist
 
-   CBarlist* GetBarlist()
-   {
-      // If this ASSERT fires, you forget to call SetBarlist for this object
-      ATLASSERT( m_pBarlist != nullptr );
-      return m_pBarlist;
-   }
+    CBarRecordCollection& GetBarRecords();
+    const CBarRecordCollection& GetBarRecords() const;
 
-   HRESULT FinalConstruct();
-   void FinalRelease();
+    Float64 GetQuantity(MaterialType material, bool bEpoxy, bool bSubstructure) const;
+    StatusType GetStatus();
 
-DECLARE_REGISTRY_RESOURCEID(IDR_GROUP)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CGroup)
-	COM_INTERFACE_ENTRY(IGroup)
-	COM_INTERFACE_ENTRY(IDispatch)
-	COM_INTERFACE_ENTRY_IMPL(IConnectionPointContainer)
-	COM_INTERFACE_ENTRY(IBarRecordCollectionEvents)
-	COM_INTERFACE_ENTRY(ISupportErrorInfo)
-END_COM_MAP()
+    Signal<CGroup&> OnGroupChanged;
+    Signal<CGroup&, CBarRecord&> OnBarRecordAdded;
+    Signal<CGroup&, CBarRecord&> OnBarRecordChanged;
+    Signal<CGroup&, const std::_tstring&> OnBarRecordRemoved;
+    Signal<CGroup&> OnBarRecordsSorted;
+    Signal<CGroup&, CBarRecord&, long, long> OnBarRecordMoved;
 
 private:
-   CComBSTR m_Name;
-   CComPtr<IBarRecordCollection> m_Bars;
-   DWORD m_BarsCookie;
-   void UpdateStatus();
+    void UpdateStatus();
 
-   // array index is MaterialType
-   // quantities are mass/weight in all cases
-   // except D7957 (GFRP) in which case the quantity is length
-   std::array<Float64, 16> m_Superstructure;
-   std::array<Float64, 16> m_SuperstructureEpoxy;
-   std::array<Float64, 16> m_Substructure;
-   std::array<Float64, 16> m_SubstructureEpoxy;
+    std::_tstring m_Name;
+    CBarRecordCollection m_Bars;
+    CBarlist* m_pBarlist = nullptr;
 
-   StatusType m_Status;
-   CBarlist* m_pBarlist;
+    // array index is MaterialType; quantities are mass/weight in all cases
+    // except D7957 (GFRP), where the quantity is length.
+    std::array<Float64, MATERIAL_COUNT> m_Superstructure{};
+    std::array<Float64, MATERIAL_COUNT> m_SuperstructureEpoxy{};
+    std::array<Float64, MATERIAL_COUNT> m_Substructure{};
+    std::array<Float64, MATERIAL_COUNT> m_SubstructureEpoxy{};
 
-public:
-// ISupportsErrorInfo
-	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
-
-
-// IGroup
-public:
-   STDMETHOD(get_Quantity)(/*[in]*/MaterialType material, /*[in]*/VARIANT_BOOL bEpoxy, /*[in]*/VARIANT_BOOL bSubstructure, /*[out, retval]*/Float64* pVal);
-	STDMETHOD(get_BarRecords)(/*[out, retval]*/ IBarRecordCollection* *pVal);
-	STDMETHOD(get_Name)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_Name)(/*[in]*/ BSTR newVal);
-   STDMETHOD(get_Status)(/*[out,retval]*/ StatusType *pVal);
-
-public :
-
-BEGIN_CONNECTION_POINT_MAP(CGroup)
-	CONNECTION_POINT_ENTRY(IID_IGroupEvents)
-END_CONNECTION_POINT_MAP()
-// IBarRecordCollectionEvents
-	STDMETHOD(OnBarRecordAdded)(IBarRecord * pNewRecord)
-	{
-      Fire_OnBarRecordAdded( this, pNewRecord );
-      UpdateStatus();
-      return S_OK;
-	}
-	STDMETHOD(OnBarRecordRemoved)(BSTR Mark)
-	{
-      Fire_OnBarRecordRemoved( this, Mark );
-      UpdateStatus();
-      return S_OK;
-	}
-	STDMETHOD(OnBarRecordChanged)(IBarRecord* pBarRecord)
-	{
-      Fire_OnBarRecordChanged( this, pBarRecord );
-      UpdateStatus();
-      return S_OK;
-	}
-
-	STDMETHOD(OnBarRecordsSorted)()
-   {
-      Fire_OnBarRecordsSorted( this );
-   	return S_OK;
-   }
-   STDMETHOD(OnBarRecordMoved)(IBarRecord* pBarRecord,long idxFrom,long idxTo)
-   {
-      Fire_OnBarRecordMoved( this, pBarRecord, idxFrom, idxTo );
-      return S_OK;
-   }
+    StatusType m_Status = StatusType::stOK;
 };
-
-#endif //__GROUP_H_

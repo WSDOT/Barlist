@@ -24,19 +24,18 @@
 
 
 // Type50.cpp : Implementation of CType50
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type50.h"
+#include <tchar.h>
 #include "LineComponent.h"
 
 /////////////////////////////////////////////////////////////////////////////
 // CType50
 void CType50::BuildBend()
 {
-   CBendImpl<CType50,&CLSID_Type50>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   AddBarComponent( new CLineComponent( GetU() ) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetU() ) );
 }

@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -24,46 +24,39 @@
 
 
 // StatusMessageCollection.cpp : Implementation of CStatusMessageCollection
-#include "stdafx.h"
-#include "Bars.h"
+
 #include "StatusMessageCollection.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CStatusMessageCollection
-
-/*
-STDMETHODIMP CStatusMessageCollection::get_Count(long *pVal)
+void CStatusMessageCollection::Add(CStatusMessage msg)
 {
-	// TODO: Add your implementation code here
-
-	return S_OK;
+    m_Messages.push_back(std::move(msg));
 }
 
-STDMETHODIMP CStatusMessageCollection::get__NewEnum(LPUNKNOWN *pVal)
+void CStatusMessageCollection::Clear()
 {
-	// TODO: Add your implementation code here
-
-	return S_OK;
-}
-*/
-
-STDMETHODIMP CStatusMessageCollection::get_Item(long index, IStatusMessage* *pVal)
-{
-	// TODO: Add your implementation code here
-   ATLASSERT( 0 <= index && index < m_coll.size() );
-   CComVariant& var = m_coll[index];
-   IDispatch* pDisp = var.pdispVal;
-   CComQIPtr<IStatusMessage> pMsg( pDisp );
-   pMsg.CopyTo(pVal);
-	return S_OK;
+    m_Messages.clear();
 }
 
-
-STDMETHODIMP CStatusMessageCollection::Add(IStatusMessage* pVal)
+std::size_t CStatusMessageCollection::Count() const
 {
-	// TODO: Add your implementation code here
-   CComQIPtr<IDispatch> pDisp(pVal);
-   CComVariant var(pDisp);
-   m_coll.push_back( var );
-	return S_OK;
+    return m_Messages.size();
+}
+
+const CStatusMessage* CStatusMessageCollection::Item(std::size_t index) const
+{
+    if (m_Messages.size() <= index)
+    {
+        return nullptr;
+    }
+    return &m_Messages[index];
+}
+
+CStatusMessageCollection::const_iterator CStatusMessageCollection::begin() const
+{
+    return m_Messages.begin();
+}
+
+CStatusMessageCollection::const_iterator CStatusMessageCollection::end() const
+{
+    return m_Messages.end();
 }

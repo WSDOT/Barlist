@@ -24,9 +24,9 @@
 
 
 // Type80.cpp : Implementation of CType80
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type80.h"
+#include <tchar.h>
+#include "BarData.h"
 #include "FabricationConstraints.h"
 #include "LineComponent.h"
 #include "BendComponent.h"
@@ -37,13 +37,12 @@
 // CType80
 void CType80::BuildBend()
 {
-   CBendImpl<CType80,&CLSID_Type80>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -55,7 +54,7 @@ void CType80::BuildBend()
    Float64 bendDeduct2;
    Float64 u, w, x, y, z, t1, t2;
 
-   pBarData->get_Diameter( &db );
+   db = barData.GetDiameter();
 
    t1 = fabs(M_PI - GetT1());
    t2 = fabs(M_PI - GetT2());
@@ -70,70 +69,60 @@ void CType80::BuildBend()
    z = IsZero(GetZ()) ? 0.00 : GetZ() - db/2.0;
 
    // Check minimum bend radius
-   Float64 rMin = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
+   Float64 rMin = CFabricationConstraints::GetOutsideBendRadius( barData, use );
    if ( !IsZero(GetW()) && !IsZero(GetT1()) && (GetY() < rMin-0.01) )
    {
-      SetStatusLevel( stWarning );
-      CComBSTR msg;
-      msg.LoadString( WARN_MINRADIUS );
-      AddStatusMsg( msg, CComVariant("Y"), CComVariant(rMin) );
+      SetStatusLevel( StatusType::stWarning );
+      AddStatusMsg(_T("WARNING : %1 is less then the minimum bend radius of %2"), _T("Y"), rMin);
    }
 
    if ( !IsZero(GetX()) && !IsZero(GetT2()) && (GetZ() < rMin-0.01) )
    {
-      SetStatusLevel( stWarning );
-      CComBSTR msg;
-      msg.LoadString( WARN_MINRADIUS );
-      AddStatusMsg( msg, CComVariant("Z"), CComVariant(rMin) );
+      SetStatusLevel( StatusType::stWarning );
+      AddStatusMsg(_T("WARNING : %1 is less then the minimum bend radius of %2"), _T("Z"), rMin);
    }
 
    // Some additional error checking
    if ( u < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("U"), CComVariant(bendDeduct1+bendDeduct2) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), bendDeduct1+bendDeduct2);
    }
 
    if ( w < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(bendDeduct1) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), bendDeduct1);
    }
 
    if ( x < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("X"), CComVariant(bendDeduct2) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("X"), bendDeduct2);
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(u) );
-   AddBarComponent( new CLineComponent(w) );
-   AddBarComponent( new CLineComponent(x) );
+   AddBarComponent( std::make_unique<CLineComponent>(u) );
+   AddBarComponent( std::make_unique<CLineComponent>(w) );
+   AddBarComponent( std::make_unique<CLineComponent>(x) );
 
    if( !IsZero(GetW()) )
    {
-      AddBarComponent( new CBendComponent(y,t1) );
+      AddBarComponent( std::make_unique<CBendComponent>(y,t1) );
    }
 
    if( !IsZero(GetX()) )
    {
-      AddBarComponent( new CBendComponent(z,t2) );
+      AddBarComponent( std::make_unique<CBendComponent>(z,t2) );
    }
 }
 
 void CType80::PreValidateBend()
 {
-   CBendImpl<CType80,&CLSID_Type80>::PreValidateBend();
+   CBend::PreValidateBend();
 
    bool bCase1 =  IsZero(GetW()) &&  IsZero(GetX());
    bool bCase2 = !IsZero(GetW()) &&  IsZero(GetX());
@@ -142,9 +131,7 @@ void CType80::PreValidateBend()
 
    if (!bCase1 && !bCase2 && !bCase3 && !bCase4)
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_ILLFORMEDBEND );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Dimensions are inconsistant"));
    }
 }

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -47,13 +47,13 @@ protected:
    virtual BOOL SaveTheDocument(LPCTSTR lpszPathName) override;
    virtual UINT GetToolbarResourceID() override;
 
-   void Merge(IBarlist* pBarlist);
+   void Merge(CBarlist& barlist);
    BOOL EditCollaboration();
 
    BOOL LoadFiles();
    void NotifyDuplicateGroups();
 
-   std::vector<std::string> m_vFiles;
+   std::vector<std::_tstring> m_vFiles;
    std::vector<CString> m_vDuplicateGroups;
 
 	DECLARE_MESSAGE_MAP()

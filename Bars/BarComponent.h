@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -27,16 +27,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_BARCOMPONENT_H__D6F6D553_1514_11D3_8937_006097C68A9C__INCLUDED_)
-#define AFX_BARCOMPONENT_H__D6F6D553_1514_11D3_8937_006097C68A9C__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
+#include <WBFLTypes.h>
 #include <vector>
+#include <memory>
 
-class CBarComponent  
+class CBarComponent
 {
 public:
 	CBarComponent();
@@ -47,15 +44,14 @@ public:
 
 protected:
    virtual bool BuildComponent() = 0;
-   void AddBarComponent(CBarComponent* pComponent);
+   void AddBarComponent(std::unique_ptr<CBarComponent> pComponent); // takes ownership
    void Clear();
 
 private:
-   std::vector<CBarComponent*> m_Components;
+   std::vector<std::unique_ptr<CBarComponent>> m_Components;
 
    // Copy and assignment not supported.
    CBarComponent(const CBarComponent&) = delete;
    CBarComponent& operator=(const CBarComponent&) = delete;
 };
 
-#endif // !defined(AFX_BARCOMPONENT_H__D6F6D553_1514_11D3_8937_006097C68A9C__INCLUDED_)

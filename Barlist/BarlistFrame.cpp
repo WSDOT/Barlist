@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -29,6 +29,8 @@
 #include "resource.h"
 
 #include "Barlist.hxx"
+
+#include <Bars\BarException.h>
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -212,8 +214,8 @@ void CBarlistFrame::OnEditPaste()
          // reconstitute the source barlist data from the XML string
          HGLOBAL hGlobal = dataObj.GetGlobalData(CBarlistListView::ms_cBarFormat);
          LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
-         CComPtr<IBarlist> source_barlist;
-         pDoc->CreateBarlist(strXML, &source_barlist);
+         CBarlist source_barlist;
+         pDoc->CreateBarlist(strXML, source_barlist);
          ::GlobalUnlock(hGlobal);
 
          // get the index of the currently selected group because this
@@ -221,17 +223,11 @@ void CBarlistFrame::OnEditPaste()
          long targetGroupIdx = GetTreeView()->GetSelectedGroup();
 
          // get the target group and its bar record collection
-         CComPtr<IBarlist> barlist;
-         pDoc->GetBarlist(&barlist);
-
-         CComPtr<IGroupCollection> groups;
-         barlist->get_Groups(&groups);
-
-         CComPtr<IGroup> targetGroup;
-         groups->get_Item(CComVariant(targetGroupIdx), &targetGroup);
-
-         CComPtr<IBarRecordCollection> targetBars;
-         targetGroup->get_BarRecords(&targetBars);
+         CBarlist& barlist = pDoc->GetBarlist();
+         CGroupCollection& groups = barlist.GetGroups();
+         auto targetGroup = groups.Item(targetGroupIdx);
+         ATLASSERT(targetGroup != nullptr);
+         CBarRecordCollection& targetBars = targetGroup->GetBarRecords();
 
          // get the current selection information so we can paste at the selection point
          CListCtrl& list = GetListView()->GetListCtrl();
@@ -245,21 +241,18 @@ void CBarlistFrame::OnEditPaste()
 
 
          // get the collection of bar records to paste
-         CComPtr<IGroupCollection> source_groups;
-         source_barlist->get_Groups(&source_groups);
-         CComPtr<IGroup> source_group;
-         source_groups->get_Item(CComVariant(0), &source_group);
-         CComPtr<IBarRecordCollection> source_bars;
-         source_group->get_BarRecords(&source_bars);
+         CGroupCollection& source_groups = source_barlist.GetGroups();
+         auto source_group = source_groups.Item(0);
+         ATLASSERT(source_group != nullptr);
+         CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
          // paste the bar records
-         long nBars;
-         source_bars->get_Count(&nBars);
-         for (long barIdx = 0; barIdx < nBars; barIdx++)
+         std::size_t nBars = source_bars.Count();
+         for (std::size_t barIdx = 0; barIdx < nBars; barIdx++)
          {
-            CComPtr<IBarRecord> bar;
-            source_bars->get_Item(CComVariant(barIdx), &bar);
-            targetBars->Insert(CComVariant(insertIdx + (insertIdx < 0 ? 0 : barIdx)), bar);
+            auto bar = source_bars.Item(barIdx);
+            ATLASSERT(bar != nullptr);
+            targetBars.Insert(insertIdx + (insertIdx < 0 ? 0 : static_cast<int>(barIdx)), bar);
          }
 
          // inserting bars changes the selection state
@@ -276,59 +269,57 @@ void CBarlistFrame::OnEditPaste()
          ATLASSERT(*pThreadID != AfxGetApp()->m_nThreadID);
          pThreadID++; // advance the pointer to the start of the xml string
          LPCSTR strXML = LPCSTR(pThreadID); // cast the pointer
-         CComPtr<IBarlist> source_barlist;
+         CBarlist source_barlist;
          CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
-         pDoc->CreateBarlist(strXML, &source_barlist);
+         pDoc->CreateBarlist(strXML, source_barlist);
          ::GlobalUnlock(hGlobal);
 
-         CComPtr<IBarlist> target_barlist;
-         pDoc->GetBarlist(&target_barlist);
+         CBarlist& target_barlist = pDoc->GetBarlist();
+         CGroupCollection& target_groups = target_barlist.GetGroups();
+         CGroupCollection& source_groups = source_barlist.GetGroups();
 
-         CComPtr<IGroupCollection> target_groups;
-         target_barlist->get_Groups(&target_groups);
-
-         CComPtr<IGroupCollection> source_groups;
-         source_barlist->get_Groups(&source_groups);
-         long nGroups;
-         source_groups->get_Count(&nGroups);
-         for (long groupIdx = 0; groupIdx < nGroups; groupIdx++)
+         std::size_t nGroups = source_groups.Count();
+         for (std::size_t groupIdx = 0; groupIdx < nGroups; groupIdx++)
          {
-            CComPtr<IGroup> source_group;
-            source_groups->get_Item(CComVariant(groupIdx), &source_group);
+            auto source_group = source_groups.Item(groupIdx);
+            ATLASSERT(source_group != nullptr);
 
-            // create a new group
-            CComBSTR bstrGroup;
-            source_group->get_Name(&bstrGroup);
-            CString strTargetGroupName(bstrGroup);
+            // create a new group, retrying with a "_Copy" / "_Copy(n)" suffix
+            // if the source group's name already exists in this document
+            CString strSourceGroupName(source_group->GetName().c_str());
+            CString strTargetGroupName(strSourceGroupName);
+            std::shared_ptr<CGroup> target_group;
             int trial = 0;
-            while (FAILED(target_groups->Add(CComBSTR(strTargetGroupName))))
+            for (;;)
             {
-               if (trial == 0)
+               try
                {
-                  strTargetGroupName.Format(_T("%s_Copy"), OLE2T(bstrGroup));
+                  target_group = target_groups.Add(std::_tstring((LPCTSTR)strTargetGroupName));
+                  break;
                }
-               else
+               catch (const CBarException&)
                {
-                  strTargetGroupName.Format(_T("%s_Copy(%d)"), OLE2T(bstrGroup), trial);
+                  if (trial == 0)
+                  {
+                     strTargetGroupName.Format(_T("%s_Copy"), (LPCTSTR)strSourceGroupName);
+                  }
+                  else
+                  {
+                     strTargetGroupName.Format(_T("%s_Copy(%d)"), (LPCTSTR)strSourceGroupName, trial);
+                  }
+                  trial++;
                }
-               trial++;
             }
 
-            CComPtr<IGroup> target_group;
-            target_groups->get_Item(CComVariant(CComBSTR(strTargetGroupName)), &target_group);
-            CComPtr<IBarRecordCollection> target_bars;
-            target_group->get_BarRecords(&target_bars);
+            CBarRecordCollection& target_bars = target_group->GetBarRecords();
+            CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
-            CComPtr<IBarRecordCollection> source_bars;
-            source_group->get_BarRecords(&source_bars);
-
-            long nBars;
-            source_bars->get_Count(&nBars);
-            for (long barIdx = 0; barIdx < nBars; barIdx++)
+            std::size_t nBars = source_bars.Count();
+            for (std::size_t barIdx = 0; barIdx < nBars; barIdx++)
             {
-               CComPtr<IBarRecord> bar;
-               source_bars->get_Item(CComVariant(barIdx), &bar);
-               target_bars->Add(bar);
+               auto bar = source_bars.Item(barIdx);
+               ATLASSERT(bar != nullptr);
+               target_bars.Add(bar);
             }
          }
       }
@@ -377,56 +368,45 @@ void CBarlistFrame::ClearQuantities()
 void CBarlistFrame::UpdateQuantities(long grpIdx)
 {
    CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   auto group = groups.Item(grpIdx);
 
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(grpIdx), &group);
-
-   UpdateQuantities(group);
+   UpdateQuantities(group.get());
 }
 
-void CBarlistFrame::UpdateQuantities(IGroup* pGroup)
+void CBarlistFrame::UpdateQuantities(CGroup* pGroup)
 {
    if (m_pQuantitiesDlg)
    {
-      CComBSTR bstrName;
       Float64 sub, subEpoxy, super, superEpoxy;
       if (pGroup == nullptr)
       {
          CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
-         CComPtr<IBarlist> barlist;
-         pDoc->GetBarlist(&barlist);
+         CBarlist& barlist = pDoc->GetBarlist();
 
-         barlist->get_Project(&bstrName);
-
-         m_pQuantitiesDlg->SetGroup(bstrName);
+         m_pQuantitiesDlg->SetGroup(barlist.GetProject());
          for (int i = 0; i < MATERIAL_COUNT; i++)
          {
             MaterialType material = (MaterialType)(i);
-            barlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
-            barlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
-            barlist->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
-            barlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+            subEpoxy = barlist.GetQuantity(material, true/*epoxy*/, true/*substructure*/);
+            sub = barlist.GetQuantity(material, false/*epoxy*/, true/*substructure*/);
+            superEpoxy = barlist.GetQuantity(material, true/*epoxy*/, false/*substructure*/);
+            super = barlist.GetQuantity(material, false/*epoxy*/, false/*substructure*/);
 
             m_pQuantitiesDlg->SetQuantities(material, sub, subEpoxy, super, superEpoxy);
          }
       }
       else
       {
-         pGroup->get_Name(&bstrName);
-
-         m_pQuantitiesDlg->SetGroup(bstrName);
+         m_pQuantitiesDlg->SetGroup(pGroup->GetName());
          for (int i = 0; i < MATERIAL_COUNT; i++)
          {
             MaterialType material = (MaterialType)(i);
-            pGroup->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_TRUE/*substructure*/, &subEpoxy);
-            pGroup->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE/*substructure*/, &sub);
-            pGroup->get_Quantity(material, VARIANT_TRUE/*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
-            pGroup->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+            subEpoxy = pGroup->GetQuantity(material, true/*epoxy*/, true/*substructure*/);
+            sub = pGroup->GetQuantity(material, false/*epoxy*/, true/*substructure*/);
+            superEpoxy = pGroup->GetQuantity(material, true/*epoxy*/, false/*substructure*/);
+            super = pGroup->GetQuantity(material, false/*epoxy*/, false/*substructure*/);
 
             m_pQuantitiesDlg->SetQuantities(material, sub, subEpoxy, super, superEpoxy);
          }

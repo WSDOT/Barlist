@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist - Barlist Extensible Application Framework
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -23,12 +23,7 @@
 // Barlist.h : main header file for the BARLIST application
 //
 
-#if !defined(AFX_BARLIST_H__0553A0AE_B8F3_454D_9146_0B973C138288__INCLUDED_)
-#define AFX_BARLIST_H__0553A0AE_B8F3_454D_9146_0B973C138288__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #ifndef __AFXWIN_H__
 	#error include 'stdafx.h' before including this file for PCH
@@ -103,5 +98,3 @@ private:
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_BARLIST_H__0553A0AE_B8F3_454D_9146_0B973C138288__INCLUDED_)

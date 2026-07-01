@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -24,16 +24,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_CHILDFRM_H__D71038F7_24C7_41A9_87E6_A9539977EABE__INCLUDED_)
-#define AFX_CHILDFRM_H__D71038F7_24C7_41A9_87E6_A9539977EABE__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
-
 
 #include "BarlistTreeView.h"
 #include "BarlistListView.h"
+
+class CGroup;
 
 class CBarlistFrame : public CMDIChildWnd
 {
@@ -50,7 +46,7 @@ public:
    CBarlistListView* GetListView();
 
    void UpdateQuantities(long grpIdx);
-   void UpdateQuantities(IGroup* pGroup);
+   void UpdateQuantities(CGroup* pGroup);
    void ClearQuantities();
 
 // Overrides
@@ -97,5 +93,3 @@ public:
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_CHILDFRM_H__D71038F7_24C7_41A9_87E6_A9539977EABE__INCLUDED_)

@@ -24,9 +24,9 @@
 
 
 // Type69.cpp : Implementation of CType69
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type69.h"
+#include <tchar.h>
+#include "BarData.h"
 #include "FabricationConstraints.h"
 #include "LineComponent.h"
 #include "BendComponent.h"
@@ -36,13 +36,12 @@
 // CType69
 void CType69::BuildBend()
 {
-   CBendImpl<CType69,&CLSID_Type69>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -57,9 +56,9 @@ void CType69::BuildBend()
    Float64 angle;
    Float64 u, wx, y, z; // reduced dimensions (wx is the hypotenous)
 
-   pBarData->get_Diameter( &db );
-   oRadius = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
-   cRadius = CFabricationConstraints::GetCenterlineBendRadius( pBarData, use );
+   db = barData.GetDiameter();
+   oRadius = CFabricationConstraints::GetOutsideBendRadius( barData, use );
+   cRadius = CFabricationConstraints::GetCenterlineBendRadius( barData, use );
    angle = IsZero(GetX()) ? 0.00 : atan2(GetX(),GetW());
 
    deduct   = IsZero(GetX()) ? 0.00 : CFabricationConstraints::GetBendDeduction( oRadius, angle );
@@ -73,60 +72,52 @@ void CType69::BuildBend()
    // Some additional error checking
    if ( u < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("U"), CComVariant(deduct) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), deduct);
    }
 
    if ( wx < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("sqrt(W*W + X*X)"), CComVariant(deduct+deduct90) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("sqrt(W*W + X*X)"), deduct+deduct90);
    }
 
    if ( y < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("Y"), CComVariant(deduct+deduct90) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("Y"), deduct+deduct90);
    }
 
    if ( z < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("Z"), CComVariant(deduct90) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("Z"), deduct90);
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(u) );
-   AddBarComponent( new CLineComponent(wx) );
-   AddBarComponent( new CLineComponent(y) );
-   AddBarComponent( new CLineComponent(z) );
+   AddBarComponent( std::make_unique<CLineComponent>(u) );
+   AddBarComponent( std::make_unique<CLineComponent>(wx) );
+   AddBarComponent( std::make_unique<CLineComponent>(y) );
+   AddBarComponent( std::make_unique<CLineComponent>(z) );
 
    if ( wx > 0 )
-      AddBarComponent( new CBendComponent(cRadius,angle) );
+      AddBarComponent( std::make_unique<CBendComponent>(cRadius,angle) );
 
    if ( y > 0 )
-      AddBarComponent( new CBendComponent(cRadius,angle) );
+      AddBarComponent( std::make_unique<CBendComponent>(cRadius,angle) );
 
    if ( z > 0 )
-      AddBarComponent( new CBend90(cRadius) );
+      AddBarComponent( std::make_unique<CBend90>(cRadius) );
 }
 
 void CType69::PreValidateBend()
 {
    // NOTE: Don't call base-class PreValidateBend().  U = 0 is
    //       valid for this bend!!!
-   //CBendImpl<CType69,&CLSID_Type69>::PreValidateBend();
+   //CBend::PreValidateBend();
 
    bool bCase1 =  !IsZero(GetU()) && IsZero(GetW()) &&  IsZero(GetX()) &&  IsZero(GetY()) &&  IsZero(GetZ());
    bool bCase2 =  !IsZero(GetU()) &&                   !IsZero(GetX()) &&  IsZero(GetY()) &&  IsZero(GetZ());
@@ -139,17 +130,13 @@ void CType69::PreValidateBend()
 
    if (!bCase1 && !bCase2 && !bCase3 && !bCase4 && !bCase5 && !bCase6 && !bCase7 && !bCase8)
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_ILLFORMEDBEND );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Dimensions are inconsistant"));
    }
 
    if (!IsZero(GetZ()) && IsZero(GetY()))
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEZEROIFOTHERISZERO );
-      AddStatusMsg( msg, CComVariant("Y"), CComVariant("Z") );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be zero if %2 is zero"), _T("Y"), _T("Z"));
    }
 }

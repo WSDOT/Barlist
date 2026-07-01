@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,53 +23,25 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// BarInfoMgr.h : Declaration of the CBarInfoMgr
+// BarInfoMgr.h : Declaration of CBarInfoMgr (native, replaces the
+// IBarInfoMgr ATL/COM coclass). Owns the process-lifetime static bar
+// size tables and vends the right one for a given material.
 
-#ifndef __BARINFOMGR_H_
-#define __BARINFOMGR_H_
+#pragma once
 
-#include "resource.h"       // main symbols
+#include "BarsExport.h"
+#include "BarCollection.h"
+#include "Enums.h"
 
-interface IBarCollection;
-
-/////////////////////////////////////////////////////////////////////////////
-// CBarInfoMgr
-class ATL_NO_VTABLE CBarInfoMgr : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-   //public CComRefCountTracer<CBarInfoMgr, CComObjectRootEx<CComSingleThreadModel>>,
-   public CComCoClass<CBarInfoMgr, &CLSID_BarInfoMgr>,
-	public ISupportErrorInfo,
-	public IDispatchImpl<IBarInfoMgr, &IID_IBarInfoMgr, &LIBID_BARSLib>
+class BARS_API CBarInfoMgr
 {
 public:
-	CBarInfoMgr()
-	{
-	}
+    CBarInfoMgr();
 
-   HRESULT FinalConstruct();
-   void FinalRelease();
-
-DECLARE_REGISTRY_RESOURCEID(IDR_BARINFOMGR)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CBarInfoMgr)
-	COM_INTERFACE_ENTRY(IBarInfoMgr)
-	COM_INTERFACE_ENTRY(IDispatch)
-	COM_INTERFACE_ENTRY(ISupportErrorInfo)
-END_COM_MAP()
-
-// ISupportsErrorInfo
-	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
-
-// IBarInfoMgr
-public:
-	STDMETHOD(get_Bars)(/*[in]*/MaterialType material,/*[out, retval]*/ IBarCollection* *pVal);
+    const CBarCollection& GetBars(MaterialType material) const;
 
 private:
-   CComPtr<IBarCollection> m_pSteelBars;
-   CComPtr<IBarCollection> m_pGalvanizedBars;
-   CComPtr<IBarCollection> m_pGFRPBars;
+    CBarCollection m_SteelBars;
+    CBarCollection m_GalvanizedBars;
+    CBarCollection m_GFRPBars;
 };
-
-#endif //__BARINFOMGR_H_

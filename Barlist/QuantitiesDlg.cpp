@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -96,9 +96,9 @@ BOOL CQuantitiesDlg::OnInitDialog()
                  // EXCEPTION: OCX Property Pages should return FALSE
 }
 
-void CQuantitiesDlg::SetGroup(BSTR bstrGroup)
+void CQuantitiesDlg::SetGroup(const std::_tstring& strGroup)
 {
-   GetDlgItem(IDC_GROUP)->SetWindowText(CString(bstrGroup));
+   GetDlgItem(IDC_GROUP)->SetWindowText(strGroup.c_str());
 }
 
 void CQuantitiesDlg::SetQuantities(MaterialType material, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy)
@@ -108,7 +108,7 @@ void CQuantitiesDlg::SetQuantities(MaterialType material, Float64 sub, Float64 s
    CString strSuper;
    CString strSuperEpoxy;
 
-   if (material == D7957)
+   if (material == MaterialType::D7957)
    {
       // GFRP
       strSub = Formatter::FormatLength(sub);
@@ -124,7 +124,7 @@ void CQuantitiesDlg::SetQuantities(MaterialType material, Float64 sub, Float64 s
       strSuperEpoxy = CanBeEpoxyCoated(material) ? Formatter::FormatMass(superEpoxy) : CString("-");
    }
 
-   int row = (int)(material)-(int)A706_Grade60;
+   int row = (int)(material)-(int)MaterialType::A706_Grade60;
    m_QuantitiesList.SetItemText(row, 1, strSub);
    m_QuantitiesList.SetItemText(row, 2, strSubEpoxy);
    m_QuantitiesList.SetItemText(row, 3, strSuper);

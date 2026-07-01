@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // ExcelExporter - Barlist Exchange File
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -24,5 +24,4 @@
 
 #include "StdAfx.h"
 #include "CLSID.h"
-#include <WBFLUnitServer_i.c> // for CLSID_AnnotatedDisplayUnitFormatter
 

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -27,26 +27,22 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_BAREXCEPTION_H__F0FE7689_2F3E_11D3_8958_006097C68A9C__INCLUDED_)
-#define AFX_BAREXCEPTION_H__F0FE7689_2F3E_11D3_8958_006097C68A9C__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
 #include <string>
+#include <tchar.h>
+#include <WBFLTypes.h>
 
-class CBarException  
+class CBarException
 {
 public:
-	CBarException(const char* lpszReason);
+	CBarException(const TCHAR* lpszReason);
 	virtual ~CBarException();
 
-   std::string GetReason() const;
+   std::_tstring GetReason() const;
 
 private:
 
-   std::string m_Reason;
+   std::_tstring m_Reason;
 };
 
-#endif // !defined(AFX_BAREXCEPTION_H__F0FE7689_2F3E_11D3_8958_006097C68A9C__INCLUDED_)

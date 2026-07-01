@@ -24,9 +24,8 @@
 
 
 // Type78.cpp : Implementation of CType78
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type78.h"
+#include <tchar.h>
 #include "FabricationConstraints.h"
 #include "LineComponent.h"
 #include "BendComponent.h"
@@ -37,13 +36,12 @@
 // CType78
 void CType78::BuildBend()
 {
-   CBendImpl<CType78,&CLSID_Type78>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -60,16 +58,16 @@ void CType78::BuildBend()
    Float64 deductHook_2;
    Float64 u, w, x; // reduced dimensions (wx is the hypotenous)
 
-   oRadius = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
-   cRadius = CFabricationConstraints::GetCenterlineBendRadius( pBarData, use );
+   oRadius = CFabricationConstraints::GetOutsideBendRadius( barData, use );
+   cRadius = CFabricationConstraints::GetCenterlineBendRadius( barData, use );
 
    deduct90_1 = IsZero(GetW()) ? 0.00 : CFabricationConstraints::GetBendDeduction( oRadius, PI_OVER_2 );
    deduct90_2 = IsZero(GetX()) ? 0.00 : CFabricationConstraints::GetBendDeduction( oRadius, PI_OVER_2 );
 
-   hRadius = CFabricationConstraints::GetHookRadius( pBarData, use );
-   tail = CFabricationConstraints::GetTailLength( pBarData, use, ht90 );
-   deductHook_1 = IsZero(GetW()) ? 0.00 : CFabricationConstraints::GetHookDeduction( pBarData, use, ht90 );
-   deductHook_2 = IsZero(GetX()) ? 0.00 : CFabricationConstraints::GetHookDeduction( pBarData, use, ht90 );
+   hRadius = CFabricationConstraints::GetHookRadius( barData, use );
+   tail = CFabricationConstraints::GetTailLength( barData, use, HookType::ht90 );
+   deductHook_1 = IsZero(GetW()) ? 0.00 : CFabricationConstraints::GetHookDeduction( barData, use, HookType::ht90 );
+   deductHook_2 = IsZero(GetX()) ? 0.00 : CFabricationConstraints::GetHookDeduction( barData, use, HookType::ht90 );
 
    u = GetU() - deduct90_1 - deduct90_2;
    w = IsZero(GetW()) ? 0.00 : GetW() - deduct90_1 - deductHook_1;
@@ -78,53 +76,47 @@ void CType78::BuildBend()
    // Some additional error checking
    if ( u < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("U"), CComVariant(deduct90_1 + deduct90_2) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), deduct90_1 + deduct90_2);
    }
 
    if ( w < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(deduct90_1+deductHook_1) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), deduct90_1+deductHook_1);
    }
 
    if ( x < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("X"), CComVariant(deduct90_2+deductHook_2) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("X"), deduct90_2+deductHook_2);
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(u) );
-   AddBarComponent( new CLineComponent(w) );
-   AddBarComponent( new CLineComponent(x) );
+   AddBarComponent( std::make_unique<CLineComponent>(u) );
+   AddBarComponent( std::make_unique<CLineComponent>(w) );
+   AddBarComponent( std::make_unique<CLineComponent>(x) );
 
    if ( !IsZero(GetW()) )
    {
-      AddBarComponent( new CBend90(cRadius) );
-      AddBarComponent( new CHook90(hRadius,tail) );
+      AddBarComponent( std::make_unique<CBend90>(cRadius) );
+      AddBarComponent( std::make_unique<CHook90>(hRadius,tail) );
    }
 
    if ( !IsZero(GetX()) )
    {
-      AddBarComponent( new CBend90(cRadius) );
-      AddBarComponent( new CHook90(hRadius,tail) );
+      AddBarComponent( std::make_unique<CBend90>(cRadius) );
+      AddBarComponent( std::make_unique<CHook90>(hRadius,tail) );
    }
 
 }
 
 void CType78::PreValidateBend()
 {
-   CBendImpl<CType78,&CLSID_Type78>::PreValidateBend();
+   CBend::PreValidateBend();
 
    bool bCase1 =  IsZero(GetW()) &&  IsZero(GetX());
    bool bCase2 = !IsZero(GetW()) &&  IsZero(GetX());
@@ -133,9 +125,7 @@ void CType78::PreValidateBend()
 
    if (!bCase1 && !bCase2 && !bCase3 && !bCase4)
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_ILLFORMEDBEND );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Dimensions are inconsistant"));
    }
 }

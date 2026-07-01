@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // BXF - Barlist Exchange File
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,12 @@
 
 #include "BarlistPlugin.h"
 #include <EAF\ComponentObject.h>
-#include "Barlst.h"
+#include <Bars\Enums.h>
+
+class CBarlist;
+class CGroup;
+class CBarRecord;
+class CBend;
 
 class CBXFApp : public CWinApp
 {
@@ -50,14 +55,14 @@ public:
 public:
    void Init(CEAFDocument* pDoc) override;
    void Terminate() override;
-   void Go(IBarlist* pBarlist) override;
+   void Go(CBarlist& barlist) override;
    CString GetMenuItem() const override;
 
 private:
-   void CreateBarlistExchangeFile(const CString& strFile, IBarlist* pBarlist);
-   void ExchangeBarRecords(CStdioFile* pFile, IGroup* pGroup);
-   void ExchangeBarRecord(CStdioFile* pFile, IBarRecord* pBarRecord);
-   CString ReportBend(IBend* pBend, bool bVaries);
-   void ReportErrors(CStdioFile* pFile, IBend* pBend);
-   CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
+   void CreateBarlistExchangeFile(const CString& strFile, CBarlist& barlist);
+   void ExchangeBarRecords(CStdioFile* pFile, CGroup& group);
+   void ExchangeBarRecord(CStdioFile* pFile, CBarRecord& barRecord);
+   CString ReportBend(CBend* pBend, bool bVaries);
+   void ReportErrors(CStdioFile* pFile, CBend* pBend);
+   CString GetMaterial(MaterialType material, bool bEpoxy);
 };

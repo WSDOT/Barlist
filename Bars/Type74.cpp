@@ -24,9 +24,8 @@
 
 
 // Type74.cpp : Implementation of CType74
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type74.h"
+#include <tchar.h>
 #include "FabricationConstraints.h"
 #include "LineComponent.h"
 #include "BendComponent.h"
@@ -36,13 +35,12 @@
 // CType74
 void CType74::BuildBend()
 {
-   CBendImpl<CType74,&CLSID_Type74>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -52,8 +50,8 @@ void CType74::BuildBend()
    Float64 deduct2;
    Float64 u, w, x;
 
-   oRadius = CFabricationConstraints::GetOutsideBendRadius(pBarData,use);
-   cRadius = CFabricationConstraints::GetCenterlineBendRadius(pBarData,use);
+   oRadius = CFabricationConstraints::GetOutsideBendRadius(barData,use);
+   cRadius = CFabricationConstraints::GetCenterlineBendRadius(barData,use);
    deduct1 = IsZero(GetW()) ? 0.00 : CFabricationConstraints::GetBendDeduction( oRadius, PI_OVER_2 );
    deduct2 = IsZero(GetX()) ? 0.00 : CFabricationConstraints::GetBendDeduction( oRadius, PI_OVER_2 );
 
@@ -64,50 +62,44 @@ void CType74::BuildBend()
    // Error check data
    if ( u < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("U"), CComVariant(deduct1 + deduct2) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), deduct1 + deduct2);
    }
 
    if ( w < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(deduct1) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), deduct1);
    }
 
    if ( x < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("X"), CComVariant(deduct2) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("X"), deduct2);
    }
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
    // Build the bend
-   AddBarComponent( new CLineComponent(u) );
+   AddBarComponent( std::make_unique<CLineComponent>(u) );
 
    if ( !IsZero(GetW()) )
    {
-      AddBarComponent( new CLineComponent(w) );
-      AddBarComponent( new CBend90(cRadius) );
+      AddBarComponent( std::make_unique<CLineComponent>(w) );
+      AddBarComponent( std::make_unique<CBend90>(cRadius) );
    }
 
    if ( !IsZero(GetX()) )
    {
-      AddBarComponent( new CLineComponent(x) );
-      AddBarComponent( new CBend90(cRadius) );
+      AddBarComponent( std::make_unique<CLineComponent>(x) );
+      AddBarComponent( std::make_unique<CBend90>(cRadius) );
    }
 }
 
 void CType74::PreValidateBend()
 {
-   CBendImpl<CType74,&CLSID_Type74>::PreValidateBend();
+   CBend::PreValidateBend();
 
    bool bCase1 =  IsZero(GetW()) &&  IsZero(GetX());
    bool bCase2 = !IsZero(GetW()) &&  IsZero(GetX());
@@ -116,9 +108,7 @@ void CType74::PreValidateBend()
 
    if (!bCase1 && !bCase2 && !bCase3 && !bCase4)
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_ILLFORMEDBEND );
-      AddStatusMsg( msg, CComVariant(), CComVariant() );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : Dimensions are inconsistant"));
    }
 }

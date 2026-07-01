@@ -64,31 +64,22 @@
       <Outputs>
       </Outputs>
     </CustomBuildStep>
-    <Midl>
-      <AdditionalIncludeDirectories>..\SDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName>.\Debug/Bars.tlb</TypeLibraryName>
-      <HeaderFileName>
-      </HeaderFileName>
-    </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\SDK\Include;..\..\WBFL\Include;%(AdditionalIncludeDirectories);$(ARPDIR)\BridgeLink\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;BARS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Debug/</AssemblerListingLocation>
       <ObjectFileName>.\Debug/</ObjectFileName>
       <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -97,7 +88,6 @@
     <Link>
       <OutputFile>$(OutDir)Bars.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\Bars.def</ModuleDefinitionFile>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -128,29 +118,20 @@
       <Outputs>
       </Outputs>
     </CustomBuildStep>
-    <Midl>
-      <AdditionalIncludeDirectories>..\SDK\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TypeLibraryName>.\Debug/Bars.tlb</TypeLibraryName>
-      <HeaderFileName>
-      </HeaderFileName>
-    </Midl>
     <ClCompile>
       <AdditionalIncludeDirectories>..\SDK\Include;..\..\WBFL\Include;%(AdditionalIncludeDirectories);$(ARPDIR)\BridgeLink\Include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BARS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\Release/</AssemblerListingLocation>
       <ObjectFileName>.\Release/</ObjectFileName>
       <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -159,7 +140,6 @@
     <Link>
       <OutputFile>$(OutDir)Bars.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ModuleDefinitionFile>.\Bars.def</ModuleDefinitionFile>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -182,26 +162,6 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Midl Include="..\SDK\Include\Barlst.idl">
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </TypeLibraryName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Barlist_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Barlist_i.c</InterfaceIdentifierFileName>
-    </Midl>
-    <Midl Include="Bars.idl">
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateStublessProxies>
-      <GenerateStublessProxies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateStublessProxies>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Bars.tlb</TypeLibraryName>
-      <TypeLibraryName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Bars.tlb</TypeLibraryName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Bars.h</HeaderFileName>
-      <HeaderFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Bars.h</HeaderFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Bars_i.c</InterfaceIdentifierFileName>
-      <InterfaceIdentifierFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Bars_i.c</InterfaceIdentifierFileName>
-    </Midl>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="BarCollection.cpp" />
     <ClCompile Include="BarComponent.cpp" />
     <ClCompile Include="BarData.cpp" />
@@ -210,8 +170,8 @@
     <ClCompile Include="Barlist.cpp" />
     <ClCompile Include="BarRecord.cpp" />
     <ClCompile Include="BarRecordCollection.cpp" />
-    <ClCompile Include="Bars.cpp" />
     <ClCompile Include="BendComponent.cpp" />
+    <ClCompile Include="BendImpl.cpp" />
     <ClCompile Include="BendData.cpp" />
     <ClCompile Include="FabricationConstraints.cpp" />
     <ClCompile Include="Group.cpp" />
@@ -223,10 +183,6 @@
     <ClCompile Include="StatusMessage.cpp" />
     <ClCompile Include="StatusMessageCollection.cpp" />
     <ClCompile Include="StatusMgr.cpp" />
-    <ClCompile Include="StdAfx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Type50.cpp" />
     <ClCompile Include="Type51.cpp" />
     <ClCompile Include="Type52.cpp" />
@@ -273,66 +229,6 @@
     <ClCompile Include="Type99.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AddinMgr.rgs" />
-    <None Include="BarCollection.rgs" />
-    <None Include="BarData.rgs" />
-    <None Include="BarInfoMgr.rgs" />
-    <None Include="Barlist.rgs" />
-    <None Include="BarRecord.rgs" />
-    <None Include="BarRecordCollection.rgs" />
-    <None Include="Bars.def" />
-    <None Include="BendData.rgs" />
-    <None Include="Group.rgs" />
-    <None Include="GroupCollection.rgs" />
-    <None Include="HookData.rgs" />
-    <None Include="StatusMessage.rgs" />
-    <None Include="StatusMessageCollection.rgs" />
-    <None Include="Type50.rgs" />
-    <None Include="Type51.rgs" />
-    <None Include="Type52.rgs" />
-    <None Include="Type53.rgs" />
-    <None Include="Type54.rgs" />
-    <None Include="Type55.rgs" />
-    <None Include="Type56.rgs" />
-    <None Include="Type57.rgs" />
-    <None Include="Type58.rgs" />
-    <None Include="Type59.rgs" />
-    <None Include="Type60.rgs" />
-    <None Include="Type61.rgs" />
-    <None Include="Type62.rgs" />
-    <None Include="Type63.rgs" />
-    <None Include="Type66.rgs" />
-    <None Include="Type67.rgs" />
-    <None Include="Type68.rgs" />
-    <None Include="Type69.rgs" />
-    <None Include="Type70.rgs" />
-    <None Include="Type71.rgs" />
-    <None Include="Type72.rgs" />
-    <None Include="Type73.rgs" />
-    <None Include="Type74.rgs" />
-    <None Include="Type75.rgs" />
-    <None Include="Type76.rgs" />
-    <None Include="Type77.rgs" />
-    <None Include="Type78.rgs" />
-    <None Include="Type79.rgs" />
-    <None Include="Type80.rgs" />
-    <None Include="Type81.rgs" />
-    <None Include="Type82.rgs" />
-    <None Include="Type83.rgs" />
-    <None Include="Type84.rgs" />
-    <None Include="Type89.rgs" />
-    <None Include="Type90.rgs" />
-    <None Include="Type91.rgs" />
-    <None Include="Type92.rgs" />
-    <None Include="Type93.rgs" />
-    <None Include="Type94.rgs" />
-    <None Include="Type95.rgs" />
-    <None Include="Type96.rgs" />
-    <None Include="Type97.rgs" />
-    <None Include="Type98.rgs" />
-    <None Include="Type99.rgs" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Bars.rc">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -347,7 +243,7 @@
     <ClInclude Include="Barlist.h" />
     <ClInclude Include="BarRecord.h" />
     <ClInclude Include="BarRecordCollection.h" />
-    <ClInclude Include="BarsCP.h" />
+    <ClInclude Include="BarsExport.h" />
     <ClInclude Include="BendComponent.h" />
     <ClInclude Include="BendData.h" />
     <ClInclude Include="BendImpl.h" />
@@ -358,11 +254,10 @@
     <ClInclude Include="HookComponent.h" />
     <ClInclude Include="HookData.h" />
     <ClInclude Include="LineComponent.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="Signal.h" />
     <ClInclude Include="StatusMessage.h" />
     <ClInclude Include="StatusMessageCollection.h" />
     <ClInclude Include="StatusMgr.h" />
-    <ClInclude Include="StdAfx.h" />
     <ClInclude Include="Type50.h" />
     <ClInclude Include="Type51.h" />
     <ClInclude Include="Type52.h" />

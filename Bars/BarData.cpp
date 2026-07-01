@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -24,104 +24,65 @@
 
 
 // BarData.cpp : Implementation of CBarData
-#include "stdafx.h"
-#include "Bars.h"
+
 #include "BarData.h"
-#include "BendData.h"
-#include "HookData.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CBarData
-void CBarData::FinalRelease()
+void CBarData::SetBarData(const std::_tstring& name, Float64 db, Float64 mass, Float64 length, Float64 maxLength)
 {
-   for ( short i = 0; i < 3; i++ )
-   {
-      m_pBends[i].Release();
-      for ( short j = 0; j < 3; j++ )
-      {
-         m_pHooks[i][j].Release();
-      }
-   }
+    m_Name = name;
+    m_db = db;
+    m_Mass = mass;
+    m_Length = length;
+    m_MaxLength = maxLength;
 }
 
-void CBarData::SetBarData(const std::string& name,Float64 db,Float64 mass,Float64 length,Float64 maxLength)
+void CBarData::AddBendData(UseType use, Float64 ID, BendMeasureType bendMeasure)
 {
-   m_Name      = name.c_str();
-   m_db        = db;
-   m_Mass      = mass;
-   m_Length    = length;
-   m_MaxLength = maxLength;
+    CBendData bendData;
+    bendData.SetData(bendMeasure, ID, use);
+    m_Bends[static_cast<size_t>(use)] = bendData;
 }
 
-void CBarData::AddBendData(UseType use,Float64 ID,BendMeasureType bendMeasure)
+void CBarData::AddHookData(UseType use, HookType hook, Float64 T, BendMeasureType bendMeasure, Float64 Tmin)
 {
-	// TODO: Add your implementation code here
-   CComObject<CBendData>* pBendData;
-   CComObject<CBendData>::CreateInstance( &pBendData );
-   pBendData->SetData(bendMeasure,ID,use);
-   m_pBends[use] = pBendData;
+    CHookData hookData;
+    hookData.SetData(hook, use, T, bendMeasure, Tmin);
+    m_Hooks[static_cast<size_t>(use)][static_cast<size_t>(hook)] = hookData;
 }
 
-void CBarData::AddHookData(UseType use,HookType hook,Float64 T,BendMeasureType bendMeasure,Float64 Tmin)
+const std::_tstring& CBarData::GetName() const
 {
-	// TODO: Add your implementation code here
-   CComObject<CHookData>* pHookData;
-   CComObject<CHookData>::CreateInstance( &pHookData );
-   pHookData->SetData(hook,use,T,bendMeasure,Tmin);
-   m_pHooks[use][hook] = pHookData;
+    return m_Name;
 }
 
-STDMETHODIMP CBarData::get_Diameter(Float64 *pVal)
+Float64 CBarData::GetDiameter() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_db;
-	return S_OK;
+    return m_db;
 }
 
-STDMETHODIMP CBarData::get_Mass(Float64 *pVal)
+Float64 CBarData::GetMass() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_Mass;
-	return S_OK;
+    return m_Mass;
 }
 
-STDMETHODIMP CBarData::get_MaxLength(double *pVal)
+Float64 CBarData::GetNormalLength() const
 {
-   // TODO: Add your implementation code here
-   *pVal = m_MaxLength;
-   return S_OK;
+    return m_Length;
 }
 
-STDMETHODIMP CBarData::get_NormalLength(Float64 *pVal)
+Float64 CBarData::GetMaxLength() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_Length;
-	return S_OK;
+    return m_MaxLength;
 }
 
-STDMETHODIMP CBarData::get_BendData(UseType use, IBendData **pVal)
+const CBendData* CBarData::GetBendData(UseType use) const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_pBends[use];
-   if ( *pVal )
-      (*pVal)->AddRef();
-
-	return S_OK;
+    const auto& bend = m_Bends[static_cast<size_t>(use)];
+    return bend.has_value() ? &bend.value() : nullptr;
 }
 
-STDMETHODIMP CBarData::get_HookData(UseType use, HookType hook, IHookData **pVal)
+const CHookData* CBarData::GetHookData(UseType use, HookType hook) const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_pHooks[use][hook];
-   if ( *pVal )
-      (*pVal)->AddRef();
-
-	return S_OK;
-}
-
-STDMETHODIMP CBarData::get_Name(BSTR *pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_Name.Copy();
-	return S_OK;
+    const auto& hookData = m_Hooks[static_cast<size_t>(use)][static_cast<size_t>(hook)];
+    return hookData.has_value() ? &hookData.value() : nullptr;
 }

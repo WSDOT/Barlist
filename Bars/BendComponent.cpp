@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -27,7 +27,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
 #include "BendComponent.h"
 #include "HelixComponent.h"
 #include <MathEx.h>
@@ -52,7 +51,7 @@ bool CBendComponent::BuildComponent()
 {
    Float64 nTurns = m_Angle / TWO_PI;
 
-   AddBarComponent( new CHelixComponent(m_Radius,nTurns) );
+   AddBarComponent( std::make_unique<CHelixComponent>(m_Radius,nTurns) );
    return true;
 }
 

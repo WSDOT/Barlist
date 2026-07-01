@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -59,7 +59,8 @@ static LPCTSTR gs_Material_SI[] =
 
 LPCTSTR GetMaterialSpecification(MaterialType material)
 {
-   return (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::US ? gs_Material_US[material] : gs_Material_SI[material]);
+   int i = (int)material;
+   return (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::US ? gs_Material_US[i] : gs_Material_SI[i]);
 }
 
 LPCTSTR GetMaterialCommonName(MaterialType material)
@@ -122,32 +123,32 @@ CString GetMaterialGrade(MaterialType material)
    CString strGrade;
    switch (material)
    {
-   case A706_Grade60:
-   case A767_A1094_Grade60:
-   case A955_Grade60:
+   case MaterialType::A706_Grade60:
+   case MaterialType::A767_A1094_Grade60:
+   case MaterialType::A955_Grade60:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("  ") : _T("41"));
       break;
 
-   case A955_Grade75: 
+   case MaterialType::A955_Grade75:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("75") : _T("52"));
       break;
 
-   case A706_Grade80:
-   case A767_A1094_Grade80:
-   case A955_Grade80:
+   case MaterialType::A706_Grade80:
+   case MaterialType::A767_A1094_Grade80:
+   case MaterialType::A955_Grade80:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("80") : _T("55"));
       break;
 
-   case A1035_Grade100:
-   case A767_A1094_Grade100:
+   case MaterialType::A1035_Grade100:
+   case MaterialType::A767_A1094_Grade100:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("1X") : _T("69"));
       break;
 
-   case A1035_Grade120:
+   case MaterialType::A1035_Grade120:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("12") : _T("83"));
       break;
 
-   case D7957:
+   case MaterialType::D7957:
       strGrade = _T("  ");
       break;
 

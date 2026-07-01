@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,44 +23,33 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// StatusMessage.h : Declaration of the CStatusMessage
+// StatusMessage.h : Declaration of CStatusMessage (native, replaces the
+// IStatusMessage ATL/COM coclass)
 
-#ifndef __STATUSMESSAGE_H_
-#define __STATUSMESSAGE_H_
+#pragma once
 
-#include "resource.h"       // main symbols
+#include "BarsExport.h"
+#include <string>
+#include <variant>
+#include <WBFLTypes.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// CStatusMessage
-class ATL_NO_VTABLE CStatusMessage : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CStatusMessage, &CLSID_StatusMessage>,
-	public IDispatchImpl<IStatusMessage, &IID_IStatusMessage, &LIBID_BARSLib>
+// Replaces the VARIANT Val1/Val2 properties -- these were only ever
+// populated with an unset value, a long, a double, or a string at any
+// call site in the codebase.
+using StatusValue = std::variant<std::monostate, long, double, std::_tstring>;
+
+class BARS_API CStatusMessage
 {
 public:
-	CStatusMessage()
-	{
-	}
+    CStatusMessage() = default;
+    CStatusMessage(std::_tstring text, StatusValue val1 = {}, StatusValue val2 = {});
 
-DECLARE_REGISTRY_RESOURCEID(IDR_STATUSMESSAGE)
+    const std::_tstring& GetText() const;
+    const StatusValue& GetVal1() const;
+    const StatusValue& GetVal2() const;
 
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CStatusMessage)
-	COM_INTERFACE_ENTRY(IStatusMessage)
-	COM_INTERFACE_ENTRY(IDispatch)
-END_COM_MAP()
-
-public:
-   CComBSTR m_Text;
-   CComVariant m_Val1;
-   CComVariant m_Val2;
-
-// IStatusMessage
-public:
-	STDMETHOD(get_Val2)(/*[out, retval]*/ VARIANT *pVal);
-	STDMETHOD(get_Val1)(/*[out, retval]*/ VARIANT *pVal);
-	STDMETHOD(get_Text)(/*[out, retval]*/ BSTR *pVal);
+private:
+    std::_tstring m_Text;
+    StatusValue m_Val1;
+    StatusValue m_Val2;
 };
-
-#endif //__STATUSMESSAGE_H_

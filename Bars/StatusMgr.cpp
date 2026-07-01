@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -24,64 +24,39 @@
 
 
 // StatusMgr.cpp: implementation of the CStatusMgr class.
-//
-//////////////////////////////////////////////////////////////////////
 
-#include "stdafx.h"
-#include "Bars.h"
 #include "StatusMgr.h"
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 CStatusMgr::CStatusMgr()
 {
-   ResetStatusMsgs();
+    ResetStatusMsgs();
 }
 
-CStatusMgr::~CStatusMgr()
+void CStatusMgr::SetStatusLevel(StatusType status)
 {
+    if (m_Status < status)
+    {
+        m_Status = status;
+    }
 }
 
-void CStatusMgr::SetStatusLevel( StatusType status )
+StatusType CStatusMgr::GetStatusLevel() const
 {
-   if ( m_Status < status )
-      m_Status = status;
+    return m_Status;
 }
 
-StatusType CStatusMgr::GetStatusLevel()
+void CStatusMgr::AddStatusMsg(std::_tstring msg, StatusValue v1, StatusValue v2)
 {
-   return m_Status;
+    m_StatusMsgs.Add(CStatusMessage(std::move(msg), std::move(v1), std::move(v2)));
 }
 
-void CStatusMgr::AddStatusMsg( BSTR bstrMsg, VARIANT v1, VARIANT v2 )
+const CStatusMessageCollection& CStatusMgr::GetStatusMessages() const
 {
-   CComObject<CStatusMessage>* pMessage;
-   CComObject<CStatusMessage>::CreateInstance( &pMessage );
-   pMessage->m_Text = CComBSTR(bstrMsg);
-   pMessage->m_Val1 = CComVariant( v1 );
-   pMessage->m_Val2 = CComVariant( v2 );
-
-   m_pStatusMsgs->Add( pMessage );
-}
-
-IStatusMessageCollection* CStatusMgr::GetStatusMessages()
-{
-   IStatusMessageCollection* pColl = m_pStatusMsgs;
-   pColl->AddRef();
-   return pColl;
+    return m_StatusMsgs;
 }
 
 void CStatusMgr::ResetStatusMsgs()
 {
-   m_Status = stOK;
-
-   if ( m_pStatusMsgs )
-      m_pStatusMsgs.Release();
-
-   CComObject<CStatusMessageCollection>* pColl;
-   CComObject<CStatusMessageCollection>::CreateInstance( &pColl );
-   
-   m_pStatusMsgs = pColl;
+    m_Status = StatusType::stOK;
+    m_StatusMsgs.Clear();
 }

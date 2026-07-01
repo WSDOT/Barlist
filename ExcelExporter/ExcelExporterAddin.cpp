@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // ExcelExporter - Barlist Exchange File
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,15 @@
 #include "CLSID.h"
 
 #include <EAF\ComponentModule.h>
+
+#include <Bars\Barlist.h>
+#include <Bars\Group.h>
+#include <Bars\GroupCollection.h>
+#include <Bars\BarRecordCollection.h>
+#include <Bars\BarRecord.h>
+#include <Bars\BendImpl.h>
+#include <Bars\StatusMessageCollection.h>
+
 CExcelExporterApp theApp;
 WBFL::EAF::ComponentModule _Module;
 
@@ -40,11 +49,11 @@ COleVariant ovOptional((long)DISP_E_PARAMNOTFOUND, VT_ERROR);  // optional param
 COleVariant ovTrue((short)TRUE); // true
 COleVariant ovFalse((short)FALSE); // false
 
-inline bool IsA706(MaterialType material) { return (int)A706_Grade60 <= (int)material && (int)material <= (int)A706_Grade80; }
-inline bool IsMMFX(MaterialType material) { return (int)A1035_Grade100 <= (int)material && (int)material <= (int)A1035_Grade120; }
-inline bool IsGalvanized(MaterialType material) { return (int)A767_A1094_Grade60 <= (int)material && (int)material <= (int)A767_A1094_Grade100; }
-inline bool IsStainless(MaterialType material) { return (int)A955_Grade60 <= (int)material && (int)material <= (int)A955_Grade80; }
-inline bool IsGFRP(MaterialType materialType) { return (int)D7957 == (int)materialType; }
+inline bool IsA706(MaterialType material) { return (int)MaterialType::A706_Grade60 <= (int)material && (int)material <= (int)MaterialType::A706_Grade80; }
+inline bool IsMMFX(MaterialType material) { return (int)MaterialType::A1035_Grade100 <= (int)material && (int)material <= (int)MaterialType::A1035_Grade120; }
+inline bool IsGalvanized(MaterialType material) { return (int)MaterialType::A767_A1094_Grade60 <= (int)material && (int)material <= (int)MaterialType::A767_A1094_Grade100; }
+inline bool IsStainless(MaterialType material) { return (int)MaterialType::A955_Grade60 <= (int)material && (int)material <= (int)MaterialType::A955_Grade80; }
+inline bool IsGFRP(MaterialType materialType) { return (int)MaterialType::D7957 == (int)materialType; }
 
 CString GetMaterialDesignation(MaterialType material)
 {
@@ -79,32 +88,32 @@ CString GetMaterialGrade(MaterialType material)
    CString strGrade;
    switch (material)
    {
-   case A706_Grade60:
-   case A767_A1094_Grade60:
-   case A955_Grade60:
+   case MaterialType::A706_Grade60:
+   case MaterialType::A767_A1094_Grade60:
+   case MaterialType::A955_Grade60:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("  ") : _T("41"));
       break;
 
-   case A955_Grade75:
+   case MaterialType::A955_Grade75:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("75") : _T("52"));
       break;
 
-   case A706_Grade80:
-   case A767_A1094_Grade80:
-   case A955_Grade80:
+   case MaterialType::A706_Grade80:
+   case MaterialType::A767_A1094_Grade80:
+   case MaterialType::A955_Grade80:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("80") : _T("55"));
       break;
 
-   case A1035_Grade100:
-   case A767_A1094_Grade100:
+   case MaterialType::A1035_Grade100:
+   case MaterialType::A767_A1094_Grade100:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("1X") : _T("69"));
       break;
 
-   case A1035_Grade120:
+   case MaterialType::A1035_Grade120:
       strGrade = (unitMode == WBFL::EAF::UnitMode::US ? _T("12") : _T("83"));
       break;
 
-   case D7957:
+   case MaterialType::D7957:
       strGrade = _T("  ");
       break;
 
@@ -126,12 +135,6 @@ BOOL CExcelExporterApp::InitInstance()
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
    _Module.Init(ObjectMap);
 
-   if (!Formatter::Init())
-   {
-      return FALSE;
-   }
-
-
    return CWinApp::InitInstance();
 }
 
@@ -146,16 +149,16 @@ TCHAR GetUse(UseType use)
    TCHAR c;
    switch (use)
    {
-   case utLongitudinal: c = ' '; break;
-   case utSeismic:      c = 'S'; break;
-   case utTransverse:   c = 'T'; break;
+   case UseType::utLongitudinal: c = ' '; break;
+   case UseType::utSeismic:      c = 'S'; break;
+   case UseType::utTransverse:   c = 'T'; break;
    }
    return c;
 }
 
-inline TCHAR GetFlag(VARIANT_BOOL vbFlag, TCHAR c)
+inline TCHAR GetFlag(bool bFlag, TCHAR c)
 {
-   return vbFlag == VARIANT_TRUE ? c : ' ';
+   return bFlag ? c : ' ';
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -203,13 +206,9 @@ void CExcelExporterAddin::Terminate()
 {
 }
 
-void CExcelExporterAddin::Go(IBarlist* pBarlist)
+void CExcelExporterAddin::Go(CBarlist& barlist)
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   if (pBarlist == NULL)
-   {
-      ::MessageBox(0, _T("An invalid barlist was provided."), _T(""), MB_OK);
-   }
 
    CString strBarlistFile;
    CEAFDocument* pDoc = EAFGetDocument();
@@ -233,7 +232,7 @@ void CExcelExporterAddin::Go(IBarlist* pBarlist)
 
       CWaitCursor cursor;
 
-      ExportToExcel(strFile, pBarlist);
+      ExportToExcel(strFile, barlist);
 
       // don't show a completion window - the excel file will open on completion
       //CString strMsg;
@@ -247,7 +246,7 @@ CString CExcelExporterAddin::GetMenuItem() const
    return CString("Export Barlist to Excel");
 }
 
-void CExcelExporterAddin::ExportToExcel(const CString& strFilename, IBarlist* pBarlist)
+void CExcelExporterAddin::ExportToExcel(const CString& strFilename, CBarlist& barlist)
 {
    CString strTemplateFolder = GetExcelTemplateFolder();
    CString strTemplateName = strTemplateFolder + _T("Barlist_Template.xltx");
@@ -280,21 +279,12 @@ void CExcelExporterAddin::ExportToExcel(const CString& strFilename, IBarlist* pB
       // You can see the spreadsheet being populated 
       m_Excel.SetVisible(TRUE);
 
-      CComPtr<IGroupCollection> groups;
-      pBarlist->get_Groups(&groups);
-      long nGroups;
-      groups->get_Count(&nGroups);
-      for (long grpIdx = 0; grpIdx < nGroups; grpIdx++)
+      CGroupCollection& groups = barlist.GetGroups();
+      for (auto& group : groups)
       {
          BeforeGroup(); // this call makes sure the last row in the worksheet isn't a group title... it starts are new worksheet if that's the case
 
-         CComPtr<IGroup> group;
-         groups->get_Item(CComVariant(grpIdx), &group);
-
-         CComBSTR bstrName;
-         group->get_Name(&bstrName);
-
-         CString strName(bstrName);
+         CString strName(group->GetName().c_str());
          strName.MakeUpper();
 
          CString strGroup;
@@ -302,7 +292,7 @@ void CExcelExporterAddin::ExportToExcel(const CString& strFilename, IBarlist* pB
          WriteStringToCell( _T("Location"), strGroup);
          NextRow();
 
-         ExportBarRecords(group);
+         ExportBarRecords(*group);
 
          NextRow();
       }
@@ -326,29 +316,21 @@ void CExcelExporterAddin::ExportToExcel(const CString& strFilename, IBarlist* pB
    END_CATCH
 }
 
-void CExcelExporterAddin::ExportBarRecords(IGroup* pGroup)
+void CExcelExporterAddin::ExportBarRecords(CGroup& group)
 {
-   CComPtr<IBarRecordCollection> bars;
-   pGroup->get_BarRecords(&bars);
-   long nBars;
-   bars->get_Count(&nBars);
-   for (long barIdx = 0; barIdx < nBars; barIdx++)
+   CBarRecordCollection& bars = group.GetBarRecords();
+   for (auto& bar : bars)
    {
-      CComPtr<IBarRecord> bar;
-      bars->get_Item(CComVariant(barIdx), &bar);
-      ExportBarRecord(bar);
+      ExportBarRecord(*bar);
       NextRow();
    }
 }
 
-void CExcelExporterAddin::ExportBarRecord(IBarRecord* pBarRecord)
+void CExcelExporterAddin::ExportBarRecord(CBarRecord& barRecord)
 {
-   USES_CONVERSION;
+   bool bVaries = barRecord.GetVaries();
 
-   VARIANT_BOOL vbVaries;
-   pBarRecord->get_Varies(&vbVaries);
-
-   if (vbVaries == VARIANT_TRUE)
+   if (bVaries)
    {
       // The current bar record is a varies bar...
       // this call makes sure both lines will fit on the worksheet
@@ -356,205 +338,164 @@ void CExcelExporterAddin::ExportBarRecord(IBarRecord* pBarRecord)
       BeforeVaries();
    }
 
-   CComBSTR bstrMark;
-   pBarRecord->get_Mark(&bstrMark);
    CString strMark;
-   strMark.Format(_T("%4s"), OLE2T(bstrMark));
+   strMark.Format(_T("%4s"), (LPCTSTR)CString(barRecord.GetMark().c_str()));
    WriteStringToCell(_T("Mark"), strMark);
 
-
-   CComBSTR bstrLocation;
-   pBarRecord->get_Location(&bstrLocation);
    CString strLocation;
-   strLocation.Format(_T("%-28s"), OLE2T(bstrLocation));
+   strLocation.Format(_T("%-28s"), (LPCTSTR)CString(barRecord.GetLocation().c_str()));
    WriteStringToCell(_T("Location"), strLocation);
 
-   CComBSTR bstrSize;
-   pBarRecord->get_Size(&bstrSize);
-   CString strSize(bstrSize);
+   CString strSize(barRecord.GetSize().c_str());
    strSize.Remove(_T('#'));
    WriteStringToCell(_T("Size"), strSize);
 
-   long nReqd;
-   pBarRecord->get_NumReqd(&nReqd);
+   long nReqd = barRecord.GetNumReqd();
    CString strNumReqd;
    strNumReqd.Format(_T("%4d"), nReqd);
    WriteStringToCell(_T("Qty"), strNumReqd);
 
-   long bendType;
-   pBarRecord->get_BendType(&bendType);
+   long bendType = barRecord.GetBendType();
    CString strBendType;
    strBendType.Format(_T("%2d"), bendType);
    WriteStringToCell(_T("BendType"), strBendType);
 
-   UseType use;
-   pBarRecord->get_Use(&use);
+   UseType use = barRecord.GetUse();
    CString strUse(GetUse(use));
    WriteStringToCell(_T("Use"), strUse);
 
-   VARIANT_BOOL vbSubstructure;
-   pBarRecord->get_Substructure(&vbSubstructure);
-   CString strSubstructure(GetFlag(vbSubstructure, 'S'));
+   bool bSubstructure = barRecord.GetSubstructure();
+   CString strSubstructure(GetFlag(bSubstructure, 'S'));
    WriteStringToCell(_T("Substructure"), strSubstructure);
 
-   VARIANT_BOOL vbEpoxy;
-   pBarRecord->get_Epoxy(&vbEpoxy);
+   bool bEpoxy = barRecord.GetEpoxy();
+   MaterialType material = barRecord.GetMaterial();
 
-   MaterialType material;
-   pBarRecord->get_Material(&material);
-
-   CString strCoating(GetMaterial(material, vbEpoxy));
+   CString strCoating(GetMaterial(material, bEpoxy));
    WriteStringToCell(_T("Coating"), strCoating);
 
-   CString strVaries(GetFlag(vbVaries, 'V'));
+   CString strVaries(GetFlag(bVaries, 'V'));
    WriteStringToCell(_T("Varies"), strVaries);
 
-   if (vbVaries == VARIANT_TRUE)
+   if (bVaries)
    {
       CString strEach;
-      long nEach;
-      pBarRecord->get_NumEach(&nEach);
+      long nEach = barRecord.GetNumEach();
       strEach.Format(_T("%2d"), nEach);
       WriteStringToCell( _T("NoEach"), strEach);
    }
 
-   CComPtr<IBend> primaryBend;
-   pBarRecord->get_PrimaryBend(&primaryBend);
-   ExportBend(primaryBend);
+   auto primaryBend = barRecord.GetPrimaryBend();
+   ExportBend(primaryBend.get());
 
-   Float64 mass;
-   pBarRecord->get_Mass(&mass);
+   Float64 mass = barRecord.GetMass();
    CString strMass(Formatter::FormatMass(mass, false));
    WriteStringToCell(_T("Weight"), strMass);
 
-
-   CComPtr<IBend> variesBend;
-   if (vbVaries == VARIANT_TRUE)
+   std::shared_ptr<CBend> variesBend;
+   if (bVaries)
    {
       NextRow(); // write varies on next row
-      pBarRecord->get_VariesBend(&variesBend);
-      ExportBend(variesBend);
+      variesBend = barRecord.GetVariesBend();
+      ExportBend(variesBend.get());
    }
 
-   ReportErrors(primaryBend);
-   ReportErrors(variesBend);
+   ReportErrors(primaryBend.get());
+   ReportErrors(variesBend.get());
 }
 
-void CExcelExporterAddin::ExportBend(IBend* pBend)
+void CExcelExporterAddin::ExportBend(CBend* pBend)
 {
-   long bendType;
-   pBend->get_BendType(&bendType);
+   long bendType = pBend->GetBendType();
 
-   Float64 u, w, x, y, z, t1, t2;
-   pBend->get_U(&u);
-   pBend->get_W(&w);
-   pBend->get_X(&x);
-   pBend->get_Y(&y);
-   pBend->get_Z(&z);
-   pBend->get_T1(&t1);
-   pBend->get_T2(&t2);
+   Float64 u = pBend->GetU();
+   Float64 w = pBend->GetW();
+   Float64 x = pBend->GetX();
+   Float64 y = pBend->GetY();
+   Float64 z = pBend->GetZ();
+   Float64 t1 = pBend->GetT1();
+   Float64 t2 = pBend->GetT2();
 
    CString strValue;
 
-   VARIANT_BOOL vbSupported;
-   pBend->get_SupportsDimension(dimU, &vbSupported);
-   if (vbSupported == VARIANT_TRUE && bendType < 90) // never report U for bendType 90-99
+   bool bSupported = pBend->SupportsDimension(DimensionType::dimU);
+   if (bSupported && bendType < 90) // never report U for bendType 90-99
    {
-      Int32 feet;
-      Float64 inches;
-      Formatter::USLength(u, &feet, &inches);
+      auto [feet, inches] = Formatter::USLength(u);
       strValue.Format(_T("%-3d"), feet);
       WriteStringToCell(_T("U_FT"), strValue);
       strValue.Format(_T("%2.0f"), inches);
       WriteStringToCell(_T("U_IN"), strValue);
    }
 
-   pBend->get_SupportsDimension(dimW, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   bSupported = pBend->SupportsDimension(DimensionType::dimW);
+   if (bSupported)
    {
-      Int32 feet;
-      Float64 inches;
-      Formatter::USLength(w, &feet, &inches);
+      auto [feet, inches] = Formatter::USLength(w);
       strValue.Format(_T("%-3d"), feet);
       WriteStringToCell(_T("W_FT"), strValue);
       strValue.Format(_T("%2.0f"), inches);
       WriteStringToCell(_T("W_IN"), strValue);
    }
 
-   pBend->get_SupportsDimension(dimX, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   bSupported = pBend->SupportsDimension(DimensionType::dimX);
+   if (bSupported)
    {
-      Int32 feet;
-      Float64 inches;
-      Formatter::USLength(x, &feet, &inches);
+      auto [feet, inches] = Formatter::USLength(x);
       strValue.Format(_T("%-3d"), feet);
       WriteStringToCell(_T("X_FT"), strValue);
       strValue.Format(_T("%2.0f"), inches);
       WriteStringToCell(_T("X_IN"), strValue);
    }
 
-   pBend->get_SupportsDimension(dimY, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   bSupported = pBend->SupportsDimension(DimensionType::dimY);
+   if (bSupported)
    {
-      Int32 feet;
-      Float64 inches;
-      Formatter::USLength(y, &feet, &inches);
+      auto [feet, inches] = Formatter::USLength(y);
       strValue.Format(_T("%-3d"), feet);
       WriteStringToCell(_T("Y_FT"), strValue);
       strValue.Format(_T("%2.0f"), inches);
       WriteStringToCell(_T("Y_IN"), strValue);
    }
 
-   pBend->get_SupportsDimension(dimZ, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   bSupported = pBend->SupportsDimension(DimensionType::dimZ);
+   if (bSupported)
    {
-      Int32 feet;
-      Float64 inches;
-      Formatter::USLength(z, &feet, &inches);
+      auto [feet, inches] = Formatter::USLength(z);
       strValue.Format(_T("%-3d"), feet);
       WriteStringToCell(_T("Z_FT"), strValue);
       strValue.Format(_T("%2.0f"), inches);
       WriteStringToCell(_T("Z_IN"), strValue);
    }
 
-   pBend->get_SupportsDimension(dimT1, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   bSupported = pBend->SupportsDimension(DimensionType::dimT1);
+   if (bSupported)
    {
       strValue.Format(_T("%3.0f"), WBFL::Units::ConvertFromSysUnits(t1, WBFL::Units::Measure::Degree));
       WriteStringToCell(_T("Theta1"), strValue);
    }
 
-   pBend->get_SupportsDimension(dimT2, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   bSupported = pBend->SupportsDimension(DimensionType::dimT2);
+   if (bSupported)
    {
       strValue.Format(_T("%3.0f"), WBFL::Units::ConvertFromSysUnits(t2, WBFL::Units::Measure::Degree));
       WriteStringToCell(_T("Theta2"), strValue);
    }
 
-   Float64 length;
-   pBend->get_Length(&length);
-   Int32 feet;
-   Float64 inches;
-   Formatter::USLength(length, &feet, &inches);
+   Float64 length = pBend->GetLength();
+   auto [feet, inches] = Formatter::USLength(length);
    strValue.Format(_T("%-3d"), feet);
    WriteStringToCell(_T("Length_FT"), strValue);
    strValue.Format(_T("%2.0f"), inches);
    WriteStringToCell(_T("Length_IN"), strValue);
 }
 
-void CExcelExporterAddin::ReportErrors(IBend* pBend)
+void CExcelExporterAddin::ReportErrors(CBend* pBend)
 {
    if (pBend)
    {
-      CComPtr<IStatusMessageCollection> statusMessages;
-      pBend->get_StatusMessages(&statusMessages);
-      long nMessages;
-      statusMessages->get_Count(&nMessages);
-      for (long i = 0; i < nMessages; i++)
+      for (const auto& statusMessage : pBend->GetStatusMessages())
       {
-         CComPtr<IStatusMessage> statusMessage;
-         statusMessages->get_Item(i, &statusMessage);
-
          CString strStatusMessage = Formatter::FormatStatusMessage(statusMessage);
          strStatusMessage += _T("\n");
 
@@ -579,10 +520,10 @@ void CExcelExporterAddin::ReportErrors(IBend* pBend)
    }
 }
 
-CString CExcelExporterAddin::GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy)
+CString CExcelExporterAddin::GetMaterial(MaterialType material, bool bEpoxy)
 {
    CString strMaterial;
-   if (vbEpoxy == VARIANT_TRUE)
+   if (bEpoxy)
    {
       strMaterial.Format(_T("%2s%2s"), GetMaterialDesignation(material).GetString(), GetMaterialGrade(material).GetString());
       strMaterial.SetAt(0, _T('E'));

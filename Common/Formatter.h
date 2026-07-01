@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -23,25 +23,24 @@
 #pragma once
 
 #include <array>
+#include <utility>
 #include <MfcTools\Format.h>
-#include "..\Bars\Barlst.h"
+#include <Bars\StatusMessage.h>
 
 class Formatter
 {
 public:
-   static BOOL Init();
    static CString FormatMass(Float64 mass, bool bUnits = true);
    static CString FormatLength(Float64 length, bool bUnits = true);
    static CString FormatLength(Float64 length, bool bFractionInches, bool bUnits);
-   static bool IsValidLength(const CString& strValue, Float64* pValue);
-   static bool ParseLength(const CString& strValue, Float64* pValue);
-   static CString FormatStatusValue(CComVariant& var);
-   static CString FormatStatusMessage(IStatusMessage* pStatusMessage);
-   static void USLength(Float64 length, Int32* pFt, Float64* pInch);
+   static std::pair<bool, Float64> IsValidLength(const CString& strValue);
+   static std::pair<bool, Float64> ParseLength(const CString& strValue);
+   static CString FormatStatusValue(const StatusValue& var);
+   static CString FormatStatusMessage(const CStatusMessage& statusMessage);
+   static std::pair<Int32, Float64> USLength(Float64 length); // returns (feet, inches)
 
 private:
    static WBFL::Units::MassData gs_MassUnit;
    static WBFL::Units::ForceData gs_WeightUnit;
    static std::array<WBFL::Units::LengthData, 2> gs_LengthUnit;
-   static CComPtr<IAnnotatedDisplayUnitFormatter> g_formatter;
 };

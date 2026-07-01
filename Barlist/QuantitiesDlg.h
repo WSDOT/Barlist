@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,9 @@
 ///////////////////////////////////////////////////////////////////////
 #pragma once
 #include "resource.h"
-#include <Bars\Barlst.h>
+#include <Bars\Enums.h>
+#include <string>
+#include <WBFLTypes.h>
 
 // CQuantitiesDlg dialog
 
@@ -50,7 +52,7 @@ protected:
 public:
    virtual BOOL OnInitDialog();
 
-   void SetGroup(BSTR bstrGroup);
+   void SetGroup(const std::_tstring& strGroup);
    void SetQuantities(MaterialType material, Float64 sub, Float64 subEpoxy, Float64 super, Float64 superEpoxy);
 
    void Clear();

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -26,10 +26,10 @@
 #include <afxstr.h>
 
 // {88FF9D4E-1F47-11d3-8941-006097C68A9C}
-DEFINE_GUID(CATID_BarlistPlugin, 
+DEFINE_GUID(CATID_BarlistPlugin,
 0x88ff9d4e, 0x1f47, 0x11d3, 0x89, 0x41, 0x0, 0x60, 0x97, 0xc6, 0x8a, 0x9c);
 
-interface IBarlist;
+class CBarlist;
 class CEAFDocument;
 
 class IBarlistPlugin
@@ -37,6 +37,9 @@ class IBarlistPlugin
 public:
    virtual void Init(CEAFDocument* pDoc) = 0;
    virtual void Terminate() = 0;
-   virtual void Go(IBarlist* pBarlist) = 0;
+   // Non-owning: the caller (Barlist.dll) retains ownership of the barlist
+   // for the duration of this call, same as the borrowed COM pointer this
+   // replaced.
+   virtual void Go(CBarlist& barlist) = 0;
    virtual CString GetMenuItem() const = 0;
 };

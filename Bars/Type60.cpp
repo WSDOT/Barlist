@@ -24,9 +24,8 @@
 
 
 // Type60.cpp : Implementation of CType60
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type60.h"
+#include <tchar.h>
 #include "LineComponent.h"
 #include "HookComponent.h"
 #include "BendComponent.h"
@@ -37,101 +36,80 @@
 // CType60
 void CType60::BuildBend()
 {
-   CBendImpl<CType60,&CLSID_Type60>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
-   Float64 radius  = CFabricationConstraints::GetOutsideBendRadius( pBarData, use );
+   Float64 radius  = CFabricationConstraints::GetOutsideBendRadius( barData, use );
    Float64 deduct  = CFabricationConstraints::GetBendDeduction( radius, PI_OVER_2 );
 
    // Error check data
    if ( (GetX() - deduct) < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg,
-                    CComVariant("X"),
-                    CComVariant(deduct));
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("X"), deduct);
 
       return;
    }
 
-   Float64 rHook = CFabricationConstraints::GetHookRadius( pBarData, use );
-   Float64 tail  = CFabricationConstraints::GetTailLength( pBarData, use, ht90 );
+   Float64 rHook = CFabricationConstraints::GetHookRadius( barData, use );
+   Float64 tail  = CFabricationConstraints::GetTailLength( barData, use, HookType::ht90 );
    if ( GetX() < (rHook+tail) )
    {
-      SetStatusLevel( stWarning );
-      CComBSTR msg;
-      msg.LoadString( WARN_DIMLESSTHANHOOK );
-      AddStatusMsg( msg,
-                    CComVariant("X"),
-                    CComVariant(rHook+tail));
+      SetStatusLevel( StatusType::stWarning );
+      AddStatusMsg(_T("WARNING : %1 is smaller than standard hook %2"), _T("X"), rHook+tail);
 
       return;
    }
 
    if ( GetU() - 2*deduct < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg,
-                    CComVariant("U"),
-                    CComVariant(2*deduct));
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("U"), 2*deduct);
 
       return;
    }
 
    if ( GetW() - 2*deduct < 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg,
-                    CComVariant("W"),
-                    CComVariant(2*deduct));
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), 2*deduct);
 
       return;
    }
 
    // Build bend
-   AddBarComponent( new CLineComponent( GetU() - 2*deduct ) );
-   AddBarComponent( new CLineComponent( GetU() - 2*deduct ) );
-   AddBarComponent( new CLineComponent( GetW() - 2*deduct ) );
-   AddBarComponent( new CLineComponent( GetW() - 2*deduct ) );
-   AddBarComponent( new CLineComponent( GetX() -   deduct ) );
-   AddBarComponent( new CLineComponent( GetX() -   deduct ) );
-   AddBarComponent( new CBend90(radius) );
-   AddBarComponent( new CBend90(radius) );
-   AddBarComponent( new CBend90(radius) );
-   AddBarComponent( new CBend90(radius) );
-   AddBarComponent( new CBend90(radius) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetU() - 2*deduct ) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetU() - 2*deduct ) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetW() - 2*deduct ) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetW() - 2*deduct ) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetX() -   deduct ) );
+   AddBarComponent( std::make_unique<CLineComponent>( GetX() -   deduct ) );
+   AddBarComponent( std::make_unique<CBend90>(radius) );
+   AddBarComponent( std::make_unique<CBend90>(radius) );
+   AddBarComponent( std::make_unique<CBend90>(radius) );
+   AddBarComponent( std::make_unique<CBend90>(radius) );
+   AddBarComponent( std::make_unique<CBend90>(radius) );
 }
 
 void CType60::PreValidateBend()
 {
-   CBendImpl<CType60,&CLSID_Type60>::PreValidateBend();
+   CBend::PreValidateBend();
 
    if ( GetW() <= 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), 0.00);
    }
 
    if ( GetX() <= 0 )
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("X"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("X"), 0.00);
    }
 }

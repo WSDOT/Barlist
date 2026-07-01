@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // ExcelExporter - Barlist Exchange File
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -25,10 +25,3 @@
 //  stdafx.obj will contain the pre-compiled type information
 
 #include "stdafx.h"
-
-#ifdef _ATL_STATIC_REGISTRY
-#include <statreg.h>
-#include <statreg.cpp>
-#endif
-
-//#include <atlimpl.cpp>

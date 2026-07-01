@@ -1,6 +1,6 @@
-///////////////////////////////////////////////////////////////////////
+﻿///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright � 1999-2026  Washington State Department of Transportation
+// Copyright © 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
@@ -23,61 +23,20 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// Type77.h : Declaration of the CType77
+// Type77.h : Declaration of CType77 (native)
 
-#ifndef __TYPE77_H_
-#define __TYPE77_H_
+#pragma once
 
-#include "resource.h"       // main symbols
 #include "BendImpl.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CBendData
-class ATL_NO_VTABLE CType77 : 
-//	public CComObjectRootEx<CComSingleThreadModel>,
-//	public CComCoClass<CType77, &CLSID_Type77>,
-   public CBendImpl<CType77,&CLSID_Type77>
+class BARS_API CType77 : public CBend
 {
 public:
-	CType77() : CBendImpl<CType77, &CLSID_Type77>(77,true,true,true)
-	{
-	}
-
-DECLARE_REGISTRY_RESOURCEID(IDR_TYPE77)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-//BEGIN_COM_MAP(CType77)
-//	COM_INTERFACE_ENTRY(IBend)
-//	COM_INTERFACE_ENTRY(IDispatch)
-//END_COM_MAP()
+    CType77() : CBend(77, true, true, true)
+    {
+    }
 
 protected:
-   virtual void BuildBend() override;
-   virtual void PreValidateBend() override;
-
-// IBend
-public:
-	// STDMETHOD(get_BarRecord)(/*[out, retval]*/ IBarRecord* *pVal);
-	// STDMETHOD(put_BarRecord)(/*[in]*/ IBarRecord* newVal);
-   // STDMETHOD(get_U)(/*[out,retval]*/ Float64* pVal);
-   // STDMETHOD(put_U)(/*[in]*/ Float64 newVal);
-   // STDMETHOD(get_W)(/*[out,retval]*/ Float64* pVal);
-   // STDMETHOD(put_W)(/*[in]*/ Float64 newVal);
-   // STDMETHOD(get_X)(/*[out,retval]*/ Float64* pVal);
-   // STDMETHOD(put_X)(/*[in]*/ Float64 newVal);
-   // STDMETHOD(get_Y)(/*[out,retval]*/ Float64* pVal);
-   // STDMETHOD(put_Y)(/*[in]*/ Float64 newVal);
-   // STDMETHOD(get_Z)(/*[out,retval]*/ Float64* pVal);
-   // STDMETHOD(put_Z)(/*[in]*/ Float64 newVal);
-   // STDMETHOD(get_T1)(/*[out,retval]*/ Float64* pVal);
-   // STDMETHOD(put_T1)(/*[in]*/ Float64 newVal);
-   // STDMETHOD(get_T2)(/*[out,retval]*/ Float64* pVal);
-   // STDMETHOD(put_T2)(/*[in]*/ Float64 newVal);
-   // STDMETHOD(get_Status)(/*[out,retval]*/ StatusType* pVal);
-   // STDMETHOD(get_StatusMsg)(/*[out,retval]*/ BSTR* pVal);
-   // STDMETHOD(get_Length)(/*[out,retval]*/ Float64* pVal);
-	// STDMETHOD(get_BendType)(/*[out, retval]*/ long *pVal);
+    void BuildBend() override;
+    void PreValidateBend() override;
 };
-
-#endif //__TYPE77_H_

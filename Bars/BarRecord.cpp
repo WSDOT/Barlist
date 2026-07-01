@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -24,421 +24,294 @@
 
 
 // BarRecord.cpp : Implementation of CBarRecord
-#include "stdafx.h"
-#include "Bars.h"
+
 #include "BarRecord.h"
+#include "BendImpl.h"
+#include "Barlist.h"
+#include "BarData.h"
 #include <unordered_set>
+#include <tchar.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// CBarRecord
-
-STDMETHODIMP CBarRecord::InterfaceSupportsErrorInfo(REFIID riid)
+CBarRecord::CBarRecord()
+#if defined(_DEBUG)
+    : m_Mark(_T("XXXX"))
+#else
+    : m_Mark(_T(""))
+#endif
 {
-	static const IID* arr[] = 
-	{
-		&IID_IBarRecord,
-	};
-	for (int i=0;i<sizeof(arr)/sizeof(arr[0]);i++)
-	{
-		if (InlineIsEqualGUID(*arr[i],riid))
-			return S_OK;
-	}
-	return S_FALSE;
 }
 
-
-void CBarRecord::FinalRelease()
+CBarRecord::~CBarRecord()
 {
-   USES_CONVERSION;
-   // Disconnection from any connection points we might have
-
-   // NOTE: There is a circular reference between this bar record and its
-   //       bends.  This reference is caused by the connection points.  This
-   //       bend record holds a reference to the bend because it is a subscriber.
-   //       At the same time, the bend holds a reference to this bar record because
-   //       it is a publisher.  In order to avoid a double-delete situation, we increment
-   //       the reference count for each connection point.
-   long dwOldRef = m_dwRef;
-
-   if (m_pPrimaryBend)
-   {
-      InternalAddRef(); // Increment the RefCount
-   }
-
-   if (m_pVariesBend)
-   {
-      InternalAddRef(); // Increment the RefCount
-   }
-
-   Disconnect( m_pPrimaryBend, m_PrimaryBendCookie );
-   Disconnect( m_pVariesBend, m_VariesBendCookie );
-
-   ATLASSERT( m_dwRef == dwOldRef );
-
-   m_pPrimaryBend.Release();
-   m_pVariesBend.Release();
-   m_pBarData.Release();
+    // Disconnect from our bends' OnBendChanged so a bend that outlives this
+    // record (shared ownership, or simply reused by a caller for another
+    // record afterward) doesn't hold a dangling lambda capturing `this`.
+    if (m_pPrimaryBend)
+    {
+        m_pPrimaryBend->OnBendChanged.Disconnect(m_PrimaryBendToken);
+    }
+    if (m_pVariesBend)
+    {
+        m_pVariesBend->OnBendChanged.Disconnect(m_VariesBendToken);
+    }
 }
 
-void CBarRecord::Disconnect(IBend* pBend,DWORD dwCookie)
+void CBarRecord::SetBarlist(CBarlist* pBarlist)
 {
-   // If we have a previous bend, disconnection from it.
-   if ( pBend )
-   {
-      CComQIPtr<IConnectionPointContainer> pCPC(pBend);
-      CComPtr<IConnectionPoint> pCP;
-      pCPC->FindConnectionPoint( IID_IBendEvents, &pCP );
-      pCP->Unadvise( dwCookie );
-   }
+    m_pBarlist = pBarlist;
 }
 
-STDMETHODIMP CBarRecord::get_Material(/*[out, retval]*/ MaterialType *pVal)
+MaterialType CBarRecord::GetMaterial() const
 {
-   *pVal = m_Material;
-   return S_OK;
+    return m_Material;
 }
 
-STDMETHODIMP CBarRecord::put_Material(MaterialType newVal)
+void CBarRecord::SetMaterial(MaterialType val)
 {
-   m_Material = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_Material = val;
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_Mark(BSTR *pVal)
+const std::_tstring& CBarRecord::GetMark() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_Mark.Copy();
-	return S_OK;
+    return m_Mark;
 }
 
-STDMETHODIMP CBarRecord::put_Mark(BSTR newVal)
+void CBarRecord::SetMark(std::_tstring val)
 {
-	// TODO: Add your implementation code here
+    if (m_pBarlist)
+    {
+        m_pBarlist->ReplaceMarkNumber(m_Mark, val);
+    }
 
-   if ( m_pBarlist )
-   {
-      // Check to see if the inbound mark number is already in use
-      USES_CONVERSION;
-      std::string strMark( OLE2A(newVal) );
-      std::string strOldMark( OLE2A(m_Mark) );
-      m_pBarlist->ReplaceMarkNumber( strOldMark, strMark );
-   }
-
-   m_Mark = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_Mark = std::move(val);
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_Location(BSTR *pVal)
+const std::_tstring& CBarRecord::GetLocation() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_Location.Copy();
-	return S_OK;
+    return m_Location;
 }
 
-STDMETHODIMP CBarRecord::put_Location(BSTR newVal)
+void CBarRecord::SetLocation(std::_tstring val)
 {
-	// TODO: Add your implementation code here
-   m_Location = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_Location = std::move(val);
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_NumReqd(long *pVal)
+long CBarRecord::GetNumReqd() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_NumReqd;
-	return S_OK;
+    return m_NumReqd;
 }
 
-STDMETHODIMP CBarRecord::put_NumReqd(long newVal)
+void CBarRecord::SetNumReqd(long val)
 {
-	// TODO: Add your implementation code here
-   m_NumReqd = newVal;
-   m_StatusMgr.ResetStatusMsgs();
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_NumReqd = val;
+    m_StatusMgr.ResetStatusMsgs();
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_Use(UseType *pVal)
+UseType CBarRecord::GetUse() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_Use;
-	return S_OK;
+    return m_Use;
 }
 
-STDMETHODIMP CBarRecord::put_Use(UseType newVal)
+void CBarRecord::SetUse(UseType val)
 {
-	// TODO: Add your implementation code here
-   m_Use = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_Use = val;
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_Substructure(VARIANT_BOOL *pVal)
+bool CBarRecord::GetSubstructure() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_bSubstructure;
-	return S_OK;
+    return m_bSubstructure;
 }
 
-STDMETHODIMP CBarRecord::put_Substructure(VARIANT_BOOL newVal)
+void CBarRecord::SetSubstructure(bool val)
 {
-	// TODO: Add your implementation code here
-   m_bSubstructure = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_bSubstructure = val;
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_Epoxy(VARIANT_BOOL *pVal)
+bool CBarRecord::GetEpoxy() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_bEpoxy;
-	return S_OK;
+    return m_bEpoxy;
 }
 
-STDMETHODIMP CBarRecord::put_Epoxy(VARIANT_BOOL newVal)
+void CBarRecord::SetEpoxy(bool val)
 {
-	// TODO: Add your implementation code here
-   m_bEpoxy = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_bEpoxy = val;
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_Varies(VARIANT_BOOL *pVal)
+bool CBarRecord::GetVaries() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_pVariesBend.p == 0 ? VARIANT_FALSE : VARIANT_TRUE;
-	return S_OK;
+    return m_pVariesBend != nullptr;
 }
 
-STDMETHODIMP CBarRecord::get_NumEach(long *pVal)
+long CBarRecord::GetNumEach() const
 {
-	// TODO: Add your implementation code here
-   *pVal = m_NumEach;
-	return S_OK;
+    return m_NumEach;
 }
 
-STDMETHODIMP CBarRecord::put_NumEach(long newVal)
+void CBarRecord::SetNumEach(long val)
 {
-	// TODO: Add your implementation code here
-   m_NumEach = newVal;
-   m_StatusMgr.ResetStatusMsgs();
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_NumEach = val;
+    m_StatusMgr.ResetStatusMsgs();
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_PrimaryBend(IBend **pVal)
+std::shared_ptr<CBend> CBarRecord::GetPrimaryBend() const
 {
-	// TODO: Add your implementation code here
-   (*pVal) = m_pPrimaryBend;
-   (*pVal)->AddRef();
-	return S_OK;
+    return m_pPrimaryBend;
 }
 
-STDMETHODIMP CBarRecord::put_PrimaryBend(IBend *newVal)
+void CBarRecord::SetPrimaryBend(std::shared_ptr<CBend> bend)
 {
-	// TODO: Add your implementation code here
-   // Disconnection from connection point
-   Disconnect( m_pPrimaryBend, m_PrimaryBendCookie );
+    if (m_pPrimaryBend)
+    {
+        m_pPrimaryBend->OnBendChanged.Disconnect(m_PrimaryBendToken);
+    }
 
-   // Attach to the interface
-   m_pPrimaryBend = newVal;
-   m_pPrimaryBend->put_BarRecord(this);
+    m_pPrimaryBend = std::move(bend);
+    m_pPrimaryBend->SetBarRecord(this);
+    m_PrimaryBendToken = m_pPrimaryBend->OnBendChanged.Connect([this] { OnBarRecordChanged(*this); });
 
-   // Attach to the connection point
-   m_pPrimaryBend.Advise( GetUnknown(), IID_IBendEvents, &m_PrimaryBendCookie );
-
-   // Avoid circular reference. Decrement RefCount in a thread safe way
-   InternalRelease();
-
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_VariesBend(IBend **pVal)
+std::shared_ptr<CBend> CBarRecord::GetVariesBend() const
 {
-	// TODO: Add your implementation code here
-   if ( m_pVariesBend )
-   {
-      (*pVal) = m_pVariesBend;
-      (*pVal)->AddRef();
-   }
-
-	return S_OK;
+    return m_pVariesBend;
 }
 
-STDMETHODIMP CBarRecord::put_VariesBend(IBend *newVal)
+void CBarRecord::SetVariesBend(std::shared_ptr<CBend> bend)
 {
-	// TODO: Add your implementation code here
+    if (m_pVariesBend)
+    {
+        m_pVariesBend->OnBendChanged.Disconnect(m_VariesBendToken);
+    }
 
-   // Disconnection from connection point
-   Disconnect( m_pVariesBend, m_VariesBendCookie );
+    if (!bend)
+    {
+        // Varies bend has been removed. Clear out status messages because
+        // no-each/no-required problems can't exist without a varies bend.
+        m_StatusMgr.ResetStatusMsgs();
+        m_NumEach = 1;
+        m_pVariesBend.reset();
+        return;
+    }
 
+    m_pVariesBend = std::move(bend);
+    m_pVariesBend->SetBarRecord(this);
+    m_VariesBendToken = m_pVariesBend->OnBendChanged.Connect([this] { OnBarRecordChanged(*this); });
 
-   if ( newVal == 0 )
-   {
-      // Varies bend has been removed.
-      // clear out status message because no each/no required problem
-      // can't exists if there isn't a varies bend.
-      m_StatusMgr.ResetStatusMsgs();
-      m_NumEach = 1;
-      m_pVariesBend = 0;
-      return S_OK;
-   }
-
-   // Attach to the interface
-   m_pVariesBend = newVal;
-   m_pVariesBend->put_BarRecord(this);
-
-   // Attach to the connection point.
-   m_pVariesBend.Advise( GetUnknown(), IID_IBendEvents, &m_VariesBendCookie );
-
-   // Avoid circular reference. Decrement RefCount in a thread safe way
-   InternalRelease();
-   
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    OnBarRecordChanged(*this);
 }
 
-STDMETHODIMP CBarRecord::get_BendType(long *pVal)
+long CBarRecord::GetBendType() const
 {
-	// TODO: Add your implementation code here
-   return m_pPrimaryBend->get_BendType(pVal);
+    return m_pPrimaryBend->GetBendType();
 }
 
-STDMETHODIMP CBarRecord::get_Size(BSTR *pVal)
+const std::_tstring& CBarRecord::GetSize() const
 {
-	// TODO: Add your implementation code here
-   return m_pBarData->get_Name(pVal);
+    return m_pBarData->GetName();
 }
 
-
-STDMETHODIMP CBarRecord::get_Status(StatusType *pVal)
+StatusType CBarRecord::GetStatus()
 {
-	// TODO: Add your implementation code here
-   UpdateStatus();
+    UpdateStatus();
 
-   StatusType recordStatus = m_StatusMgr.GetStatusLevel();
+    StatusType recordStatus = m_StatusMgr.GetStatusLevel();
+    StatusType primaryStatus = m_pPrimaryBend->GetStatus();
+    StatusType variesStatus = StatusType::stOK;
+    if (m_pVariesBend)
+    {
+        variesStatus = m_pVariesBend->GetStatus();
+    }
 
-   StatusType primaryStatus;
-   m_pPrimaryBend->get_Status( &primaryStatus );
-   
-   StatusType variesStatus = stOK;
-   if (m_pVariesBend)
-   {
-      m_pVariesBend->get_Status(&variesStatus);
-   }
+    StatusType status = recordStatus;
+    if (status < primaryStatus)
+    {
+        status = primaryStatus;
+    }
+    if (status < variesStatus)
+    {
+        status = variesStatus;
+    }
 
-   StatusType status = max(recordStatus,max(primaryStatus,variesStatus));
-   *pVal = status;
-   return S_OK;
+    return status;
 }
 
-STDMETHODIMP CBarRecord::get_Mass(Float64 *pVal)
+Float64 CBarRecord::GetMass()
 {
-	// TODO: Add your implementation code here
-   Float64 primaryLength;
-   Float64 variesLength;
+    Float64 primaryLength = m_pPrimaryBend->GetLength();
+    Float64 variesLength = m_pVariesBend ? m_pVariesBend->GetLength() : primaryLength;
 
-   m_pPrimaryBend->get_Length(&primaryLength);
-   if (m_pVariesBend)
-   {
-      m_pVariesBend->get_Length(&variesLength);
-   }
-   else
-   {
-      variesLength = primaryLength;
-   }
+    Float64 length = (primaryLength + variesLength) / 2;
+    Float64 unitMass = m_pBarData->GetMass();
+    Float64 mass = m_NumReqd * length * unitMass;
 
-   Float64 length = (primaryLength + variesLength)/2;
-   
-   Float64 unitMass;
-   m_pBarData->get_Mass(&unitMass);
+    // If status is error, don't figure the mass.
+    StatusType status = GetStatus();
 
-   Float64 mass = m_NumReqd * length * unitMass;
-
-   // If status is error, don't figure the mass.
-   StatusType status;
-   get_Status(&status);
-
-   *pVal = status == stError ? 0.00 : mass;
-
-   return S_OK;
+    return status == StatusType::stError ? 0.0 : mass;
 }
 
-STDMETHODIMP CBarRecord::get_BarData(IBarData **pVal)
+const CBarData* CBarRecord::GetBarData() const
 {
-   return m_pBarData.CopyTo(pVal);
+    return m_pBarData;
 }
 
-STDMETHODIMP CBarRecord::put_BarData(IBarData *newVal)
+void CBarRecord::SetBarData(const CBarData* barData)
 {
-   m_pBarData = newVal;
-   Fire_OnBarRecordChanged(this);
-   return S_OK;
+    m_pBarData = barData;
+    OnBarRecordChanged(*this);
+}
+
+const CStatusMessageCollection& CBarRecord::GetStatusMessages() const
+{
+    return m_StatusMgr.GetStatusMessages();
 }
 
 void CBarRecord::UpdateStatus()
 {
-   USES_CONVERSION;
+    m_StatusMgr.ResetStatusMsgs();
 
-   m_StatusMgr.ResetStatusMsgs();
+    // Check if the mark number is in use elsewhere
+    if (m_pBarlist->BarRecordMultiUse(m_Mark))
+    {
+        m_StatusMgr.SetStatusLevel(StatusType::stWarning);
+        m_StatusMgr.AddStatusMsg(_T("WARNING : Mark Number %1 is currently in use"), m_Mark);
+    }
 
-   std::string strMark = OLE2A( m_Mark );
-   // Check if the mark number is in use elsewhere
-   if ( m_pBarlist->BarRecordMultiUse( strMark ) )
-   {
-      m_StatusMgr.SetStatusLevel( stWarning );
-      CComBSTR msg;
-      msg.LoadString( WARN_DUPMARKNUMBER );
-      m_StatusMgr.AddStatusMsg( msg, CComVariant(m_Mark), CComVariant() );
-   }
+    // Check if bar is larger than #14 and Grade 75 or higher
+    static const std::unordered_set<MaterialType> grade75andHigher = {
+        MaterialType::A706_Grade80,
+        MaterialType::A1035_Grade100,
+        MaterialType::A1035_Grade120,
+        MaterialType::A767_A1094_Grade80,
+        MaterialType::A767_A1094_Grade100,
+        MaterialType::A955_Grade75,
+        MaterialType::A955_Grade80
+    };
 
-   // Check if bar is larger than #14 and Grade 75 or higher
-   std::unordered_set<int> grade75andHigher = {
-	   A706_Grade80,
-	   A1035_Grade100,
-	   A1035_Grade120,
-	   A767_A1094_Grade80,
-	   A767_A1094_Grade100,
-	   A955_Grade75,
-	   A955_Grade80
-   };
+    if (grade75andHigher.find(m_Material) != grade75andHigher.end() && GetSize() == _T("#18"))
+    {
+        m_StatusMgr.SetStatusLevel(StatusType::stWarning);
+        m_StatusMgr.AddStatusMsg(_T("WARNING: Due to safety concerns, CRSI does not recommend bending bars larger than #14 with grade designation of Grade 75 or higher"));
+    }
 
-   BSTR bstrSize;
-   get_Size(&bstrSize);
-
-   std::string size(OLE2A(bstrSize));
-   if (grade75andHigher.find(m_Material) != grade75andHigher.end() && size == "#18")
-   {
-	   m_StatusMgr.SetStatusLevel(stWarning);
-	   CComBSTR msg;
-	   msg.LoadString(WARN_LARGEBAR);
-	   m_StatusMgr.AddStatusMsg(msg, CComVariant(), CComVariant());
-   }
-
-   // Check if the number required is evenly divided by the number each
-   // if this is a varies bend record.
-   VARIANT_BOOL bVaries;
-   get_Varies( &bVaries );
-   if ( bVaries == VARIANT_TRUE )
-   {
-      long remainder = m_NumReqd % m_NumEach;
-      if ( remainder != 0 )
-      {
-         m_StatusMgr.SetStatusLevel( stError );
-         CComBSTR msg;
-         msg.LoadString( ERR_NOEACHNOTMULTIPLEOFNOREQD );
-         m_StatusMgr.AddStatusMsg( msg, CComVariant(), CComVariant() );
-      }
-   }
-}
-
-STDMETHODIMP CBarRecord::get_StatusMessages(IStatusMessageCollection **pVal)
-{
-	// TODO: Add your implementation code here
-   *pVal = m_StatusMgr.GetStatusMessages();
-	return S_OK;
+    // Check if the number required is evenly divided by the number each,
+    // if this is a varies bend record.
+    if (GetVaries())
+    {
+        long remainder = m_NumReqd % m_NumEach;
+        if (remainder != 0)
+        {
+            m_StatusMgr.SetStatusLevel(StatusType::stError);
+            m_StatusMgr.AddStatusMsg(_T("ERROR : # Each must be an even multiple of Num Reqd"));
+        }
+    }
 }

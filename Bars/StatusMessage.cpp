@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -24,37 +24,25 @@
 
 
 // StatusMessage.cpp : Implementation of CStatusMessage
-#include "stdafx.h"
-#include "Bars.h"
+
 #include "StatusMessage.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CStatusMessage
-
-
-STDMETHODIMP CStatusMessage::get_Text(BSTR *pVal)
+CStatusMessage::CStatusMessage(std::_tstring text, StatusValue val1, StatusValue val2)
+    : m_Text(std::move(text)), m_Val1(std::move(val1)), m_Val2(std::move(val2))
 {
-	// TODO: Add your implementation code here
-   *pVal = m_Text.Copy();
-	return S_OK;
 }
 
-STDMETHODIMP CStatusMessage::get_Val1(VARIANT *pVal)
+const std::_tstring& CStatusMessage::GetText() const
 {
-	// TODO: Add your implementation code here
-   CComVariant var;
-   var.Attach( pVal );
-   var = m_Val1;
-   var.Detach( pVal );
-	return S_OK;
+    return m_Text;
 }
 
-STDMETHODIMP CStatusMessage::get_Val2(VARIANT *pVal)
+const StatusValue& CStatusMessage::GetVal1() const
 {
-	// TODO: Add your implementation code here
-   CComVariant var;
-   var.Attach( pVal );
-   var = m_Val2;
-   var.Detach( pVal );
-	return S_OK;
+    return m_Val1;
+}
+
+const StatusValue& CStatusMessage::GetVal2() const
+{
+    return m_Val2;
 }

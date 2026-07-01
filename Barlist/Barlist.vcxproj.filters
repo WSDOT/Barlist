@@ -49,12 +49,6 @@
     <ClCompile Include="BarDlgStateMachine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Bars\Barlist_i.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Bars\Bars_i.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include=".\Schema\Barlist.cxx">
       <Filter>Schema</Filter>
     </ClCompile>
@@ -115,9 +109,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OptionsDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mfcdual.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Events.h">

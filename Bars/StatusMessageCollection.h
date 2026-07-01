@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,45 +23,30 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// StatusMessageCollection.h : Declaration of the CStatusMessageCollection
+// StatusMessageCollection.h : Declaration of CStatusMessageCollection
+// (native, replaces the IStatusMessageCollection ATL/COM coclass, which
+// used ICollectionOnSTLImpl<...>/CComEnumOnSTL over std::vector<CComVariant>)
 
-#ifndef __STATUSMESSAGECOLLECTION_H_
-#define __STATUSMESSAGECOLLECTION_H_
+#pragma once
 
-#include "resource.h"       // main symbols
+#include "BarsExport.h"
+#include "StatusMessage.h"
 #include <vector>
+#include <cstddef>
 
-typedef CComEnumOnSTL<IEnumVARIANT,&IID_IEnumVARIANT, VARIANT, _Copy<VARIANT>, std::vector<CComVariant> > StatusMsgEnum;
-typedef ICollectionOnSTLImpl<IStatusMessageCollection,std::vector<CComVariant>,VARIANT,_Copy<VARIANT>,StatusMsgEnum> IStatusMessageColl;
-
-/////////////////////////////////////////////////////////////////////////////
-// CStatusMessageCollection
-class ATL_NO_VTABLE CStatusMessageCollection : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CStatusMessageCollection, &CLSID_StatusMessageCollection>,
-	public IDispatchImpl<IStatusMessageColl, &IID_IStatusMessageCollection, &LIBID_BARSLib>
-//	public IDispatchImpl<IStatusMessageCollection, &IID_IStatusMessageCollection, &LIBID_BARSLib>
+class BARS_API CStatusMessageCollection
 {
 public:
-	CStatusMessageCollection()
-	{
-	}
+    void Add(CStatusMessage msg);
+    void Clear();
 
-DECLARE_REGISTRY_RESOURCEID(IDR_STATUSMESSAGECOLLECTION)
+    std::size_t Count() const;
+    const CStatusMessage* Item(std::size_t index) const; // nullptr if index out of range
 
-DECLARE_PROTECT_FINAL_CONSTRUCT()
+    using const_iterator = std::vector<CStatusMessage>::const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
 
-BEGIN_COM_MAP(CStatusMessageCollection)
-	COM_INTERFACE_ENTRY(IStatusMessageCollection)
-	COM_INTERFACE_ENTRY(IDispatch)
-END_COM_MAP()
-
-// IStatusMessageCollection
-public:
-	STDMETHOD(Add)(/*[in]*/ IStatusMessage* pVal);
-	STDMETHOD(get_Item)(/*[in]*/ long index, /*[out, retval]*/ IStatusMessage* *pVal);
-//	STDMETHOD(get__NewEnum)(/*[out, retval]*/ LPUNKNOWN *pVal);
-//	STDMETHOD(get_Count)(/*[out, retval]*/ long *pVal);
+private:
+    std::vector<CStatusMessage> m_Messages;
 };
-
-#endif //__STATUSMESSAGECOLLECTION_H_

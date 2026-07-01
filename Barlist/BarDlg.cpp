@@ -1,22 +1,22 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright Â© 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
-// published by the Washington State Department of Transportation, 
+// it under the terms of the Alternate Route Open Source License as
+// published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
-// This program is distributed in the hope that it will be useful, but 
-// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// This program is distributed in the hope that it will be useful, but
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 // the Alternate Route Open Source License for more details.
 //
-// You should have received a copy of the Alternate Route Open Source 
-// License along with this program; if not, write to the Washington 
-// State Department of Transportation, Bridge and Structures Office, 
-// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// You should have received a copy of the Alternate Route Open Source
+// License along with this program; if not, write to the Washington
+// State Department of Transportation, Bridge and Structures Office,
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
@@ -32,9 +32,19 @@
 #include "Helpers.h"
 
 #include "CollaborationDoc.h" // for FormatWeight and FormatLength
-#include <Bars\Bars.h>
+
+#include <Bars\BarInfoMgr.h>
+#include <Bars\Barlist.h>
+#include <Bars\Group.h>
+#include <Bars\GroupCollection.h>
+#include <Bars\BarRecordCollection.h>
+#include <Bars\BarRecord.h>
+#include <Bars\BendImpl.h>
+#include <Bars\StatusMessageCollection.h>
+#include <Bars\BarException.h>
 
 #include <array>
+#include <vector>
 
 #include <MfcTools\Prompts.h>
 #include <MfcTools\Format.h>
@@ -47,33 +57,9 @@
 #include <afxpriv.h> // for AfxSetWindowText
 
 
-void DDX_Text(CDataExchange* pDX, int nIDC, CComBSTR& bstr)
+void DDV_NonEmptyString(CDataExchange* pDX, LPCTSTR name, const std::_tstring& strText)
 {
-   USES_CONVERSION;
-   HWND hWndCtrl = pDX->PrepareEditCtrl(nIDC);
-   if (pDX->m_bSaveAndValidate)
-   {
-      int nLen = ::GetWindowTextLength(hWndCtrl) + 1;
-      LPTSTR text = new TCHAR[nLen];
-      ::GetWindowText(hWndCtrl, text, nLen);
-      bstr = T2BSTR(text);
-      delete[] text;
-   }
-   else
-   {
-      AfxSetWindowText(hWndCtrl, OLE2T(bstr));
-   }
-}
-
-void DDV_NonEmptyString(CDataExchange* pDX, LPCTSTR name, CComBSTR& bstrText)
-{
-   bool bError = false;
-   if (bstrText.Length() == 0 || bstrText == _T(""))
-   {
-      bError = true;
-   }
-
-   if (bError)
+   if (strText.empty())
    {
       CString str;
       str.Format(_T("%s cannot be blank"), name);
@@ -107,23 +93,6 @@ void DDX_CacheEditText(CDataExchange* pDX, int nIDC, T& value)
          pWnd->GetWindowText(strValue);
          ((CCacheEdit*)(pWnd))->SetDefaultValue((Float64)value,strValue);
       }
-   }
-}
-
-void DDX_CBString(CDataExchange* pDX, int nIDC, CComBSTR& bstr)
-{
-   USES_CONVERSION;
-   std::_tstring str;
-   if (!pDX->m_bSaveAndValidate)
-   {
-      str = (OLE2T(bstr));
-   }
-   
-   DDX_CBString(pDX, nIDC, str);
-
-   if (pDX->m_bSaveAndValidate)
-   {
-      bstr = T2BSTR(str.c_str());
    }
 }
 
@@ -170,11 +139,16 @@ void DDX_LengthValue(CDataExchange* pDX, int nIDC, Float64& data)
       {
          CString strValue;
          DDX_Text(pDX, nIDC, strValue);
-         if (!Formatter::ParseLength(strValue, &data))
+         auto [bValid, value] = Formatter::ParseLength(strValue);
+         if (!bValid)
          {
             pDX->PrepareEditCtrl(nIDC);
             AfxMessageBox(_T("Invalid format"), MB_OK);
             pDX->Fail();
+         }
+         else
+         {
+            data = value;
          }
       }
       else
@@ -262,8 +236,8 @@ void CBendTypeComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 IMPLEMENT_DYNAMIC(CBarDlg, CDialog)
 
-CBarDlg::CBarDlg(IBarInfoMgr* pBarInfoMgr, IBarlist* pBarlist, long groupIdx, long barIdx,CWnd* pParent /*=NULL*/)
-	: CDialog(IDD_BAR, pParent), m_BarInfoMgr(pBarInfoMgr), m_Barlist(pBarlist), m_GroupIdx(groupIdx), m_BarIdx(barIdx), m_SM(this)
+CBarDlg::CBarDlg(CBarInfoMgr& barInfoMgr, CBarlist& barlist, long groupIdx, long barIdx,CWnd* pParent /*=NULL*/)
+	: CDialog(IDD_BAR, pParent), m_BarInfoMgr(barInfoMgr), m_Barlist(barlist), m_GroupIdx(groupIdx), m_BarIdx(barIdx), m_SM(this)
 {
    m_bIsCollaboration = false;
 }
@@ -319,7 +293,7 @@ BEGIN_MESSAGE_MAP(CBarDlg, CDialog)
    ON_EN_CHANGE(IDC_VARIES_Z, &CBarDlg::OnChange)
    ON_EN_CHANGE(IDC_VARIES_T1, &CBarDlg::OnChange)
    ON_EN_CHANGE(IDC_VARIES_T2, &CBarDlg::OnChange)
-   
+
    ON_BN_CLICKED(IDC_LONGITUDINAL, &CBarDlg::OnChange)
    ON_BN_CLICKED(IDC_TRANSVERSE, &CBarDlg::OnChange)
    ON_BN_CLICKED(IDC_SEISMIC, &CBarDlg::OnChange)
@@ -391,7 +365,7 @@ BOOL CBarDlg::OnInitDialog()
 
    pEdit = (CEdit*)GetDlgItem(IDC_NUM_EACH);
    pEdit->LimitText(2);
-   
+
    CButton* pSave = (CButton*)GetDlgItem(IDC_SAVE);
    HICON hSaveIcon = (HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_SAVE), IMAGE_ICON, 16, 16, 0);
    pSave->SetIcon(hSaveIcon);
@@ -401,33 +375,29 @@ BOOL CBarDlg::OnInitDialog()
    pHelp->SetIcon(hHelpIcon);
 
    // Determine initial state
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   long nGroups;
-   groups->get_Count(&nGroups);
+   CGroupCollection& groups = m_Barlist.GetGroups();
+   long nGroups = (long)groups.Count();
    if (0 < nGroups)
    {
       UpdateMarkNumbers();
 
-      CComPtr<IGroup> group;
       m_GroupIdx = Max(0L, m_GroupIdx);
-      groups->get_Item(CComVariant(m_GroupIdx), &group);
-      CComPtr<IBarRecordCollection> bars;
-      group->get_BarRecords(&bars);
+      auto group = groups.Item(m_GroupIdx);
+      ATLASSERT(group != nullptr);
+      CBarRecordCollection& bars = group->GetBarRecords();
 
-      long nBars;
-      bars->get_Count(&nBars);
+      long nBars = (long)bars.Count();
       if (0 < nBars)
       {
          // there are bars in the group so we are in the editing state
          m_SM.SetState(State::Editing);
 
-         CComPtr<IBarRecord> barRecord;
          m_BarIdx = Max(0L, m_BarIdx);
-         bars->get_Item(CComVariant(m_BarIdx), &barRecord);
+         auto barRecord = bars.Item(m_BarIdx);
+         ATLASSERT(barRecord != nullptr);
          pCB->SetCurSel(m_BarIdx);
-         UpdateBarData(FALSE, m_GroupIdx, m_BarIdx, barRecord);
-         UpdateDimensions(barRecord);
+         UpdateBarData(FALSE, m_GroupIdx, m_BarIdx, barRecord.get());
+         UpdateDimensions(barRecord.get());
       }
       else
       {
@@ -504,35 +474,21 @@ void CBarDlg::OnStateChanged()
 
 long CBarDlg::GetBarRecordCount()
 {
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
-   long nBars;
-   bars->get_Count(&nBars);
-   return nBars;
+   auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   return (long)group->GetBarRecords().Count();
 }
 
 void CBarDlg::UpdateGroups()
 {
-   USES_CONVERSION;
    CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_GROUPS);
    int curSel = pCB->GetCurSel();
    pCB->ResetContent();
 
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   long nGroups;
-   groups->get_Count(&nGroups);
-   for (long idx = 0; idx < nGroups; idx++)
+   CGroupCollection& groups = m_Barlist.GetGroups();
+   for (auto& group : groups)
    {
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(idx), &group);
-      CComBSTR bstrName;
-      group->get_Name(&bstrName);
-      pCB->AddString(OLE2T(bstrName));
+      pCB->AddString(CString(group->GetName().c_str()));
    }
 
    if (0 <= m_GroupIdx)
@@ -551,8 +507,6 @@ void CBarDlg::UpdateGroups()
 
 void CBarDlg::UpdateBarSizes()
 {
-   USES_CONVERSION;
-
    // Capture the current state of the combo box so it can
    // be reset if possible
    CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_BAR_SIZE);
@@ -567,30 +521,15 @@ void CBarDlg::UpdateBarSizes()
    MaterialType material;
    DDX_CBItemData(&dx, IDC_MATERIALS, material);
 
-   CComPtr<IBarCollection> bars;
-   m_BarInfoMgr->get_Bars(material, &bars);
-
-   CComPtr<IUnknown> unknown;
-   bars->get__NewEnum(&unknown);
-   CComQIPtr<IEnumVARIANT> enumVariant(unknown);
+   const CBarCollection& bars = m_BarInfoMgr.GetBars(material);
 
    pCB->ResetContent();
 
-   CComVariant variant;
-   ULONG nFetched;
-   while (enumVariant->Next(1, &variant, &nFetched) == S_OK)
+   for (const auto& barData : bars)
    {
-      CComPtr<IBarData> barData;
-      (variant.punkVal)->QueryInterface(&barData);
-
-      CComBSTR bstrSize;
-      barData->get_Name(&bstrSize);
-
       // not all materials have the all the bar sizes. look at gfrp bars
       // put this name in the combo box
-      pCB->AddString(OLE2T(bstrSize));
-
-      variant.Clear();
+      pCB->AddString(CString(barData.GetName().c_str()));
    }
 
    // Restore the selection if possible... even though different materials
@@ -629,19 +568,17 @@ void CBarDlg::OnClickedAddGroup()
    BOOL bResult = AfxQuestion(_T("New Group"), _T("Group Name:"), _T(""), strGroup);
    if (bResult)
    {
-      CComPtr<IGroupCollection> groups;
-      m_Barlist->get_Groups(&groups);
-      if (FAILED(groups->Add(CComBSTR(strGroup))))
+      CGroupCollection& groups = m_Barlist.GetGroups();
+      try
       {
-         AfxMessageBox(_T("The barlist already contains a group with the same name or the group name is invalid."), MB_ICONINFORMATION | MB_OK);
-      }
-      else
-      {
-         long nGroups;
-         groups->get_Count(&nGroups);
-         m_GroupIdx = nGroups-1; // update group index
+         groups.Add(std::_tstring((LPCTSTR)strGroup));
+         m_GroupIdx = (long)groups.Count() - 1; // update group index
          m_SM.StateChange(Action::AddGroup);
          UpdateGroups();
+      }
+      catch (const CBarException&)
+      {
+         AfxMessageBox(_T("The barlist already contains a group with the same name or the group name is invalid."), MB_ICONINFORMATION | MB_OK);
       }
    }
 }
@@ -660,16 +597,11 @@ void CBarDlg::OnSelchangeGroups()
       CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
       pDoc->SelectGroup(m_GroupIdx);
 
-      CComPtr<IGroupCollection> groups;
-      m_Barlist->get_Groups(&groups);
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(m_GroupIdx), &group);
+      auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+      ATLASSERT(group != nullptr);
+      CBarRecordCollection& bars = group->GetBarRecords();
 
-      CComPtr<IBarRecordCollection> bars;
-      group->get_BarRecords(&bars);
-
-      long nBars;
-      bars->get_Count(&nBars);
+      long nBars = (long)bars.Count();
 
       m_BarIdx = (nBars == 0 ? -1 : 0);
 
@@ -692,22 +624,20 @@ void CBarDlg::OnCbnSelchangeMark()
    {
       m_BarIdx = (long)curSel;
 
-      CComPtr<IGroupCollection> groups;
-      m_Barlist->get_Groups(&groups);
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(m_GroupIdx), &group);
-      CComPtr<IBarRecordCollection> bars;
-      group->get_BarRecords(&bars);
-      CComPtr<IBarRecord> bar;
-      bars->get_Item(CComVariant(m_BarIdx), &bar);
+      auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+      ATLASSERT(group != nullptr);
+      CBarRecordCollection& bars = group->GetBarRecords();
 
-      if (bar)
+      if (0 <= m_BarIdx && (size_t)m_BarIdx < bars.Count())
       {
-         UpdateBarData(FALSE, m_GroupIdx, m_BarIdx, bar);
+         auto bar = bars.Item(m_BarIdx);
+         ATLASSERT(bar != nullptr);
+
+         UpdateBarData(FALSE, m_GroupIdx, m_BarIdx, bar.get());
 
          UpdateVaries();
-         UpdateDimensions(bar);
-         UpdateStatus(bar);
+         UpdateDimensions(bar.get());
+         UpdateStatus(bar.get());
       }
    }
 }
@@ -720,43 +650,37 @@ void CBarDlg::OnCbnEditchangeMark()
 
 void CBarDlg::UpdateStatus()
 {
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
+   auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
-   CComPtr<IBarRecord> bar;
-   bars->get_Item(CComVariant(m_BarIdx), &bar);
-
-   if (bar)
+   if (0 <= m_BarIdx && (size_t)m_BarIdx < bars.Count())
    {
-      UpdateStatus(bar);
+      auto bar = bars.Item(m_BarIdx);
+      ATLASSERT(bar != nullptr);
+      UpdateStatus(bar.get());
    }
    else
    {
-      UpdateStatus(group);
+      UpdateStatus(group.get());
    }
 }
 
-void CBarDlg::UpdateStatus(IGroup* pGroup)
+void CBarDlg::UpdateStatus(CGroup* pGroup)
 {
    if (pGroup)
    {
-      StatusType status;
-      pGroup->get_Status(&status);
+      StatusType status = pGroup->GetStatus();
       UpdateStatus(status);
       UpdateMessages(nullptr);
    }
 }
 
-void CBarDlg::UpdateStatus(IBarRecord* pBarRecord)
+void CBarDlg::UpdateStatus(CBarRecord* pBarRecord)
 {
    if (pBarRecord)
    {
-      StatusType status;
-      pBarRecord->get_Status(&status);
+      StatusType status = pBarRecord->GetStatus();
       UpdateStatus(status);
       UpdateMessages(pBarRecord);
    }
@@ -765,48 +689,34 @@ void CBarDlg::UpdateStatus(IBarRecord* pBarRecord)
 void CBarDlg::UpdateStatus(const StatusType& status)
 {
    CStatic* pIcon = (CStatic*)GetDlgItem(IDC_STATUS);
-   if (status == stOK)
+   if (status == StatusType::stOK)
    {
       pIcon->SetIcon((HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_GREEN), IMAGE_ICON, 12, 12, 0));
    }
-   else if (status == stWarning)
+   else if (status == StatusType::stWarning)
    {
       pIcon->SetIcon((HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_YELLOW), IMAGE_ICON, 12, 12, 0));
    }
    else
    {
-      ATLASSERT(status == stError);
+      ATLASSERT(status == StatusType::stError);
       pIcon->SetIcon((HICON)::LoadImage(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDI_RED), IMAGE_ICON, 12, 12, 0));
    }
 }
 
 void CBarDlg::UpdateMarkNumbers()
 {
-   USES_CONVERSION;
-
    CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_MARK);
    int curSel = pCB->GetCurSel();
    pCB->ResetContent();
 
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
+   auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
-
-   long nBars;
-   bars->get_Count(&nBars);
-   for (int i = 0; i < nBars; i++)
+   for (auto& bar : bars)
    {
-      CComPtr<IBarRecord> bar;
-      bars->get_Item(CComVariant(i), &bar);
-
-      CComBSTR bstrMark;
-      bar->get_Mark(&bstrMark);
-
-      pCB->AddString(OLE2T(bstrMark));
+      pCB->AddString(CString(bar->GetMark().c_str()));
    }
 
    if (curSel == CB_ERR)
@@ -820,7 +730,7 @@ void CBarDlg::UpdateMarkNumbers()
    }
 }
 
-void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, IBarRecord* pBarRecord)
+void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, CBarRecord* pBarRecord)
 {
    CDataExchange dx(this, bSaveAndValidate);
    CDataExchange* pDX = &dx;
@@ -835,9 +745,9 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
    const auto* pDisplayUnits = pApp->GetDisplayUnits();
 
    MaterialType material;
-   CComBSTR bstrMark;
-   CComBSTR bstrLocation;
-   CComBSTR bstrSize;
+   std::_tstring strMark;
+   std::_tstring strLocation;
+   std::_tstring strSize;
    long bendType;
    long nReqd;
    long nEach;
@@ -850,42 +760,39 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
    const int varies = 1;
    std::array<Float64, 2> u{ 0,0 }, w{ 0,0 }, x{ 0,0 }, y{ 0,0 }, z{ 0,0 }, t1{ 0,0 }, t2{ 0,0 };
 
-   CComPtr<IBend> primaryBend;
-
    if (!bSaveAndValidate)
    {
-      pBarRecord->get_Material(&material);
-      pBarRecord->get_Mark(&bstrMark);
-      pBarRecord->get_Location(&bstrLocation);
-      pBarRecord->get_BendType(&bendType);
-      pBarRecord->get_Size(&bstrSize);
-      pBarRecord->get_NumReqd(&nReqd);
-      pBarRecord->get_Use(&use);
-      pBarRecord->get_Substructure(&vbSubstructure);
-      pBarRecord->get_Epoxy(&vbEpoxy);
-      pBarRecord->get_Varies(&vbVaries);
-      pBarRecord->get_NumEach(&nEach);
+      material = pBarRecord->GetMaterial();
+      strMark = pBarRecord->GetMark();
+      strLocation = pBarRecord->GetLocation();
+      bendType = pBarRecord->GetBendType();
+      strSize = pBarRecord->GetSize();
+      nReqd = pBarRecord->GetNumReqd();
+      use = pBarRecord->GetUse();
+      vbSubstructure = pBarRecord->GetSubstructure() ? VARIANT_TRUE : VARIANT_FALSE;
+      vbEpoxy = pBarRecord->GetEpoxy() ? VARIANT_TRUE : VARIANT_FALSE;
+      vbVaries = pBarRecord->GetVaries() ? VARIANT_TRUE : VARIANT_FALSE;
+      nEach = pBarRecord->GetNumEach();
 
-      pBarRecord->get_PrimaryBend(&primaryBend);
-      primaryBend->get_U(&u[primary]);
-      primaryBend->get_W(&w[primary]);
-      primaryBend->get_X(&x[primary]);
-      primaryBend->get_Y(&y[primary]);
-      primaryBend->get_Z(&z[primary]);
-      primaryBend->get_T1(&t1[primary]);
-      primaryBend->get_T2(&t2[primary]);
+      auto primaryBend = pBarRecord->GetPrimaryBend();
+      u[primary] = primaryBend->GetU();
+      w[primary] = primaryBend->GetW();
+      x[primary] = primaryBend->GetX();
+      y[primary] = primaryBend->GetY();
+      z[primary] = primaryBend->GetZ();
+      t1[primary] = primaryBend->GetT1();
+      t2[primary] = primaryBend->GetT2();
 
       if (vbVaries == VARIANT_TRUE)
       {
-         CComPtr<IBend> variesBend;
-         pBarRecord->get_VariesBend(&variesBend);
-         variesBend->get_U(&u[varies]);
-         variesBend->get_W(&w[varies]);
-         variesBend->get_X(&x[varies]);
-         variesBend->get_Y(&y[varies]);
-         variesBend->get_Z(&z[varies]);
-         variesBend->get_T1(&t1[varies]);
-         variesBend->get_T2(&t2[varies]);
+         auto variesBend = pBarRecord->GetVariesBend();
+         u[varies] = variesBend->GetU();
+         w[varies] = variesBend->GetW();
+         x[varies] = variesBend->GetX();
+         y[varies] = variesBend->GetY();
+         z[varies] = variesBend->GetZ();
+         t1[varies] = variesBend->GetT1();
+         t2[varies] = variesBend->GetT2();
       }
 
       // Now that we know the bar size, fill up the bar size combo box so the DDX below will
@@ -898,14 +805,14 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
 
    DDX_CBItemData(pDX, IDC_MATERIALS, material);
 
-   DDX_Text(pDX, IDC_MARK, bstrMark);
-   DDV_NonEmptyString(pDX, _T("Mark No."), bstrMark);
+   DDX_String(pDX, IDC_MARK, strMark);
+   DDV_NonEmptyString(pDX, _T("Mark No."), strMark);
 
-   DDX_Text(pDX, IDC_LOCATION, bstrLocation);
-   DDV_NonEmptyString(pDX, _T("Location"), bstrLocation);
+   DDX_String(pDX, IDC_LOCATION, strLocation);
+   DDV_NonEmptyString(pDX, _T("Location"), strLocation);
 
    DDX_CBItemData(pDX, IDC_TYPE, bendType);
-   DDX_CBString(pDX, IDC_BAR_SIZE, bstrSize);
+   DDX_CBString(pDX, IDC_BAR_SIZE, strSize);
    DDX_Text(pDX, IDC_NUM_REQUIRED, nReqd);
    DDV_MinMaxLong(pDX, nReqd, 1, 9999);
 
@@ -944,51 +851,47 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
          pDX->Fail();
       }
 
-      pBarRecord->put_Material(material);
+      pBarRecord->SetMaterial(material);
 
-      pBarRecord->put_Mark(bstrMark);
-      pBarRecord->put_Location(bstrLocation);
+      pBarRecord->SetMark(strMark);
+      pBarRecord->SetLocation(strLocation);
 
-      CComPtr<IBarCollection> bars;
-      m_BarInfoMgr->get_Bars(material,&bars);
-      CComPtr<IBarData> barData;
-      bars->get_Item(CComVariant(bstrSize), &barData);
-      pBarRecord->put_BarData(barData);
+      const CBarCollection& bars = m_BarInfoMgr.GetBars(material);
+      const CBarData* barData = bars.Find(strSize);
+      pBarRecord->SetBarData(barData);
 
-      pBarRecord->put_NumReqd(nReqd);
+      pBarRecord->SetNumReqd(nReqd);
 
-      pBarRecord->put_Use(use);
+      pBarRecord->SetUse(use);
 
-      pBarRecord->put_Substructure(vbSubstructure);
-      pBarRecord->put_Epoxy(vbEpoxy);
+      pBarRecord->SetSubstructure(vbSubstructure == VARIANT_TRUE);
+      pBarRecord->SetEpoxy(vbEpoxy == VARIANT_TRUE);
 
-      CComPtr<IBend> primaryBend;
-      CBendFactory::CreateBend(bendType, &primaryBend);
-      primaryBend->put_U(u[primary]);
-      primaryBend->put_W(w[primary]);
-      primaryBend->put_X(x[primary]);
-      primaryBend->put_Y(y[primary]);
-      primaryBend->put_Z(z[primary]);
-      primaryBend->put_T1(t1[primary]);
-      primaryBend->put_T2(t2[primary]);
-      pBarRecord->put_PrimaryBend(primaryBend);
+      auto primaryBend = CBendFactory::CreateBend(bendType);
+      primaryBend->SetU(u[primary]);
+      primaryBend->SetW(w[primary]);
+      primaryBend->SetX(x[primary]);
+      primaryBend->SetY(y[primary]);
+      primaryBend->SetZ(z[primary]);
+      primaryBend->SetT1(t1[primary]);
+      primaryBend->SetT2(t2[primary]);
+      pBarRecord->SetPrimaryBend(primaryBend);
 
       // Varies Bend
       if (vbVaries == VARIANT_TRUE)
       {
-         pBarRecord->put_NumEach(nEach);
+         pBarRecord->SetNumEach(nEach);
 
-         CComPtr<IBend> variesBend;
-         CBendFactory::CreateBend(bendType, &variesBend);
-         variesBend->put_U(u[varies]);
-         variesBend->put_W(w[varies]);
-         variesBend->put_X(x[varies]);
-         variesBend->put_Y(y[varies]);
-         variesBend->put_Z(z[varies]);
-         variesBend->put_T1(t1[varies]);
-         variesBend->put_T2(t2[varies]);
+         auto variesBend = CBendFactory::CreateBend(bendType);
+         variesBend->SetU(u[varies]);
+         variesBend->SetW(w[varies]);
+         variesBend->SetX(x[varies]);
+         variesBend->SetY(y[varies]);
+         variesBend->SetZ(z[varies]);
+         variesBend->SetT1(t1[varies]);
+         variesBend->SetT2(t2[varies]);
 
-         pBarRecord->put_VariesBend(variesBend);
+         pBarRecord->SetVariesBend(variesBend);
       }
    }
 
@@ -1001,56 +904,43 @@ void CBarDlg::UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, I
    m_SM.SetState(State::Editing);
 }
 
-void CBarDlg::UpdateMessages(IBarRecord* pBarRecord)
+void CBarDlg::UpdateMessages(CBarRecord* pBarRecord)
 {
    if (pBarRecord)
    {
       CString strMsgs;
 
-      CComPtr<IBend> primaryBend;
-      pBarRecord->get_PrimaryBend(&primaryBend);
-      Float64 length;
-      primaryBend->get_Length(&length);
+      auto primaryBend = pBarRecord->GetPrimaryBend();
+      Float64 length = primaryBend->GetLength();
       CString strLength = Formatter::FormatLength(length);
       strMsgs += _T("Primary bend length: ") + strLength + _T("\r\n");
 
-      VARIANT_BOOL vbVaries;
-      pBarRecord->get_Varies(&vbVaries);
-      if (vbVaries == VARIANT_TRUE)
+      bool bVaries = pBarRecord->GetVaries();
+      if (bVaries)
       {
-         CComPtr<IBend> variesBend;
-         pBarRecord->get_VariesBend(&variesBend);
-         Float64 length;
-         variesBend->get_Length(&length);
+         auto variesBend = pBarRecord->GetVariesBend();
+         Float64 length = variesBend->GetLength();
          CString strLength = Formatter::FormatLength(length);
          strMsgs += _T("Varies bend length: ") + strLength + _T("\r\n");
       }
 
-      CComPtr<IStatusMessageCollection> statusMessages;
-      pBarRecord->get_StatusMessages(&statusMessages);
-      GetStatusMessages(_T("*** Bar Record ***"), strMsgs, statusMessages);
+      GetStatusMessages(_T("*** Bar Record ***"), strMsgs, pBarRecord->GetStatusMessages());
 
-      statusMessages.Release();
-      primaryBend->get_StatusMessages(&statusMessages);
-      GetStatusMessages(_T("*** Primary Bend ***"), strMsgs, statusMessages);
+      GetStatusMessages(_T("*** Primary Bend ***"), strMsgs, primaryBend->GetStatusMessages());
 
-      if (vbVaries == VARIANT_TRUE)
+      if (bVaries)
       {
-         CComPtr<IBend> variesBend;
-         pBarRecord->get_VariesBend(&variesBend);
-         statusMessages.Release();
-         variesBend->get_StatusMessages(&statusMessages);
-         GetStatusMessages(_T("*** Varies Bend ***"), strMsgs, statusMessages);
+         auto variesBend = pBarRecord->GetVariesBend();
+         GetStatusMessages(_T("*** Varies Bend ***"), strMsgs, variesBend->GetStatusMessages());
       }
 
       GetDlgItem(IDC_STATUS_MESSAGE)->SetWindowText(strMsgs);
    }
 }
 
-void CBarDlg::GetStatusMessages(LPCTSTR lpszMsgGroup,CString& strMsgs, IStatusMessageCollection* pMessages)
+void CBarDlg::GetStatusMessages(LPCTSTR lpszMsgGroup,CString& strMsgs, const CStatusMessageCollection& messages)
 {
-   long nMessages;
-   pMessages->get_Count(&nMessages);
+   long nMessages = (long)messages.Count();
    if (0 < nMessages)
    {
       if (0 < strMsgs.GetLength())
@@ -1061,11 +951,9 @@ void CBarDlg::GetStatusMessages(LPCTSTR lpszMsgGroup,CString& strMsgs, IStatusMe
       strMsgs += _T("\r\n");
    }
 
-   for (long i = 0; i < nMessages; i++)
+   long i = 0;
+   for (const auto& statusMessage : messages)
    {
-      CComPtr<IStatusMessage> statusMessage;
-      pMessages->get_Item(i, &statusMessage);
-
       CString strMsg = Formatter::FormatStatusMessage(statusMessage);
 
       if (i != 0)
@@ -1073,6 +961,7 @@ void CBarDlg::GetStatusMessages(LPCTSTR lpszMsgGroup,CString& strMsgs, IStatusMe
          strMsgs += _T("\r\n");
       }
       strMsgs += strMsg;
+      i++;
    }
 }
 
@@ -1100,12 +989,12 @@ void CBarDlg::UpdateVaries()
    m_SM.SetState(state);
 }
 
-void CBarDlg::UpdateBendGuide(IBarRecord* pBarRecord)
+void CBarDlg::UpdateBendGuide(CBarRecord* pBarRecord)
 {
    long bendType = -1;
    if (pBarRecord)
    {
-      pBarRecord->get_BendType(&bendType);
+      bendType = pBarRecord->GetBendType();
    }
    UpdateBendGuide(bendType);
 }
@@ -1119,39 +1008,38 @@ void CBarDlg::UpdateBendGuide(long bendType)
    DDX_MetaFileStatic(&dc, IDC_BEND_GUIDE, m_BendGuide, AfxGetInstanceHandle(), strBend, _T("Metafile"), EMF_RESIZE);
 }
 
-void CBarDlg::UpdateDimensions(IBarRecord* pBarRecord)
+void CBarDlg::UpdateDimensions(CBarRecord* pBarRecord)
 {
    long bendType = 50;
-   VARIANT_BOOL vbVaries = VARIANT_FALSE;
+   bool bVaries = false;
    if (pBarRecord)
    {
-      pBarRecord->get_BendType(&bendType);
-      pBarRecord->get_Varies(&vbVaries);
+      bendType = pBarRecord->GetBendType();
+      bVaries = pBarRecord->GetVaries();
    }
-   UpdateDimensions(bendType, vbVaries == VARIANT_TRUE);
+   UpdateDimensions(bendType, bVaries);
    UpdateBendGuide(bendType);
 }
 
 
 #define UPDATE(_dim_,_IDC_,ctrlVaries) \
-bend->get_SupportsDimension(_dim_, &vbSupported);\
-GetDlgItem(_IDC_)->EnableWindow(vbSupported == VARIANT_TRUE); \
-ctrlVaries.EnableWindow(bVaries && vbSupported == VARIANT_TRUE);\
-if(vbSupported==VARIANT_FALSE)GetDlgItem(_IDC_)->SetWindowText(_T(""));
+bSupported = bend->SupportsDimension(_dim_);\
+GetDlgItem(_IDC_)->EnableWindow(bSupported); \
+ctrlVaries.EnableWindow(bVaries && bSupported);\
+if(!bSupported)GetDlgItem(_IDC_)->SetWindowText(_T(""));
 void CBarDlg::UpdateDimensions(long bendType, bool bVaries)
 {
    State state = m_SM.GetState();
 
-   CComPtr<IBend> bend;
-   CBendFactory::CreateBend(bendType,&bend);
-   VARIANT_BOOL vbSupported;
-   UPDATE(dimU,IDC_U, m_ctrlVariesU);
-   UPDATE(dimW,IDC_W, m_ctrlVariesW);
-   UPDATE(dimX,IDC_X, m_ctrlVariesX);
-   UPDATE(dimY,IDC_Y, m_ctrlVariesY);
-   UPDATE(dimZ,IDC_Z, m_ctrlVariesZ);
-   UPDATE(dimT1,IDC_T1, m_ctrlVariesT1);
-   UPDATE(dimT2,IDC_T2, m_ctrlVariesT2);
+   auto bend = CBendFactory::CreateBend(bendType);
+   bool bSupported;
+   UPDATE(DimensionType::dimU,IDC_U, m_ctrlVariesU);
+   UPDATE(DimensionType::dimW,IDC_W, m_ctrlVariesW);
+   UPDATE(DimensionType::dimX,IDC_X, m_ctrlVariesX);
+   UPDATE(DimensionType::dimY,IDC_Y, m_ctrlVariesY);
+   UPDATE(DimensionType::dimZ,IDC_Z, m_ctrlVariesZ);
+   UPDATE(DimensionType::dimT1,IDC_T1, m_ctrlVariesT1);
+   UPDATE(DimensionType::dimT2,IDC_T2, m_ctrlVariesT2);
 
    m_SM.SetState(state);
 }
@@ -1181,19 +1069,15 @@ void CBarDlg::SelectBar(long groupIdx, long barIdx)
 
 void CBarDlg::OnBnClickedDelete()
 {
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
-   bars->Remove(CComVariant(m_BarIdx));
+   auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
+   bars.Remove(m_BarIdx);
 
    // update the bar index
    // generally, we want to select the next bar, but if this is the last bar
    // then use index of the new last bar
-   long nBars;
-   bars->get_Count(&nBars);
+   long nBars = (long)bars.Count();
    m_BarIdx = Min(m_BarIdx + 1, nBars - 1);
 
    m_SM.StateChange(Action::DeleteRecord);
@@ -1203,24 +1087,22 @@ void CBarDlg::OnBnClickedDelete()
 
 void CBarDlg::OnBnClickedUpdate()
 {
-   CComPtr<IBarRecord> barRecord;
-   barRecord.CoCreateInstance(CLSID_BarRecord);
-   UpdateBarData(TRUE, m_GroupIdx, m_BarIdx, barRecord);
+   auto barRecord = std::make_shared<CBarRecord>();
+   UpdateBarData(TRUE, m_GroupIdx, m_BarIdx, barRecord.get());
 
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
+   auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
-   if (SUCCEEDED(bars->Replace(CComVariant(m_BarIdx), barRecord)))
+   if (0 <= m_BarIdx && (size_t)m_BarIdx < bars.Count())
    {
+      bars.Replace(m_BarIdx, barRecord);
+
       m_SM.StateChange(Action::UpdateRecord);
 
       UpdateVaries();
-      UpdateDimensions(barRecord);
-      UpdateStatus(barRecord);
+      UpdateDimensions(barRecord.get());
+      UpdateStatus(barRecord.get());
    }
    else
    {
@@ -1258,34 +1140,28 @@ void CBarDlg::OnCbnSelchangeMaterials()
 
 void CBarDlg::OnBnClickedAddBar()
 {
-   CComPtr<IBarRecord> barRecord;
-   barRecord.CoCreateInstance(CLSID_BarRecord);
-   UpdateBarData(TRUE, m_GroupIdx, m_BarIdx, barRecord);
+   auto barRecord = std::make_shared<CBarRecord>();
+   UpdateBarData(TRUE, m_GroupIdx, m_BarIdx, barRecord.get());
 
-   CComPtr<IGroupCollection> groups;
-   m_Barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
+   auto group = m_Barlist.GetGroups().Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
-   long nBars;
-   bars->get_Count(&nBars);
+   long nBars = (long)bars.Count();
    m_BarIdx = nBars; // this is before adding the bar record to the bars collection, so this is the index
 
-   bars->Add(barRecord);
+   bars.Add(barRecord);
 
    UpdateVaries();
-   UpdateDimensions(barRecord);
-   UpdateStatus(barRecord);
+   UpdateDimensions(barRecord.get());
+   UpdateStatus(barRecord.get());
 
    SelectBar(m_GroupIdx, m_BarIdx);
 
    CComboBox* pCB = (CComboBox*)GetDlgItem(IDC_MARK);
-   CComBSTR bstrMark;
-   barRecord->get_Mark(&bstrMark);
-   bstrMark = AutoIncrementMark(CString(bstrMark));
-   pCB->SetCurSel(pCB->AddString(OLE2T(bstrMark)));
+   CString strMark(barRecord->GetMark().c_str());
+   strMark = AutoIncrementMark(strMark);
+   pCB->SetCurSel(pCB->AddString(strMark));
 
    m_SM.StateChange(Action::AddRecord);
 }

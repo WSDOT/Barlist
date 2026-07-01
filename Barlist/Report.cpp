@@ -1,22 +1,22 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright Â© 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
-// published by the Washington State Department of Transportation, 
+// it under the terms of the Alternate Route Open Source License as
+// published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
-// This program is distributed in the hope that it will be useful, but 
-// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// This program is distributed in the hope that it will be useful, but
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 // the Alternate Route Open Source License for more details.
 //
-// You should have received a copy of the Alternate Route Open Source 
-// License along with this program; if not, write to the Washington 
-// State Department of Transportation, Bridge and Structures Office, 
-// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// You should have received a copy of the Alternate Route Open Source
+// License along with this program; if not, write to the Washington
+// State Department of Transportation, Bridge and Structures Office,
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 
@@ -24,6 +24,12 @@
 #include "Report.h"
 #include "BarlistDoc.h"
 #include "Helpers.h"
+
+#include <Bars\Barlist.h>
+#include <Bars\Group.h>
+#include <Bars\BarRecord.h>
+#include <Bars\BendImpl.h>
+#include <Bars\StatusMessageCollection.h>
 
 #include <MfcTools\Text.h>
 #include <MfcTools\VersionInfo.h>
@@ -77,29 +83,14 @@ const std::vector<CString>& CReport::GetReport()
    return m_vReportLines;
 }
 
-void CReport::BuildReport(IBarlist* pBarlist)
+void CReport::BuildReport(CBarlist& barlist)
 {
    // First capture some infomation for the report cover page
-   USES_CONVERSION;
-   CComBSTR bstrProject;
-   pBarlist->get_Project(&bstrProject);
-   m_strProject.Format(_T("Project: %s"), OLE2T(bstrProject));
-
-   CComBSTR bstrJobNumber;
-   pBarlist->get_JobNumber(&bstrJobNumber);
-   m_strJobNumber.Format(_T("Job Number: %s"), OLE2T(bstrJobNumber));
-
-   CComBSTR bstrEngineer;
-   pBarlist->get_Engineer(&bstrEngineer);
-   m_strEngineer.Format(_T("Engineer: %s"), OLE2T(bstrEngineer));
-
-   CComBSTR bstrCompany;
-   pBarlist->get_Company(&bstrCompany);
-   m_strCompany.Format(_T("Company: %s"), OLE2T(bstrCompany));
-
-   CComBSTR bstrComments;
-   pBarlist->get_Comments(&bstrComments);
-   m_strComments.Format(_T("Comments: %s"),OLE2T(bstrComments));
+   m_strProject.Format(_T("Project: %s"), CString(barlist.GetProject().c_str()));
+   m_strJobNumber.Format(_T("Job Number: %s"), CString(barlist.GetJobNumber().c_str()));
+   m_strEngineer.Format(_T("Engineer: %s"), CString(barlist.GetEngineer().c_str()));
+   m_strCompany.Format(_T("Company: %s"), CString(barlist.GetCompany().c_str()));
+   m_strComments.Format(_T("Comments: %s"), CString(barlist.GetComments().c_str()));
 
    // Build the report
    m_vReportLines.clear();
@@ -108,103 +99,70 @@ void CReport::BuildReport(IBarlist* pBarlist)
    CBarlistDoc* pDoc = (CBarlistDoc*)EAFGetDocument();
    if (pDoc->GetReportOptions() == CBarlistDoc::ReportOptions::REPORT_TOTAL_AND_GROUP_QUANTITIES)
    {
-       ReportGroups(pBarlist);
-       ReportQuantitiesByGroup(pBarlist);
-       ReportQuantities(pBarlist);
+       ReportGroups(barlist);
+       ReportQuantitiesByGroup(barlist);
+       ReportQuantities(barlist);
    }
    else
    {
-       ReportGroups(pBarlist);
-       ReportQuantities(pBarlist);
+       ReportGroups(barlist);
+       ReportQuantities(barlist);
    }
 }
 
-void CReport::ReportGroups(IBarlist* pBarlist)
+void CReport::ReportGroups(CBarlist& barlist)
 {
-   USES_CONVERSION;
-   CComPtr<IGroupCollection> groups;
-   pBarlist->get_Groups(&groups);
-
-   long nGroups;
-   groups->get_Count(&nGroups);
-   for (long grpIdx = 0; grpIdx < nGroups; grpIdx++)
+   for (auto& group : barlist.GetGroups())
    {
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(grpIdx), &group);
-
-      CComBSTR bstrName;
-      group->get_Name(&bstrName);
-
-      CString strName(bstrName);
+      CString strName(group->GetName().c_str());
       strName.MakeUpper();
       CString strGroup;
       strGroup.Format(_T("%4s %-28s\n"), _T(""), strName);
       m_vReportLines.push_back(strGroup);
-      
-      ReportBarRecords(group);
-      
+
+      ReportBarRecords(*group);
+
       m_vReportLines.push_back(_T("\n"));
    }
 }
 
-void CReport::ReportBarRecords(IGroup* pGroup)
+void CReport::ReportBarRecords(CGroup& group)
 {
-   CComPtr<IBarRecordCollection> bars;
-   pGroup->get_BarRecords(&bars);
-   long nBars;
-   bars->get_Count(&nBars);
-   for (long barIdx = 0; barIdx < nBars; barIdx++)
+   for (auto& bar : group.GetBarRecords())
    {
-      CComPtr<IBarRecord> bar;
-      bars->get_Item(CComVariant(barIdx), &bar);
-      ReportBarRecord(bar);
+      ReportBarRecord(*bar);
    }
 }
 
-void CReport::ReportBarRecord(IBarRecord* pBarRecord)
+void CReport::ReportBarRecord(CBarRecord& barRecord)
 {
-   USES_CONVERSION;
-
    CString strBarRecord;
 
-   CComBSTR bstrMark;
-   pBarRecord->get_Mark(&bstrMark);
+   CString strMark(barRecord.GetMark().c_str());
+   CString strLocation(barRecord.GetLocation().c_str());
 
-   CComBSTR bstrLocation;
-   pBarRecord->get_Location(&bstrLocation);
-
-   CComBSTR bstrSize;
-   pBarRecord->get_Size(&bstrSize);
-   CString strSize(bstrSize);
+   CString strSize(barRecord.GetSize().c_str());
    strSize.Remove(_T('#'));
 
-   long nReqd;
-   pBarRecord->get_NumReqd(&nReqd);
+   long nReqd = barRecord.GetNumReqd();
 
-   long bendType;
-   pBarRecord->get_BendType(&bendType);
+   long bendType = barRecord.GetBendType();
 
-   UseType use;
-   pBarRecord->get_Use(&use);
+   UseType use = barRecord.GetUse();
 
-   VARIANT_BOOL vbSubstructure;
-   pBarRecord->get_Substructure(&vbSubstructure);
+   bool bSubstructure = barRecord.GetSubstructure();
 
-   VARIANT_BOOL vbEpoxy;
-   pBarRecord->get_Epoxy(&vbEpoxy);
+   bool bEpoxy = barRecord.GetEpoxy();
 
-   MaterialType material;
-   pBarRecord->get_Material(&material);
+   MaterialType material = barRecord.GetMaterial();
 
-   VARIANT_BOOL vbVaries;
-   pBarRecord->get_Varies(&vbVaries);
+   bool bVaries = barRecord.GetVaries();
 
-   strBarRecord.Format(_T("%4s %-28s %2s %4d %2d %c %c %4s %c "), OLE2T(bstrMark), OLE2T(bstrLocation), strSize, nReqd, bendType, GetUse(use), GetFlag(vbSubstructure, 'S'), GetMaterial(material,vbEpoxy), GetFlag(vbVaries, 'V'));
+   strBarRecord.Format(_T("%4s %-28s %2s %4d %2d %c %c %4s %c "), (LPCTSTR)strMark, (LPCTSTR)strLocation, (LPCTSTR)strSize, nReqd, bendType, GetUse(use), GetFlag(bSubstructure, 'S'), (LPCTSTR)GetMaterial(material, bEpoxy), GetFlag(bVaries, 'V'));
 
-   if (vbVaries == VARIANT_TRUE)
+   if (bVaries)
    {
-      long nEach;
-      pBarRecord->get_NumEach(&nEach);
+      long nEach = barRecord.GetNumEach();
       CString strEach;
       strEach.Format(_T("%2d "), nEach);
       strBarRecord += strEach;
@@ -214,31 +172,28 @@ void CReport::ReportBarRecord(IBarRecord* pBarRecord)
       strBarRecord += _T("   ");
    }
 
-   CComPtr<IBend> primaryBend;
-   pBarRecord->get_PrimaryBend(&primaryBend);
-   strBarRecord += ReportBend(primaryBend, false);
+   auto primaryBend = barRecord.GetPrimaryBend();
+   strBarRecord += ReportBend(*primaryBend, false);
 
-   Float64 mass;
-   pBarRecord->get_Mass(&mass);
+   Float64 mass = barRecord.GetMass();
    strBarRecord += (EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("   ") : _T("  ")) + Formatter::FormatMass(mass, false);
    strBarRecord += _T("\n");
 
    m_vReportLines.push_back(strBarRecord);
 
-   CComPtr<IBend> variesBend;
-   if (vbVaries == VARIANT_TRUE)
+   auto variesBend = barRecord.GetVariesBend();
+   if (bVaries)
    {
-      pBarRecord->get_VariesBend(&variesBend);
-      CString strVariesBend = ReportBend(variesBend, true);
+      CString strVariesBend = ReportBend(*variesBend, true);
       strVariesBend += _T("\n");
       m_vReportLines.push_back(strVariesBend);
    }
 
-   ReportErrors(primaryBend);
-   ReportErrors(variesBend);
+   ReportErrors(primaryBend.get());
+   ReportErrors(variesBend.get());
 }
 
-CString CReport::ReportBend(IBend* pBend, bool bVaries)
+CString CReport::ReportBend(CBend& bend, bool bVaries)
 {
    CString strBend;
 
@@ -247,38 +202,31 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
       strBend.Format(_T("%59s"), _T(" "));
    }
 
-   Float64 u, w, x, y, z, t1, t2;
-   pBend->get_U(&u);
-   pBend->get_W(&w);
-   pBend->get_X(&x);
-   pBend->get_Y(&y);
-   pBend->get_Z(&z);
-   pBend->get_T1(&t1);
-   pBend->get_T2(&t2);
+   Float64 u = bend.GetU();
+   Float64 w = bend.GetW();
+   Float64 x = bend.GetX();
+   Float64 y = bend.GetY();
+   Float64 z = bend.GetZ();
+   Float64 t1 = bend.GetT1();
+   Float64 t2 = bend.GetT2();
 
    strBend += Formatter::FormatLength(u, false);
 
    CString strLengthSpace(EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("  ") : _T(" "));
    CString strSkipLength(EAFGetApp()->GetUnitsMode() == WBFL::EAF::UnitMode::SI ? _T("       ") : _T("        "));
 
-   VARIANT_BOOL vbSupported;
-   pBend->get_SupportsDimension(dimW, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + Formatter::FormatLength(w, false)) : strLengthSpace + strSkipLength;
+   strBend += bend.SupportsDimension(DimensionType::dimW) ? (strLengthSpace + Formatter::FormatLength(w, false)) : strLengthSpace + strSkipLength;
 
-   pBend->get_SupportsDimension(dimX, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (strLengthSpace + Formatter::FormatLength(x, false)) : strLengthSpace + strSkipLength;
+   strBend += bend.SupportsDimension(DimensionType::dimX) ? (strLengthSpace + Formatter::FormatLength(x, false)) : strLengthSpace + strSkipLength;
 
-   pBend->get_SupportsDimension(dimY, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (_T(" ") + Formatter::FormatLength(y, false)) : _T(" ") + strSkipLength;
+   strBend += bend.SupportsDimension(DimensionType::dimY) ? (CString(_T(" ")) + Formatter::FormatLength(y, false)) : CString(_T(" ")) + strSkipLength;
 
-   pBend->get_SupportsDimension(dimZ, &vbSupported);
-   strBend += (vbSupported == VARIANT_TRUE) ? (_T(" ") + Formatter::FormatLength(z, false)) : _T(" ") + strSkipLength;
+   strBend += bend.SupportsDimension(DimensionType::dimZ) ? (CString(_T(" ")) + Formatter::FormatLength(z, false)) : CString(_T(" ")) + strSkipLength;
 
    CEAFApp* pApp = EAFGetApp();
    const auto* pDisplayUnits = pApp->GetDisplayUnits();
 
-   pBend->get_SupportsDimension(dimT1, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   if (bend.SupportsDimension(DimensionType::dimT1))
    {
       CString strT1;
       strT1.Format(_T(" %3.0f"), WBFL::Units::ConvertFromSysUnits(t1, pDisplayUnits->Angle.UnitOfMeasure));
@@ -289,8 +237,7 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
       strBend += _T("    ");
    }
 
-   pBend->get_SupportsDimension(dimT2, &vbSupported);
-   if (vbSupported == VARIANT_TRUE)
+   if (bend.SupportsDimension(DimensionType::dimT2))
    {
       CString strT2;
       strT2.Format(_T(" %3.0f"), WBFL::Units::ConvertFromSysUnits(t2, pDisplayUnits->Angle.UnitOfMeasure));
@@ -301,26 +248,19 @@ CString CReport::ReportBend(IBend* pBend, bool bVaries)
       strBend += _T("    ");
    }
 
-   Float64 length;
-   pBend->get_Length(&length);
+   Float64 length = bend.GetLength();
    strBend += _T("  ") + Formatter::FormatLength(length, false);
 
    return strBend;
 }
 
-void CReport::ReportErrors(IBend* pBend)
+void CReport::ReportErrors(CBend* pBend)
 {
    if (pBend)
    {
-      CComPtr<IStatusMessageCollection> statusMessages;
-      pBend->get_StatusMessages(&statusMessages);
-      long nMessages;
-      statusMessages->get_Count(&nMessages);
-      for (long i = 0; i < nMessages; i++)
+      const CStatusMessageCollection& statusMessages = pBend->GetStatusMessages();
+      for (const auto& statusMessage : statusMessages)
       {
-         CComPtr<IStatusMessage> statusMessage;
-         statusMessages->get_Item(i, &statusMessage);
-
          CString strStatusMessage = Formatter::FormatStatusMessage(statusMessage);
          strStatusMessage += _T("\n");
          m_vReportLines.push_back(strStatusMessage);
@@ -330,32 +270,32 @@ void CReport::ReportErrors(IBend* pBend)
 
 TCHAR CReport::GetUse(UseType use)
 {
-   TCHAR c;
+   TCHAR c = ' ';
    switch (use)
    {
-   case utLongitudinal: c = ' '; break;
-   case utSeismic:      c = 'S'; break;
-   case utTransverse:   c = 'T'; break;
+   case UseType::utLongitudinal: c = ' '; break;
+   case UseType::utSeismic:      c = 'S'; break;
+   case UseType::utTransverse:   c = 'T'; break;
    }
    return c;
 }
 
-inline TCHAR CReport::GetFlag(VARIANT_BOOL vbFlag, TCHAR c)
+inline TCHAR CReport::GetFlag(bool bFlag, TCHAR c)
 {
-   return vbFlag == VARIANT_TRUE ? c : ' ';
+   return bFlag ? c : ' ';
 }
 
-CString CReport::GetMaterial(MaterialType material,VARIANT_BOOL vbEpoxy)
+CString CReport::GetMaterial(MaterialType material, bool bEpoxy)
 {
    CString strMaterial;
-   if (vbEpoxy == VARIANT_TRUE)
+   if (bEpoxy)
    {
-      strMaterial.Format(_T("%2s%2s"), GetMaterialDesignation(material), GetMaterialGrade(material));
+      strMaterial.Format(_T("%2s%2s"), (LPCTSTR)GetMaterialDesignation(material), (LPCTSTR)GetMaterialGrade(material));
       strMaterial.SetAt(0, _T('E'));
    }
    else
    {
-      strMaterial.Format(_T("%2s%2s"), GetMaterialDesignation(material), GetMaterialGrade(material));
+      strMaterial.Format(_T("%2s%2s"), (LPCTSTR)GetMaterialDesignation(material), (LPCTSTR)GetMaterialGrade(material));
    }
    return strMaterial;
 }
@@ -377,28 +317,28 @@ void CReport::AddMaterialDataToReport(MaterialType material, Float64 sub, Float6
     CString strMaterial;
     strMaterial.Format(_T("%-30s "), GetMaterialSpecification(material));
 
-    if (material == D7957)
+    if (material == MaterialType::D7957)
     {
-        strMaterial.AppendFormat(_T("%23s %25s %25s %25s "), Formatter::FormatLength(sub), _T(""), Formatter::FormatLength(super), _T(""));
+        strMaterial.AppendFormat(_T("%23s %25s %25s %25s "), (LPCTSTR)Formatter::FormatLength(sub), _T(""), (LPCTSTR)Formatter::FormatLength(super), _T(""));
     }
     else
     {
-        strMaterial.AppendFormat(_T("%22s "), Formatter::FormatMass(sub));
+        strMaterial.AppendFormat(_T("%22s "), (LPCTSTR)Formatter::FormatMass(sub));
 
         if (CanBeEpoxyCoated(material))
         {
-            strMaterial.AppendFormat(_T("%22s "), Formatter::FormatMass(subEpoxy));
+            strMaterial.AppendFormat(_T("%22s "), (LPCTSTR)Formatter::FormatMass(subEpoxy));
         }
         else
         {
             strMaterial.AppendFormat(_T("%22s "), _T(""));
         }
 
-        strMaterial.AppendFormat(_T("%27s "), Formatter::FormatMass(super));
+        strMaterial.AppendFormat(_T("%27s "), (LPCTSTR)Formatter::FormatMass(super));
 
         if (CanBeEpoxyCoated(material))
         {
-            strMaterial.AppendFormat(_T("%25s "), Formatter::FormatMass(superEpoxy));
+            strMaterial.AppendFormat(_T("%25s "), (LPCTSTR)Formatter::FormatMass(superEpoxy));
         }
         else
         {
@@ -410,24 +350,14 @@ void CReport::AddMaterialDataToReport(MaterialType material, Float64 sub, Float6
 
 
 
-void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
+void CReport::ReportQuantitiesByGroup(CBarlist& barlist)
 {
-    USES_CONVERSION;
-
-    CComPtr<IGroupCollection> groups;
-    pBarlist->get_Groups(&groups);
-    long nGroups;
-    groups->get_Count(&nGroups);
-
-    for (auto i = 0; i < nGroups; i++)
+    for (auto& group : barlist.GetGroups())
     {
-        CComPtr<IGroup> group;
-        groups->get_Item(CComVariant(i), &group);
-        CComBSTR bstrGroupName;
-        group->get_Name(&bstrGroupName);
+        CString strGroupName(group->GetName().c_str());
 
         CString strGroupHeading;
-        strGroupHeading.Format(_T("\nGroup : %s\n"), OLE2T(bstrGroupName));
+        strGroupHeading.Format(_T("\nGroup : %s\n"), (LPCTSTR)strGroupName);
         m_vReportLines.push_back(strGroupHeading);
 
         AddReportHeader();
@@ -441,11 +371,10 @@ void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
 
             MaterialType material = static_cast<MaterialType>(j);
 
-            Float64 sub{ 0.0 }, subEpoxy{ 0.0 }, super{ 0.0 }, superEpoxy{ 0.0 };
-            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_TRUE /*epoxy*/, VARIANT_TRUE /*substructure*/, &subEpoxy);
-            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE /*substructure*/, &sub);
-            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_TRUE /*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
-            pBarlist->get_QuantityByGroup(bstrGroupName, material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+            Float64 subEpoxy = barlist.GetQuantityByGroup(group->GetName(), material, true /*epoxy*/, true /*substructure*/);
+            Float64 sub = barlist.GetQuantityByGroup(group->GetName(), material, false/*epoxy*/, true /*substructure*/);
+            Float64 superEpoxy = barlist.GetQuantityByGroup(group->GetName(), material, true /*epoxy*/, false/*substructure*/);
+            Float64 super = barlist.GetQuantityByGroup(group->GetName(), material, false/*epoxy*/, false/*substructure*/);
 
             AddMaterialDataToReport(material, sub, subEpoxy, super, superEpoxy);
         }
@@ -454,7 +383,7 @@ void CReport::ReportQuantitiesByGroup(IBarlist* pBarlist)
 }
 
 
-void CReport::ReportQuantities(IBarlist* pBarlist)
+void CReport::ReportQuantities(CBarlist& barlist)
 {
     CString strSummaryHeading{ _T("\nSummary of Quantities:\n") };
     m_vReportLines.push_back(strSummaryHeading);
@@ -470,11 +399,10 @@ void CReport::ReportQuantities(IBarlist* pBarlist)
 
         MaterialType material = static_cast<MaterialType>(i);
 
-        Float64 sub{ 0.0 }, subEpoxy{ 0.0 }, super{ 0.0 }, superEpoxy{ 0.0 };
-        pBarlist->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_TRUE /*substructure*/, &subEpoxy);
-        pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_TRUE /*substructure*/, &sub);
-        pBarlist->get_Quantity(material, VARIANT_TRUE /*epoxy*/, VARIANT_FALSE/*substructure*/, &superEpoxy);
-        pBarlist->get_Quantity(material, VARIANT_FALSE/*epoxy*/, VARIANT_FALSE/*substructure*/, &super);
+        Float64 subEpoxy = barlist.GetQuantity(material, true /*epoxy*/, true /*substructure*/);
+        Float64 sub = barlist.GetQuantity(material, false/*epoxy*/, true /*substructure*/);
+        Float64 superEpoxy = barlist.GetQuantity(material, true /*epoxy*/, false/*substructure*/);
+        Float64 super = barlist.GetQuantity(material, false/*epoxy*/, false/*substructure*/);
 
         AddMaterialDataToReport(material, sub, subEpoxy, super, superEpoxy);
     }
@@ -542,7 +470,7 @@ void CReport::Print(CDC* pDC, CPrintInfo* pInfo)
 void CReport::PageHeader(CDC* pDC, CPrintInfo* pInfo)
 {
    AFX_MANAGE_STATE(AfxGetStaticModuleState());
-   
+
    pDC->Rectangle(m_Border);
 
    CString strExe = AfxGetApp()->m_pszExeName;

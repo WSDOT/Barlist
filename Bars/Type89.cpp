@@ -24,9 +24,9 @@
 
 
 // Type89.cpp : Implementation of CType89
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type89.h"
+#include <tchar.h>
+#include "BarData.h"
 #include "FabricationConstraints.h"
 #include "LineComponent.h"
 #include "BendComponent.h"
@@ -37,13 +37,12 @@
 // CType89
 void CType89::BuildBend()
 {
-   CBendImpl<CType89,&CLSID_Type89>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -54,18 +53,18 @@ void CType89::BuildBend()
    Float64 barLength;
    Float64 totalSpliceLength;
 
-   pBarData->get_NormalLength( &barLength );
+   barLength = barData.GetNormalLength();
    nSplices = (long)(GetU() / barLength);
    totalSpliceLength = nSplices*GetW();
 
    // Assemble the bend components
-   AddBarComponent( new CLineComponent(GetU()) );
-   AddBarComponent( new CLineComponent(totalSpliceLength) );
+   AddBarComponent( std::make_unique<CLineComponent>(GetU()) );
+   AddBarComponent( std::make_unique<CLineComponent>(totalSpliceLength) );
 }
 
 void CType89::PostValidateBend()
 {
    // NOTE: Don't call base class PostValidateBend().  We don't want
    //       the maximum lengths to be checked.
-   //CBendImpl<CType89,&CLSID_Type89>::PostValidateBend();
+   //CBend::PostValidateBend();
 }

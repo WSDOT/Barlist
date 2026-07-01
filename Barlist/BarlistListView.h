@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -19,20 +19,14 @@
 // P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
-#if !defined(AFX_BarlistListView_H__536620BD_A422_4A74_880F_39C6CAEE3834__INCLUDED_)
-#define AFX_BarlistListView_H__536620BD_A422_4A74_880F_39C6CAEE3834__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 // BarlistListView.h : header file
 //
 
 class CBarlistDoc;
 class CBarlistTreeView;
 class CBarlistFrame;
-interface IBarRecordCollection;
-interface IBarRecord;
+class CBarRecord;
 
 /////////////////////////////////////////////////////////////////////////////
 // CBarlistListView view
@@ -108,7 +102,7 @@ protected:
    BOOL m_bRMouse;
 
    void CacheBarlistClipboardData(COleDataSource& dataSource);
-   void SetBarRecord(int row, IBarRecord* pBarRecord);
+   void SetBarRecord(int row, CBarRecord* pBarRecord);
    BOOL MouseButtonDrag(UINT nFlags, CPoint point);
 
 public:
@@ -132,5 +126,3 @@ public:
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_BarlistListView_H__536620BD_A422_4A74_880F_39C6CAEE3834__INCLUDED_)

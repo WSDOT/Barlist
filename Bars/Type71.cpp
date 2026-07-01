@@ -24,9 +24,9 @@
 
 
 // Type71.cpp : Implementation of CType71
-#include "stdafx.h"
-#include "Bars.h"
 #include "Type71.h"
+#include <tchar.h>
+#include "BarData.h"
 #include "LineComponent.h"
 #include "HelixComponent.h"
 #include <MathEx.h>
@@ -35,13 +35,12 @@
 // CType71
 void CType71::BuildBend()
 {
-   CBendImpl<CType71,&CLSID_Type71>::BuildBend();
+   CBend::BuildBend();
 
-   if ( GetStatusLevel() == stError )
+   if ( GetStatusLevel() == StatusType::stError )
       return;
 
-   CComPtr<IBarData> pBarData;
-   GetBarData(&pBarData);
+   const CBarData& barData = GetBarData();
 
    UseType use = GetUseType();
 
@@ -49,35 +48,31 @@ void CType71::BuildBend()
    Float64 radius;
    Float64 nTurns;
 
-   pBarData->get_Diameter( &db );
+   db = barData.GetDiameter();
    radius = (GetU() - db)/2.0;
    nTurns = 0.5;
 
    // Error check data
 
    // Build the bend
-   AddBarComponent( new CHelixComponent(radius,nTurns) );
-   AddBarComponent( new CLineComponent(GetW()-GetU()/2) );
-   AddBarComponent( new CLineComponent(GetX()-GetU()/2) );
+   AddBarComponent( std::make_unique<CHelixComponent>(radius,nTurns) );
+   AddBarComponent( std::make_unique<CLineComponent>(GetW()-GetU()/2) );
+   AddBarComponent( std::make_unique<CLineComponent>(GetX()-GetU()/2) );
 }
 
 void CType71::PreValidateBend()
 {
-   CBendImpl<CType71,&CLSID_Type71>::PreValidateBend();
+   CBend::PreValidateBend();
 
    if ( GetW() <= 0)
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("W"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("W"), 0.00);
    }
 
    if ( GetX() <= 0)
    {
-      SetStatusLevel( stError );
-      CComBSTR msg;
-      msg.LoadString( ERR_MUSTBEGREATERTHAN );
-      AddStatusMsg( msg, CComVariant("X"), CComVariant(0.00) );
+      SetStatusLevel( StatusType::stError );
+      AddStatusMsg(_T("ERROR : %1 must be greater than %2"), _T("X"), 0.00);
    }
 }

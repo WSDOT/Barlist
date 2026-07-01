@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // ExcelExporter - Barlist Exchange File
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,12 @@
 #include "BarlistPlugin.h"
 #include <MfcTools\ExcelWrapper.h>
 #include <EAF\ComponentObject.h>
-#include "..\Bars\Bars.h"
+#include <Bars\Enums.h>
+
+class CBarlist;
+class CGroup;
+class CBarRecord;
+class CBend;
 
 class CExcelExporterApp : public CWinApp
 {
@@ -48,16 +53,16 @@ public:
 public:
    void Init(CEAFDocument* pDoc) override;
    void Terminate() override;
-   void Go(IBarlist* pBarlist) override;
+   void Go(CBarlist& barlist) override;
    CString GetMenuItem() const override;
 
 private:
-   void ExportToExcel(const CString& strFile, IBarlist* pBarlist);
-   void ExportBarRecords(IGroup* pGroup);
-   void ExportBarRecord(IBarRecord* pBarRecord);
-   void ExportBend(IBend* pBend);
-   void ReportErrors(IBend* pBend);
-   CString GetMaterial(MaterialType material, VARIANT_BOOL vbEpoxy);
+   void ExportToExcel(const CString& strFile, CBarlist& barlist);
+   void ExportBarRecords(CGroup& group);
+   void ExportBarRecord(CBarRecord& barRecord);
+   void ExportBend(CBend* pBend);
+   void ReportErrors(CBend* pBend);
+   CString GetMaterial(MaterialType material, bool bEpoxy);
 
    CString m_strExcelTemplateFolder;
    const CString& GetExcelTemplateFolder() const { return m_strExcelTemplateFolder; }

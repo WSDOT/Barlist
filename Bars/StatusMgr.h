@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,35 +23,27 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// StatusMgr.h: interface for the CStatusMgr class.
-//
-//////////////////////////////////////////////////////////////////////
+// StatusMgr.h: interface for the CStatusMgr class (native).
 
-#if !defined(AFX_STATUSMGR_H__8742D32D_3AD5_11D3_8962_006097C68A9C__INCLUDED_)
-#define AFX_STATUSMGR_H__8742D32D_3AD5_11D3_8962_006097C68A9C__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
 
-#include "StatusMessageCollection.h"
+#include "BarsExport.h"
+#include "Enums.h"
 #include "StatusMessage.h"
+#include "StatusMessageCollection.h"
 
-class CStatusMgr  
+class BARS_API CStatusMgr
 {
 public:
-	CStatusMgr();
-	virtual ~CStatusMgr();
+    CStatusMgr();
 
-   void SetStatusLevel( StatusType status );
-   StatusType GetStatusLevel();
-   void AddStatusMsg(BSTR bstrMsg, VARIANT v1, VARIANT v2);
-   IStatusMessageCollection* GetStatusMessages();
-   void ResetStatusMsgs();
+    void SetStatusLevel(StatusType status);
+    StatusType GetStatusLevel() const;
+    void AddStatusMsg(std::_tstring msg, StatusValue v1 = {}, StatusValue v2 = {});
+    const CStatusMessageCollection& GetStatusMessages() const;
+    void ResetStatusMsgs();
 
 private:
-   StatusType m_Status;
-   CComPtr<IStatusMessageCollection> m_pStatusMsgs;
+    StatusType m_Status;
+    CStatusMessageCollection m_StatusMsgs;
 };
-
-#endif // !defined(AFX_STATUSMGR_H__8742D32D_3AD5_11D3_8962_006097C68A9C__INCLUDED_)

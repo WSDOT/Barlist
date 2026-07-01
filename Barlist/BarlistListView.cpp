@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
@@ -35,6 +35,9 @@
 #include "GenerateMarkNumbersDlg.h"
 
 #include "Barlist.hxx"
+
+#include <Bars\BarRecord.h>
+#include <Bars\BendImpl.h>
 
 
 
@@ -191,18 +194,11 @@ void CBarlistListView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
    if (lHint == HINT_BAR_CHANGED)
    {
       CBarRecordEventHint* pBarHint = (CBarRecordEventHint*)pHint;
-      CComPtr<IBarRecordCollection> bars;
-      pBarHint->group->get_BarRecords(&bars);
-      long nBars;
-      bars->get_Count(&nBars);
-      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      CBarRecordCollection& bars = pBarHint->group->GetBarRecords();
+      long barIdx = bars.IndexOf(pBarHint->pBarRecord);
+      if (barIdx != -1)
       {
-         CComPtr<IBarRecord> bar;
-         bars->get_Item(CComVariant(barIdx), &bar);
-         if (bar.IsEqualObject(pBarHint->pBarRecord))
-         {
-            SetBarRecord(barIdx, pBarHint->pBarRecord);
-         }
+         SetBarRecord(barIdx, pBarHint->pBarRecord);
       }
    }
 
@@ -260,8 +256,6 @@ long CBarlistListView::GetSelectedBar()
 
 void CBarlistListView::OnGroupSelected(long groupIdx)
 {
-   USES_CONVERSION;
-
    m_GroupIdx = groupIdx;
    CListCtrl& list = GetListCtrl();
    list.DeleteAllItems();
@@ -273,110 +267,83 @@ void CBarlistListView::OnGroupSelected(long groupIdx)
    }
 
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   auto group = groups.Item(groupIdx);
+   ATLASSERT(group != nullptr);
 
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
+   CBarRecordCollection& barRecords = group->GetBarRecords();
 
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(groupIdx), &group);
-
-   CComPtr<IBarRecordCollection> barRecords;
-   group->get_BarRecords(&barRecords);
-
-   long nBarRecords;
-   barRecords->get_Count(&nBarRecords);
+   std::size_t nBarRecords = barRecords.Count();
    int row = 0;
-   for (long barRecordIdx = 0; barRecordIdx < nBarRecords; barRecordIdx++, row++)
+   for (std::size_t barRecordIdx = 0; barRecordIdx < nBarRecords; barRecordIdx++, row++)
    {
-      CComPtr<IBarRecord> barRecord;
-      barRecords->get_Item(CComVariant(barRecordIdx), &barRecord);
+      auto barRecord = barRecords.Item(barRecordIdx);
+      ATLASSERT(barRecord != nullptr);
 
-      CComBSTR bstrMark;
-      barRecord->get_Mark(&bstrMark);
-      list.InsertItem(row, OLE2T(bstrMark));
+      list.InsertItem(row, CString(barRecord->GetMark().c_str()));
       list.SetItemData(row, barRecordIdx);
 
-      SetBarRecord(row, barRecord);
+      SetBarRecord(row, barRecord.get());
    }
 }
 
-void CBarlistListView::SetBarRecord(int row, IBarRecord* pBarRecord)
+void CBarlistListView::SetBarRecord(int row, CBarRecord* pBarRecord)
 {
-   USES_CONVERSION;
    CListCtrl& list = GetListCtrl();
 
-   CComBSTR bstrMark;
-   pBarRecord->get_Mark(&bstrMark);
-   list.SetItemText(row, 0, OLE2T(bstrMark));
+   list.SetItemText(row, 0, CString(pBarRecord->GetMark().c_str()));
 
-   StatusType status;
-   pBarRecord->get_Status(&status);
+   StatusType status = pBarRecord->GetStatus();
    VERIFY(list.SetItem(row, 0, LVIF_IMAGE, nullptr, (int)status, 0, 0, 0, 0));
 
    int subItem = 1;
-   CComBSTR bstrLocation;
-   pBarRecord->get_Location(&bstrLocation);
-   list.SetItemText(row, subItem++, OLE2T(bstrLocation));
+   list.SetItemText(row, subItem++, CString(pBarRecord->GetLocation().c_str()));
 
-   CComBSTR bstrSize;
-   pBarRecord->get_Size(&bstrSize);
-   list.SetItemText(row, subItem++, OLE2T(bstrSize));
+   list.SetItemText(row, subItem++, CString(pBarRecord->GetSize().c_str()));
 
-   long nReqd;
-   pBarRecord->get_NumReqd(&nReqd);
+   long nReqd = pBarRecord->GetNumReqd();
    CString strReqd;
    strReqd.Format(_T("%d"), nReqd);
    list.SetItemText(row, subItem++, strReqd);
 
-   long bendType;
-   pBarRecord->get_BendType(&bendType);
+   long bendType = pBarRecord->GetBendType();
    CString strBendType;
    strBendType.Format(_T("%d"), bendType);
    list.SetItemText(row, subItem++, strBendType);
 
    // use
-   UseType use;
-   pBarRecord->get_Use(&use);
+   UseType use = pBarRecord->GetUse();
    CString strUse("");
-   if (use == utTransverse)
+   if (use == UseType::utTransverse)
    {
       strUse = _T("T");
    }
-   else if (use == utSeismic)
+   else if (use == UseType::utSeismic)
    {
       strUse = _T("S");
    }
    list.SetItemText(row, subItem++, strUse);
 
-   MaterialType material;
-   pBarRecord->get_Material(&material);
+   MaterialType material = pBarRecord->GetMaterial();
    CString strMaterial = GetMaterialSpecification(material);
    list.SetItemText(row, subItem++, strMaterial);
 
-   VARIANT_BOOL vbFlag;
-   pBarRecord->get_Substructure(&vbFlag);
-   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("S") : _T("")));
+   list.SetItemText(row, subItem++, (pBarRecord->GetSubstructure() ? _T("S") : _T("")));
 
-   pBarRecord->get_Epoxy(&vbFlag);
-   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("E") : _T("")));
+   list.SetItemText(row, subItem++, (pBarRecord->GetEpoxy() ? _T("E") : _T("")));
 
-   pBarRecord->get_Varies(&vbFlag);
-   list.SetItemText(row, subItem++, (vbFlag == VARIANT_TRUE ? _T("V") : _T("")));
+   list.SetItemText(row, subItem++, (pBarRecord->GetVaries() ? _T("V") : _T("")));
 
    // length
-   CComPtr<IBend> primaryBend;
-   pBarRecord->get_PrimaryBend(&primaryBend);
-   Float64 length;
-   primaryBend->get_Length(&length);
+   auto primaryBend = pBarRecord->GetPrimaryBend();
+   Float64 length = primaryBend->GetLength();
    CString strLength = Formatter::FormatLength(length);
    list.SetItemText(row, subItem++, strLength);
 
-   if (material != D7957)
+   if (material != MaterialType::D7957)
    {
-      Float64 mass;
-      pBarRecord->get_Mass(&mass);
+      Float64 mass = pBarRecord->GetMass();
       CString strMass = Formatter::FormatMass(mass);
       list.SetItemText(row, subItem++, strMass);
    }
@@ -417,17 +384,14 @@ void CBarlistListView::OnBarRenamed(NMHDR* pNMHDR, LRESULT* pResult)
       long barRecordIdx = (long)list.GetItemData(pInfo->item.iItem);
 
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(m_GroupIdx), &group);
-      CComPtr<IBarRecordCollection> bars;
-      group->get_BarRecords(&bars);
-      CComPtr<IBarRecord> bar;
-      bars->get_Item(CComVariant(barRecordIdx), &bar);
-      bar->put_Mark(pInfo->item.pszText);
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
+      auto group = groups.Item(m_GroupIdx);
+      ATLASSERT(group != nullptr);
+      CBarRecordCollection& bars = group->GetBarRecords();
+      auto bar = bars.Item(barRecordIdx);
+      ATLASSERT(bar != nullptr);
+      bar->SetMark(std::_tstring(pInfo->item.pszText));
    }
 }
 
@@ -438,16 +402,13 @@ void CBarlistListView::OnColumnClicked(NMHDR* pNMHDR, LRESULT* pResult)
    if (pInfo->iSubItem == 0)
    {
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(m_GroupIdx), &group);
-      CComPtr<IBarRecordCollection> bars;
-      group->get_BarRecords(&bars);
-      bars->Sort();
-      
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
+      auto group = groups.Item(m_GroupIdx);
+      ATLASSERT(group != nullptr);
+      CBarRecordCollection& bars = group->GetBarRecords();
+      bars.Sort();
+
       OnGroupSelected(m_GroupIdx);
    }
 }
@@ -462,21 +423,18 @@ void CBarlistListView::OnUpdateMoveUp(CCmdUI *pCmdUI)
 void CBarlistListView::OnMoveUp()
 {
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   auto group = groups.Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
    CListCtrl& list = GetListCtrl();
    POSITION pos = list.GetFirstSelectedItemPosition();
    std::vector<int> vItems;
    while (pos)
    {
-      bars->MoveUp(CComVariant((long)list.GetItemData(list.GetNextSelectedItem(pos))));
+      bars.MoveUp((long)list.GetItemData(list.GetNextSelectedItem(pos)));
    }
 }
 
@@ -500,14 +458,11 @@ void CBarlistListView::OnMoveDown()
    }
 
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   auto group = groups.Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
    // use reverse iterators to traverse the vector backwards
    auto iter = vItems.rbegin();
@@ -516,7 +471,7 @@ void CBarlistListView::OnMoveDown()
    {
       long barRecordIdx = (long)list.GetItemData(*iter);
 
-      bars->MoveDown(CComVariant(barRecordIdx));
+      bars.MoveDown(barRecordIdx);
    }
 }
 
@@ -540,14 +495,11 @@ void CBarlistListView::OnDelete()
    }
 
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   auto group = groups.Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
    // use reverse iterators to traverse the vector backwards
    auto iter = vItems.rbegin();
@@ -556,7 +508,7 @@ void CBarlistListView::OnDelete()
    {
       long barRecordIdx = (long)list.GetItemData(*iter);
 
-      bars->Remove(CComVariant(barRecordIdx));
+      bars.Remove(barRecordIdx);
    }
 }
 
@@ -589,27 +541,20 @@ void CBarlistListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 void CBarlistListView::CacheBarlistClipboardData(COleDataSource& dataSource)
 {
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   auto group = groups.Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
-   CComBSTR bstrName;
-   group->get_Name(&bstrName);
+   const std::_tstring& groupName = group->GetName();
 
-   CComPtr<IBarlist> source_barlist;
-   source_barlist.CoCreateInstance(CLSID_Barlist);
-   CComPtr<IGroupCollection> source_groups;
-   source_barlist->get_Groups(&source_groups);
-   source_groups->Add(bstrName);
-   CComPtr<IGroup> source_group;
-   source_groups->get_Item(CComVariant(0), &source_group);
-   CComPtr<IBarRecordCollection> source_bars;
-   source_group->get_BarRecords(&source_bars);
+   CBarlist source_barlist;
+   CGroupCollection& source_groups = source_barlist.GetGroups();
+   source_groups.Add(groupName);
+   auto source_group = source_groups.Item(0);
+   ATLASSERT(source_group != nullptr);
+   CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
    CListCtrl& list = GetListCtrl();
    POSITION pos = list.GetFirstSelectedItemPosition();
@@ -618,13 +563,12 @@ void CBarlistListView::CacheBarlistClipboardData(COleDataSource& dataSource)
       int item = list.GetNextSelectedItem(pos);
       long barRecordIdx = (long)list.GetItemData(item);
 
-      CComPtr<IBarRecord> bar;
-      bars->get_Item(CComVariant(barRecordIdx), &bar);
+      auto bar = bars.Item(barRecordIdx);
+      ATLASSERT(bar != nullptr);
 
-      CComPtr<IBarRecord> clone;
-      pDoc->CopyBar(bar, &clone);
+      auto clone = pDoc->CopyBar(*bar);
 
-      source_bars->Add(clone);
+      source_bars.Add(clone);
    }
 
    Barlist barlist_xml = pDoc->CreateXML(source_barlist);
@@ -673,41 +617,38 @@ BOOL CBarlistListView::MouseButtonDrag(UINT nFlags, CPoint point)
 
                // reconstitute the source barlist data from the XML string
                LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
-               CComPtr<IBarlist> source_barlist;
-               pDoc->CreateBarlist(strXML, &source_barlist);
+               CBarlist source_barlist;
+               pDoc->CreateBarlist(strXML, source_barlist);
                ::GlobalUnlock(hGlobal);
 
                // get the collection of bar records to paste
-               CComPtr<IGroupCollection> source_groups;
-               source_barlist->get_Groups(&source_groups);
-               CComPtr<IGroup> source_group;
-               source_groups->get_Item(CComVariant(0), &source_group);
-               CComPtr<IBarRecordCollection> source_bars;
-               source_group->get_BarRecords(&source_bars);
+               CGroupCollection& source_groups = source_barlist.GetGroups();
+               auto source_group = source_groups.Item(0);
+               ATLASSERT(source_group != nullptr);
+               CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
-               CComBSTR bstrName;
-               source_group->get_Name(&bstrName);
+               const std::_tstring& groupName = source_group->GetName();
 
-               CComPtr<IBarlist> barlist;
-               pDoc->GetBarlist(&barlist);
-               CComPtr<IGroupCollection> groups;
-               barlist->get_Groups(&groups);
-               CComPtr<IGroup> group;
-               groups->get_Item(CComVariant(bstrName), &group);
-               CComPtr<IBarRecordCollection> bars;
-               group->get_BarRecords(&bars);
+               CBarlist& barlist = pDoc->GetBarlist();
+               CGroupCollection& groups = barlist.GetGroups();
+               auto group = groups.Find(groupName);
+               CBarRecordCollection& bars = group->GetBarRecords();
 
-
-               long nBars;
-               source_bars->get_Count(&nBars);
-               for (long barIdx = 0; barIdx < nBars; barIdx++)
+               std::size_t nBars = source_bars.Count();
+               for (std::size_t barIdx = 0; barIdx < nBars; barIdx++)
                {
-                  CComPtr<IBarRecord> bar;
-                  source_bars->get_Item(CComVariant(barIdx), &bar);
+                  auto bar = source_bars.Item(barIdx);
+                  ATLASSERT(bar != nullptr);
 
-                  CComBSTR bstrMark;
-                  bar->get_Mark(&bstrMark);
-                  bars->Remove(CComVariant(bstrMark));
+                  auto rec = bars.Find(bar->GetMark());
+                  if (rec)
+                  {
+                     long recIdx = bars.IndexOf(rec.get());
+                     if (recIdx != -1)
+                     {
+                        bars.Remove(recIdx);
+                     }
+                  }
                }
             }
          
@@ -787,40 +728,31 @@ DROPEFFECT CBarlistListView::OnDropEx(COleDataObject* pDataObject, DROPEFFECT dr
       }
 
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-
-      CComPtr<IGroup> targetGroup;
-      groups->get_Item(CComVariant(m_GroupIdx), &targetGroup);
-
-      CComPtr<IBarRecordCollection> targetBars;
-      targetGroup->get_BarRecords(&targetBars);
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
+      auto targetGroup = groups.Item(m_GroupIdx);
+      ATLASSERT(targetGroup != nullptr);
+      CBarRecordCollection& targetBars = targetGroup->GetBarRecords();
 
       // reconstitute the source barlist data from the XML string
       HGLOBAL hGlobal = pDataObject->GetGlobalData(CBarlistListView::ms_cBarFormat);
       LPCSTR strXML = (LPCSTR)::GlobalLock(hGlobal);
-      CComPtr<IBarlist> source_barlist;
-      pDoc->CreateBarlist(strXML, &source_barlist);
+      CBarlist source_barlist;
+      pDoc->CreateBarlist(strXML, source_barlist);
       ::GlobalUnlock(hGlobal);
 
       // get the collection of bar records to paste
-      CComPtr<IGroupCollection> source_groups;
-      source_barlist->get_Groups(&source_groups);
-      CComPtr<IGroup> source_group;
-      source_groups->get_Item(CComVariant(0), &source_group);
-      CComPtr<IBarRecordCollection> source_bars;
-      source_group->get_BarRecords(&source_bars);
+      CGroupCollection& source_groups = source_barlist.GetGroups();
+      auto source_group = source_groups.Item(0);
+      ATLASSERT(source_group != nullptr);
+      CBarRecordCollection& source_bars = source_group->GetBarRecords();
 
-      long nBars;
-      source_bars->get_Count(&nBars);
-      for (long barIdx = 0; barIdx < nBars; barIdx++)
+      std::size_t nBars = source_bars.Count();
+      for (std::size_t barIdx = 0; barIdx < nBars; barIdx++)
       {
-         CComPtr<IBarRecord> bar;
-         source_bars->get_Item(CComVariant(barIdx), &bar);
-         targetBars->Add(bar);
+         auto bar = source_bars.Item(barIdx);
+         ATLASSERT(bar != nullptr);
+         targetBars.Add(bar);
       }
 
       return deResult;
@@ -842,14 +774,11 @@ void CBarlistListView::OnEditCut()
 
    // do the cut
    CBarlistDoc* pDoc = GetDocument();
-   CComPtr<IBarlist> barlist;
-   pDoc->GetBarlist(&barlist);
-   CComPtr<IGroupCollection> groups;
-   barlist->get_Groups(&groups);
-   CComPtr<IGroup> group;
-   groups->get_Item(CComVariant(m_GroupIdx), &group);
-   CComPtr<IBarRecordCollection> bars;
-   group->get_BarRecords(&bars);
+   CBarlist& barlist = pDoc->GetBarlist();
+   CGroupCollection& groups = barlist.GetGroups();
+   auto group = groups.Item(m_GroupIdx);
+   ATLASSERT(group != nullptr);
+   CBarRecordCollection& bars = group->GetBarRecords();
 
    // because we are working with index, we have
    // to remove from the collection in reverse order
@@ -870,7 +799,7 @@ void CBarlistListView::OnEditCut()
    for ( ; iter != end; iter++)
    {
       long barRecordIdx = *iter;
-      bars->Remove(CComVariant(barRecordIdx));
+      bars.Remove(barRecordIdx);
    }
 }
 
@@ -894,14 +823,11 @@ void CBarlistListView::OnGenerateMarkNumbers()
    if (dlg.DoModal() == IDOK)
    {
       CBarlistDoc* pDoc = GetDocument();
-      CComPtr<IBarlist> barlist;
-      pDoc->GetBarlist(&barlist);
-      CComPtr<IGroupCollection> groups;
-      barlist->get_Groups(&groups);
-      CComPtr<IGroup> group;
-      groups->get_Item(CComVariant(m_GroupIdx), &group);
-      CComPtr<IBarRecordCollection> bars;
-      group->get_BarRecords(&bars);
+      CBarlist& barlist = pDoc->GetBarlist();
+      CGroupCollection& groups = barlist.GetGroups();
+      auto group = groups.Item(m_GroupIdx);
+      ATLASSERT(group != nullptr);
+      CBarRecordCollection& bars = group->GetBarRecords();
 
       CListCtrl& list = GetListCtrl();
       int n = list.GetSelectedCount();
@@ -918,13 +844,13 @@ void CBarlistListView::OnGenerateMarkNumbers()
          int item = list.GetNextSelectedItem(pos);
          long barRecordIdx = (long)list.GetItemData(item);
 
-         CComPtr<IBarRecord> bar;
-         bars->get_Item(CComVariant(barRecordIdx), &bar);
+         auto bar = bars.Item(barRecordIdx);
+         ATLASSERT(bar != nullptr);
 
          CString strMark;
          strMark.Format(_T("%d"), mark);
 
-         bar->put_Mark(CComBSTR(strMark));
+         bar->SetMark(std::_tstring((LPCTSTR)strMark));
 
          mark += dlg.m_Increment;
       }

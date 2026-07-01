@@ -1,0 +1,5 @@
+; ExampleAddin.def : Declares the module parameters.
+
+LIBRARY      "ExampleAddin.DLL"
+
+EXPORTS

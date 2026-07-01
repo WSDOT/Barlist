@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,51 +23,29 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// BendData.h : Declaration of the CBendData
+// BendData.h : Declaration of CBendData (native, replaces the IBendData
+// ATL/COM coclass). Immutable reference data -- no setters beyond SetData,
+// which is only ever called once during CBarCollection's static table init.
 
-#ifndef __BENDDATA_H_
-#define __BENDDATA_H_
+#pragma once
 
-#include "resource.h"       // main symbols
+#include "BarsExport.h"
+#include "Enums.h"
+#include <WBFLTypes.h>
 
-/////////////////////////////////////////////////////////////////////////////
-// CBendData
-class ATL_NO_VTABLE CBendData : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-	public CComCoClass<CBendData, &CLSID_BendData>,
-	public IDispatchImpl<IBendData, &IID_IBendData, &LIBID_BARSLib>
+class BARS_API CBendData
 {
 public:
-	CBendData()
-	{
-	}
+    CBendData() = default;
 
-   void SetData(BendMeasureType bendMeasure,Float64 ID,UseType use)
-   {
-      m_BendMeasure = bendMeasure;
-      m_ID  = ID;
-      m_Use = use;
-   }
+    void SetData(BendMeasureType bendMeasure, Float64 ID, UseType use);
 
-DECLARE_REGISTRY_RESOURCEID(IDR_BENDDATA)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CBendData)
-	COM_INTERFACE_ENTRY(IBendData)
-	COM_INTERFACE_ENTRY(IDispatch)
-END_COM_MAP()
-
-// IBendData
-public:
-	STDMETHOD(get_InsideDiameter)(/*[out, retval]*/ Float64 *pVal);
-   STDMETHOD(get_BendMeasure)(BendMeasureType* pVal);
-	STDMETHOD(get_Use)(/*[out, retval]*/ UseType *pVal);
+    UseType GetUse() const;
+    Float64 GetInsideDiameter() const; // inside bend diameter, or ID/db if BendMeasure == BarDiameter
+    BendMeasureType GetBendMeasure() const;
 
 private:
-   UseType m_Use;
-   Float64 m_ID; // Inside bend diameter or ID/db (inside diameter is this number of bar diameters), depending on value of m_BendMeasure
-   BendMeasureType m_BendMeasure;
+    UseType m_Use = UseType::utLongitudinal;
+    Float64 m_ID = 0;
+    BendMeasureType m_BendMeasure = BendMeasureType::BarDiameter;
 };
-
-#endif //__BENDDATA_H_

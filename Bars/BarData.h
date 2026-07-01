@@ -1,18 +1,18 @@
 ///////////////////////////////////////////////////////////////////////
 // Bars.dll - Automation Engine for Reinforcing Steel Weight Estimations
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright ï¿½ 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This software was developed as part of the Alternate Route Project
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
+// it under the terms of the Alternate Route Open Source License as
 // published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
 // This program is distributed in the hope that it will be useful,
 // but is distributed AS IS, WITHOUT ANY WARRANTY; without even the
-// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 // PURPOSE.  See the Alternate Route Open Source License for more details.
 //
 // You should have received a copy of the Alternate Open Source License
@@ -23,67 +23,47 @@
 ///////////////////////////////////////////////////////////////////////
 
 
-// BarData.h : Declaration of the CBarData
+// BarData.h : Declaration of CBarData (native, replaces the IBarData
+// ATL/COM coclass). Immutable per-bar-size reference data, owned and
+// vended by CBarCollection's static tables.
 
-#ifndef __BARDATA_H_
-#define __BARDATA_H_
+#pragma once
 
-#include "resource.h"       // main symbols
+#include "BarsExport.h"
+#include "BendData.h"
+#include "HookData.h"
+#include <WBFLTypes.h>
 #include <string>
+#include <array>
+#include <optional>
 
-typedef enum BendMeasure
-{
-   DiameterRatio,
-   Diameter
-} BendMeasure;
-
-/////////////////////////////////////////////////////////////////////////////
-// CBarData
-class ATL_NO_VTABLE CBarData : 
-	public CComObjectRootEx<CComSingleThreadModel>,
-   //public CComRefCountTracer<CBarData, CComObjectRootEx<CComSingleThreadModel>>,
-   public CComCoClass<CBarData, &CLSID_BarData>,
-	public IDispatchImpl<IBarData, &IID_IBarData, &LIBID_BARSLib>
+class BARS_API CBarData
 {
 public:
-	CBarData()
-	{
-	}
+    CBarData() = default;
 
-   void FinalRelease();
+    void SetBarData(const std::_tstring& name, Float64 db, Float64 mass, Float64 length, Float64 maxLength);
+    void AddBendData(UseType use, Float64 ID, BendMeasureType bendMeasure);
+    void AddHookData(UseType use, HookType hook, Float64 T, BendMeasureType bendMeasure, Float64 Tmin);
 
-   void SetBarData(const std::string& name,Float64 db,Float64 mass,Float64 length,Float64 max_length);
-   void AddBendData(UseType use,Float64 ID, BendMeasureType bendMeasure);
-   void AddHookData(UseType use,HookType hook,Float64 T,BendMeasureType bendMeasure, Float64 Tmin);
+    const std::_tstring& GetName() const;
+    Float64 GetDiameter() const;
+    Float64 GetMass() const;
+    Float64 GetNormalLength() const;
+    Float64 GetMaxLength() const;
 
-DECLARE_REGISTRY_RESOURCEID(IDR_BARDATA)
-
-DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-BEGIN_COM_MAP(CBarData)
-	COM_INTERFACE_ENTRY(IBarData)
-	COM_INTERFACE_ENTRY(IDispatch)
-END_COM_MAP()
-
-// IBarData
-public:
-	STDMETHOD(get_Name)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(get_HookData)(/*[in]*/ UseType use,/*[in]*/ HookType hook,/*[out, retval]*/ IHookData* *pVal);
-	STDMETHOD(get_BendData)(/*[in]*/ UseType use, /*[out, retval]*/ IBendData* *pVal);
-   STDMETHOD(get_MaxLength)(/*[out, retval]*/ Float64 *pVal);
-   STDMETHOD(get_NormalLength)(/*[out, retval]*/ Float64 *pVal);
-	STDMETHOD(get_Mass)(/*[out, retval]*/ Float64 *pVal);
-	STDMETHOD(get_Diameter)(/*[out, retval]*/ Float64 *pVal);
+    // Returns nullptr if no bend/hook data was registered for the given use/hook,
+    // matching the original COM getters' silent-null behavior.
+    const CBendData* GetBendData(UseType use) const;
+    const CHookData* GetHookData(UseType use, HookType hook) const;
 
 private:
-   CComBSTR m_Name;
-   Float64 m_db;
-   Float64 m_Mass;
-   Float64 m_Length;
-   Float64 m_MaxLength;
+    std::_tstring m_Name;
+    Float64 m_db = 0;
+    Float64 m_Mass = 0;
+    Float64 m_Length = 0;
+    Float64 m_MaxLength = 0;
 
-   CComPtr<IBendData> m_pBends[3];
-   CComPtr<IHookData> m_pHooks[3][3];
+    std::array<std::optional<CBendData>, 3> m_Bends;
+    std::array<std::array<std::optional<CHookData>, 3>, 3> m_Hooks;
 };
-
-#endif //__BARDATA_H_

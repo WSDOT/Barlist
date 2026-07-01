@@ -1,22 +1,22 @@
 ///////////////////////////////////////////////////////////////////////
 // Barlist
-// Copyright © 1999-2026  Washington State Department of Transportation
+// Copyright Â© 1999-2026  Washington State Department of Transportation
 //                        Bridge and Structures Office
 //
 // This program is free software; you can redistribute it and/or modify
-// it under the terms of the Alternate Route Open Source License as 
-// published by the Washington State Department of Transportation, 
+// it under the terms of the Alternate Route Open Source License as
+// published by the Washington State Department of Transportation,
 // Bridge and Structures Office.
 //
-// This program is distributed in the hope that it will be useful, but 
-// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied 
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+// This program is distributed in the hope that it will be useful, but
+// distribution is AS IS, WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
 // the Alternate Route Open Source License for more details.
 //
-// You should have received a copy of the Alternate Route Open Source 
-// License along with this program; if not, write to the Washington 
-// State Department of Transportation, Bridge and Structures Office, 
-// P.O. Box  47340, Olympia, WA 98503, USA or e-mail 
+// You should have received a copy of the Alternate Route Open Source
+// License along with this program; if not, write to the Washington
+// State Department of Transportation, Bridge and Structures Office,
+// P.O. Box  47340, Olympia, WA 98503, USA or e-mail
 // Bridge_Support@wsdot.wa.gov
 ///////////////////////////////////////////////////////////////////////
 #pragma once
@@ -26,16 +26,13 @@
 #include <MfcTools\CacheEdit.h>
 #include <MfcTools\CacheCheckBox.h>
 #include <MfcTools\MetaFileStatic.h>
+#include <Bars\Enums.h>
 
-interface IBarInfoMgr;
-interface IBarlist;
-interface IGroup;
-interface IBarRecord;
-interface IStatusMessageCollection;
-
-enum StatusType;
-
-void DDX_Text(CDataExchange* pDX, int nIDC, CComBSTR& bstr);
+class CBarInfoMgr;
+class CBarlist;
+class CGroup;
+class CBarRecord;
+class CStatusMessageCollection;
 
 // Want to be able to update the bend image as the user scrolls
 // over the list of bend... the only way to do this is with
@@ -53,7 +50,7 @@ class CBarDlg : public CDialog
 	DECLARE_DYNAMIC(CBarDlg)
 
 public:
-	CBarDlg(IBarInfoMgr* pBarInfoMgr,IBarlist* pBarlist,long groupIdx=-1,long barIdx=-1,CWnd* pParent = NULL);   // standard constructor
+	CBarDlg(CBarInfoMgr& barInfoMgr,CBarlist& barlist,long groupIdx=-1,long barIdx=-1,CWnd* pParent = NULL);   // standard constructor
 	virtual ~CBarDlg();
 
 // Dialog Data
@@ -64,8 +61,9 @@ public:
 protected:
    bool m_bIsCollaboration;
 
-   CComPtr<IBarInfoMgr> m_BarInfoMgr;
-   CComPtr<IBarlist> m_Barlist;
+   // Non-owning: BarlistDoc retains ownership for the lifetime of this dialog.
+   CBarInfoMgr& m_BarInfoMgr;
+   CBarlist& m_Barlist;
 
    CBarDlgStateMachine m_SM;
    friend CBarDlgStateMachine;
@@ -95,26 +93,26 @@ protected:
 
    void SelectBar(long groupIdx, long barIdx);
 
-   void UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, IBarRecord* pBarRecord);
-   void UpdateMessages(IBarRecord* pBarRecord);
-   void GetStatusMessages(LPCTSTR lpszMsgGroup, CString& strMsgs, IStatusMessageCollection* pMessages);
+   void UpdateBarData(BOOL bSaveAndValidate, long groupIdx, long barIdx, CBarRecord* pBarRecord);
+   void UpdateMessages(CBarRecord* pBarRecord);
+   void GetStatusMessages(LPCTSTR lpszMsgGroup, CString& strMsgs, const CStatusMessageCollection& messages);
 
    void UpdateGroups();
    void UpdateBarSizes();
    void UpdateBendTypes();
-   
+
    void UpdateStatus();
-   void UpdateStatus(IGroup* pGroup);
-   void UpdateStatus(IBarRecord* pBarRecord);
+   void UpdateStatus(CGroup* pGroup);
+   void UpdateStatus(CBarRecord* pBarRecord);
    void UpdateStatus(const StatusType& status);
 
    void UpdateVaries();
 
    void UpdateMarkNumbers();
-   void UpdateDimensions(IBarRecord* pBarRecord);
+   void UpdateDimensions(CBarRecord* pBarRecord);
    void UpdateDimensions(long bendType,bool bVaries);
 
-   void UpdateBendGuide(IBarRecord* pBarRecord);
+   void UpdateBendGuide(CBarRecord* pBarRecord);
    void UpdateBendGuide(long bendType);
 
    BOOL CheckEditState();
