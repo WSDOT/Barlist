@@ -843,7 +843,7 @@ void CBarlistDoc::OnAddBar()
       {
          AFX_MANAGE_STATE(AfxGetStaticModuleState());
          CString strGroup;
-         BOOL bResult = AfxQuestion(_T("New Group"), _T("The barlist must have at least one group before bars can be added.\nGroup Name:"), _T(""), strGroup);
+         BOOL bResult = AfxQuestion(_T("New Group"), _T("The barlist must have at least one group before bars can be added.\nGroup Name:"), _T("Unnamed"), strGroup);
          if (bResult)
          {
             VERIFY(SUCCEEDED(groups->Add(CComBSTR(strGroup))));
