@@ -79,6 +79,8 @@ protected:
    virtual CString GetProductCode() override;
    virtual CString GetDocumentationRootLocation() override;
 
+   std::_tstring GetManifestApplicationName() const override;
+
 public:
    CString GetVersion(bool bIncludeBuildNumber) const;
    CString GetVersionString(bool bIncludeBuildNumber) const;

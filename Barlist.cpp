@@ -138,6 +138,11 @@ CString CBarlistApp::GetDocumentationRootLocation()
    }
 }
 
+std::_tstring CBarlistApp::GetManifestApplicationName() const
+{
+   return _T("BarlistDriver");
+}
+
 LPCTSTR CBarlistApp::GetRegistryKey()
 {
    return _T("Washington State Department of Transportation");
