@@ -40,14 +40,14 @@ void CBarData::AddBendData(UseType use, Float64 ID, BendMeasureType bendMeasure)
 {
     CBendData bendData;
     bendData.SetData(bendMeasure, ID, use);
-    m_Bends[static_cast<size_t>(use)] = bendData;
+    m_Bends[+use] = bendData;
 }
 
 void CBarData::AddHookData(UseType use, HookType hook, Float64 T, BendMeasureType bendMeasure, Float64 Tmin)
 {
     CHookData hookData;
     hookData.SetData(hook, use, T, bendMeasure, Tmin);
-    m_Hooks[static_cast<size_t>(use)][static_cast<size_t>(hook)] = hookData;
+    m_Hooks[+use][+hook] = hookData;
 }
 
 const std::_tstring& CBarData::GetName() const
@@ -77,12 +77,12 @@ Float64 CBarData::GetMaxLength() const
 
 const CBendData* CBarData::GetBendData(UseType use) const
 {
-    const auto& bend = m_Bends[static_cast<size_t>(use)];
+    const auto& bend = m_Bends[+use];
     return bend.has_value() ? &bend.value() : nullptr;
 }
 
 const CHookData* CBarData::GetHookData(UseType use, HookType hook) const
 {
-    const auto& hookData = m_Hooks[static_cast<size_t>(use)][static_cast<size_t>(hook)];
+    const auto& hookData = m_Hooks[+use][+hook];
     return hookData.has_value() ? &hookData.value() : nullptr;
 }

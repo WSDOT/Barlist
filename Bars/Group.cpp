@@ -93,7 +93,7 @@ const CBarRecordCollection& CGroup::GetBarRecords() const
 
 Float64 CGroup::GetQuantity(MaterialType material, bool bEpoxy, bool bSubstructure) const
 {
-    std::size_t materialIdx = static_cast<std::size_t>(material);
+    std::size_t materialIdx = +material;
 
     if (bSubstructure)
     {
@@ -158,7 +158,7 @@ void CGroup::UpdateStatus()
             quantity = bar->GetMass();
         }
 
-        std::size_t materialIdx = static_cast<std::size_t>(material);
+        std::size_t materialIdx = +material;
         if (bSubstructure)
         {
             if (bEpoxy)

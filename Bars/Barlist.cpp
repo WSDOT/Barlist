@@ -221,7 +221,7 @@ Float64 CBarlist::GetQuantity(MaterialType material, bool bEpoxy, bool bSubstruc
 
 Float64 CBarlist::GetQuantityByGroup(const std::_tstring& groupName, MaterialType material, bool bEpoxy, bool bSubstructure) const
 {
-    std::size_t materialIdx = static_cast<std::size_t>(material);
+    std::size_t materialIdx = +material;
 
     if (bSubstructure)
     {
