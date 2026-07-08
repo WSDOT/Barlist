@@ -28,7 +28,6 @@
 #include "BarCollection.h"
 #include <tchar.h>
 
-#pragma warning(disable : 4251)
 #include <Units\Units.h>
 
 struct CBarCollection::BarInfo
@@ -56,7 +55,7 @@ struct CBarCollection::BendInfo
 
 struct CBarCollection::HookInfo
 {
-    HookInfo(const TCHAR* name, UseType use, HookType hook, Float64 tail, Float64 min_tail, BendMeasureType bm = BendMeasureType::BarDiameter) :
+    HookInfo(const TCHAR* name, UseType use, HookType hook, Float64 tail, Float64 min_tail = 0.0, BendMeasureType bm = BendMeasureType::BarDiameter) :
         Name(name), use(use), hook(hook), tail(tail), min_tail(min_tail), bendMeasure(bm) {}
 
     std::_tstring Name;
@@ -138,35 +137,42 @@ static const CBarCollection::BendInfo* GetSteelBendInfo(int& count)
 {
     static const CBarCollection::BendInfo data[] =
 {
-   CBarCollection::BendInfo(_T("#3"), UseType::utLongitudinal,  6.0),
-   CBarCollection::BendInfo(_T("#3"), UseType::utTransverse,    4.0),
-   CBarCollection::BendInfo(_T("#3"), UseType::utSeismic,       4.0),
-
-   CBarCollection::BendInfo(_T("#4"), UseType::utLongitudinal,  6.0),
-   CBarCollection::BendInfo(_T("#4"), UseType::utTransverse,    4.0),
-   CBarCollection::BendInfo(_T("#4"), UseType::utSeismic,       4.0),
-
-   CBarCollection::BendInfo(_T("#5"), UseType::utLongitudinal,  6.0),
-   CBarCollection::BendInfo(_T("#5"), UseType::utTransverse,    4.0),
-   CBarCollection::BendInfo(_T("#5"), UseType::utSeismic,       4.0),
-
-   CBarCollection::BendInfo(_T("#6"), UseType::utLongitudinal,  6.0),
-   CBarCollection::BendInfo(_T("#6"), UseType::utTransverse,    6.0),
-   CBarCollection::BendInfo(_T("#6"), UseType::utSeismic,       6.0),
-
-   CBarCollection::BendInfo(_T("#7"), UseType::utLongitudinal,  6.0),
-   CBarCollection::BendInfo(_T("#7"), UseType::utTransverse,    6.0),
-   CBarCollection::BendInfo(_T("#7"), UseType::utSeismic,       6.0),
-
-   CBarCollection::BendInfo(_T("#8"), UseType::utLongitudinal,  6.0),
-   CBarCollection::BendInfo(_T("#8"), UseType::utTransverse,    6.0),
-   CBarCollection::BendInfo(_T("#8"), UseType::utSeismic,       6.0),
-
+   // LRFD Table 5.10.2.3-1
+   // #3-#5 6db (general)
+   // #6-#8 6db
+   // #9, #10, #11 8db
+   // #14, #18 10db
+   CBarCollection::BendInfo( _T("#3"), UseType::utLongitudinal,  6.0),
+   CBarCollection::BendInfo( _T("#4"), UseType::utLongitudinal,  6.0),
+   CBarCollection::BendInfo( _T("#5"), UseType::utLongitudinal,  6.0),
+   CBarCollection::BendInfo( _T("#6"), UseType::utLongitudinal,  6.0),
+   CBarCollection::BendInfo( _T("#7"), UseType::utLongitudinal,  6.0),
+   CBarCollection::BendInfo( _T("#8"), UseType::utLongitudinal,  6.0),
    CBarCollection::BendInfo( _T("#9"), UseType::utLongitudinal,  8.0),
    CBarCollection::BendInfo(_T("#10"), UseType::utLongitudinal,  8.0),
    CBarCollection::BendInfo(_T("#11"), UseType::utLongitudinal,  8.0),
    CBarCollection::BendInfo(_T("#14"), UseType::utLongitudinal, 10.0),
-   CBarCollection::BendInfo(_T("#18"), UseType::utLongitudinal, 10.0)
+   CBarCollection::BendInfo(_T("#18"), UseType::utLongitudinal, 10.0),
+
+   // LRFD Table 5.10.2.3-1
+   // #3-#5 4db (stirrups and ties)
+   // #6-#8 6db
+   CBarCollection::BendInfo(_T("#3"), UseType::utTransverse,    4.0),
+   CBarCollection::BendInfo(_T("#4"), UseType::utTransverse,    4.0),
+   CBarCollection::BendInfo(_T("#5"), UseType::utTransverse,    4.0),
+   CBarCollection::BendInfo(_T("#6"), UseType::utTransverse,    6.0),
+   CBarCollection::BendInfo(_T("#7"), UseType::utTransverse,    6.0),
+   CBarCollection::BendInfo(_T("#8"), UseType::utTransverse,    6.0),
+
+   // There is nothing specified in LRFD for seismic bends, but there is for seismic hooks. When a bar is designated as seismic
+   // the bend diameter is the same as for transverse bars. It is easier to have a seismic bend table than to have a special 
+   // coding to use the transverse bend table for seismic bars.
+   CBarCollection::BendInfo(_T("#3"), UseType::utSeismic,       4.0),
+   CBarCollection::BendInfo(_T("#4"), UseType::utSeismic,       4.0),
+   CBarCollection::BendInfo(_T("#5"), UseType::utSeismic,       4.0),
+   CBarCollection::BendInfo(_T("#6"), UseType::utSeismic,       6.0),
+   CBarCollection::BendInfo(_T("#7"), UseType::utSeismic,       6.0),
+   CBarCollection::BendInfo(_T("#8"), UseType::utSeismic,       6.0)
 };
     count = sizeof(data) / sizeof(data[0]);
     return data;
@@ -174,58 +180,62 @@ static const CBarCollection::BendInfo* GetSteelBendInfo(int& count)
 
 static const CBarCollection::HookInfo* GetSteelHookInfo(int& count)
 {
+    static const Float64 _2_5_in = WBFL::Units::ConvertToSysUnits(2.5, WBFL::Units::Measure::Inch);
+    static const Float64 _3_in = WBFL::Units::ConvertToSysUnits(3.0, WBFL::Units::Measure::Inch);
     static const CBarCollection::HookInfo data[] =
 {
-   CBarCollection::HookInfo(_T("#3"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#3"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht90,   6.0,    0.0),
-   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht135,  6.0,    0.0),
-   CBarCollection::HookInfo(_T("#3"), UseType::utSeismic,      HookType::ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
+   // LRFD 5.10.2.1, for longitudinal reinforcement, hooks with 90-degree bend the extension is 12db for all sizes
+   CBarCollection::HookInfo( _T("#3"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo( _T("#4"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo( _T("#5"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo( _T("#6"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo( _T("#7"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo( _T("#8"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo( _T("#9"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo(_T("#10"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo(_T("#11"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo(_T("#14"), UseType::utLongitudinal, HookType::ht90,  12.0),
+   CBarCollection::HookInfo(_T("#18"), UseType::utLongitudinal, HookType::ht90,  12.0),
 
-   CBarCollection::HookInfo(_T("#4"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#4"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht90,   6.0,    0.0),
-   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht135,  6.0,    0.0),
-   CBarCollection::HookInfo(_T("#4"), UseType::utSeismic,      HookType::ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
+   // LRFD 5.10.2.1, for longitudinal reinforcement, hooks with 180-degree bend the extension is 4db, but not less than 2.5", for all sizes
+   CBarCollection::HookInfo( _T("#3"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo( _T("#4"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo( _T("#5"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo( _T("#6"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo( _T("#7"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo( _T("#8"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo( _T("#9"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo(_T("#10"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo(_T("#11"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo(_T("#14"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
+   CBarCollection::HookInfo(_T("#18"), UseType::utLongitudinal, HookType::ht180,  4.0,   _2_5_in),
 
-   CBarCollection::HookInfo(_T("#5"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#5"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht90,   6.0,    0.0),
-   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht135,  6.0,    0.0),
-   CBarCollection::HookInfo(_T("#5"), UseType::utSeismic,      HookType::ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
+   // LRFD 5.10.2.1, for transverse reinforcement, hooks with 90-degree bend the extension
+   // 6db for #5 and smaller
+   // 12db for #6, #7, #8
+   // Standard hooks for transverse reinforcement for bars greater than #8 are not specified in LRFD
+   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht90,   6.0),
+   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht90,   6.0),
+   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht90,   6.0),
+   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht90,  12.0),
+   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht90,  12.0),
+   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht90,  12.0),
 
-   CBarCollection::HookInfo(_T("#6"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#6"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht135,  6.0,    0.0),
-   CBarCollection::HookInfo(_T("#6"), UseType::utSeismic,      HookType::ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
+   // LRFD 5.10.2.1, for transverse reinforcement, hooks with 135-degree bend the extension is 6db for #8 and smaller
+   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht135,  6.0),
+   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht135,  6.0),
+   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht135,  6.0),
+   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht135,  6.0),
+   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht135,  6.0),
+   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht135,  6.0),
 
-   CBarCollection::HookInfo(_T("#7"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#7"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht135,  6.0,    0.0),
-   CBarCollection::HookInfo(_T("#7"), UseType::utSeismic,      HookType::ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
-
-   CBarCollection::HookInfo(_T("#8"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#8"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht135,  6.0,    0.0),
-   CBarCollection::HookInfo(_T("#8"), UseType::utSeismic,      HookType::ht135,  6.0,   WBFL::Units::ConvertToSysUnits(3.0,WBFL::Units::Measure::Inch)),
-
-   CBarCollection::HookInfo(_T("#9"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#9"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-
-   CBarCollection::HookInfo(_T("#10"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#10"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-
-   CBarCollection::HookInfo(_T("#11"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#11"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-
-   CBarCollection::HookInfo(_T("#14"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#14"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch)),
-
-   CBarCollection::HookInfo(_T("#18"), UseType::utLongitudinal, HookType::ht90,  12.0,    0.0),
-   CBarCollection::HookInfo(_T("#18"), UseType::utLongitudinal, HookType::ht180,  4.0,   WBFL::Units::ConvertToSysUnits(2.5,WBFL::Units::Measure::Inch))
+   // LRFD 5.10.2.2 and LRFD 5.11.4.1.4, seismic hooks with 135-degree bend the extension is 6db, but not less than 3", for #8 and smaller
+   CBarCollection::HookInfo(_T("#3"), UseType::utSeismic,      HookType::ht135,  6.0,   _3_in),
+   CBarCollection::HookInfo(_T("#4"), UseType::utSeismic,      HookType::ht135,  6.0,   _3_in),
+   CBarCollection::HookInfo(_T("#5"), UseType::utSeismic,      HookType::ht135,  6.0,   _3_in),
+   CBarCollection::HookInfo(_T("#6"), UseType::utSeismic,      HookType::ht135,  6.0,   _3_in),
+   CBarCollection::HookInfo(_T("#7"), UseType::utSeismic,      HookType::ht135,  6.0,   _3_in),
+   CBarCollection::HookInfo(_T("#8"), UseType::utSeismic,      HookType::ht135,  6.0,   _3_in)
 };
     count = sizeof(data) / sizeof(data[0]);
     return data;
@@ -280,41 +290,40 @@ static const CBarCollection::HookInfo* GetGfrpHookInfo(int& count)
 {
     static const CBarCollection::HookInfo data[] =
 {
-   CBarCollection::HookInfo(_T("#3"), UseType::utLongitudinal, HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#3"), UseType::utLongitudinal, HookType::ht180,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht135,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#3"), UseType::utSeismic,      HookType::ht135,  8.0, 0.0),
+   CBarCollection::HookInfo(_T("#3"), UseType::utLongitudinal, HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#4"), UseType::utLongitudinal, HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#5"), UseType::utLongitudinal, HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#6"), UseType::utLongitudinal, HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#7"), UseType::utLongitudinal, HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#8"), UseType::utLongitudinal, HookType::ht90,   8.0),
 
-   CBarCollection::HookInfo(_T("#4"), UseType::utLongitudinal, HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#4"), UseType::utLongitudinal, HookType::ht180,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht135,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#4"), UseType::utSeismic,      HookType::ht135,  8.0, 0.0),
+   CBarCollection::HookInfo(_T("#3"), UseType::utLongitudinal, HookType::ht180,  8.0),
+   CBarCollection::HookInfo(_T("#4"), UseType::utLongitudinal, HookType::ht180,  8.0),
+   CBarCollection::HookInfo(_T("#5"), UseType::utLongitudinal, HookType::ht180,  8.0),
+   CBarCollection::HookInfo(_T("#6"), UseType::utLongitudinal, HookType::ht180,  8.0),
+   CBarCollection::HookInfo(_T("#7"), UseType::utLongitudinal, HookType::ht180,  8.0),
+   CBarCollection::HookInfo(_T("#8"), UseType::utLongitudinal, HookType::ht180,  8.0),
 
-   CBarCollection::HookInfo(_T("#5"), UseType::utLongitudinal, HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#5"), UseType::utLongitudinal, HookType::ht180,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht135,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#5"), UseType::utSeismic,      HookType::ht135,  8.0, 0.0),
+   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht90,   8.0),
+   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht90,   8.0),
 
-   CBarCollection::HookInfo(_T("#6"), UseType::utLongitudinal, HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#6"), UseType::utLongitudinal, HookType::ht180,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht135,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#6"), UseType::utSeismic,      HookType::ht135,  8.0, 0.0),
+   CBarCollection::HookInfo(_T("#3"), UseType::utTransverse,   HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#4"), UseType::utTransverse,   HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#5"), UseType::utTransverse,   HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#6"), UseType::utTransverse,   HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht135,  8.0),
 
-   CBarCollection::HookInfo(_T("#7"), UseType::utLongitudinal, HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#7"), UseType::utLongitudinal, HookType::ht180,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#7"), UseType::utTransverse,   HookType::ht135,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#7"), UseType::utSeismic,      HookType::ht135,  8.0, 0.0),
-
-   CBarCollection::HookInfo(_T("#8"), UseType::utLongitudinal, HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#8"), UseType::utLongitudinal, HookType::ht180,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht90,   8.0, 0.0),
-   CBarCollection::HookInfo(_T("#8"), UseType::utTransverse,   HookType::ht135,  8.0, 0.0),
-   CBarCollection::HookInfo(_T("#8"), UseType::utSeismic,      HookType::ht135,  8.0, 0.0),
+   CBarCollection::HookInfo(_T("#3"), UseType::utSeismic,      HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#4"), UseType::utSeismic,      HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#5"), UseType::utSeismic,      HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#6"), UseType::utSeismic,      HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#7"), UseType::utSeismic,      HookType::ht135,  8.0),
+   CBarCollection::HookInfo(_T("#8"), UseType::utSeismic,      HookType::ht135,  8.0),
 };
     count = sizeof(data) / sizeof(data[0]);
     return data;
