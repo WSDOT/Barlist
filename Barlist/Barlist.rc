@@ -55,8 +55,8 @@ IDR_BARLIST_10_TO_20_XSLT 256                     ".\\Schema\\Barlist_Version_1.
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 9,0,2,1
- PRODUCTVERSION 9,0,2,1
+ FILEVERSION 9,0,3,1
+ PRODUCTVERSION 9,0,3,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -74,12 +74,12 @@ BEGIN
             VALUE "Comments", "A member of the Alternate Route Project"
             VALUE "CompanyName", "Washington State Department of Transportation"
             VALUE "FileDescription", "Barlist Module"
-            VALUE "FileVersion", "9.0.2.1"
+            VALUE "FileVersion", "9.0.3.1"
             VALUE "InternalName", "Barlist"
             VALUE "LegalCopyright", "Copyright © 1999-2026, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "Barlist.DLL"
             VALUE "ProductName", "Barlist Module"
-            VALUE "ProductVersion", "9.0.2.1"
+            VALUE "ProductVersion", "9.0.3.1"
         END
     END
     BLOCK "VarFileInfo"
