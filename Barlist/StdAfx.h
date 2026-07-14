@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <targetver.h>
+
 #include <afxwin.h>
 #include <afxdisp.h>
 #include <afxcview.h>
