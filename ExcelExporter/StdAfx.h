@@ -33,6 +33,8 @@
 
 #define _ATL_APARTMENT_THREADED
 
+#include <targetver.h>
+
 #include <afxwin.h>
 #include <afxdisp.h>
 #include <afxext.h>

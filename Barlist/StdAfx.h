@@ -31,6 +31,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <targetver.h>
+
 #include <afxwin.h>
 #include <afxdisp.h>
 #include <afxcview.h>
