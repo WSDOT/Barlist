@@ -46,7 +46,7 @@
 
 
   <?if $(var.Platform)="x64"?>
-      <?define XercesSourceRoot=\ARP\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\?>
+      <?define XercesSourceRoot=\ARP\WBFL\Apache\XERCESCPKG-324-X64-VC143\bin\?>
    <?else?>
       <?define XercesSourceRoot=\ARP\WBFL\Apache\XERCESCPKG-31-X86-VC100\bin\?>
    <?endif?>

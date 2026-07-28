@@ -9,7 +9,7 @@
       <DirectoryRef Id="APPLICATIONFOLDER"
                     FileSource ="$(var.XercesSourceRoot)" >
          <Component Id="Xerces" Guid="{C1EBA88B-0D32-4300-B0ED-574A9568DCC8}" Win64="$(var.IsWin64)">
-            <File Id="xerces_c_3_1.dll"    Name="xerces-c_3_1.dll" KeyPath="yes"/>
+            <File Id="xerces_c_32.dll"    Name="xerces-c-3.2.dll" KeyPath="yes"/>
          </Component>
       </DirectoryRef >
 

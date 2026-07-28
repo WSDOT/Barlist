@@ -78,7 +78,7 @@
       <AdditionalIncludeDirectories>..\SDK\Include</AdditionalIncludeDirectories>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\WBFL\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories);$(ARPDIR)\BridgeLink\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);%(AdditionalIncludeDirectories);$(ARPDIR)\BridgeLink\Include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -106,7 +106,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalDependencies>$(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3.lib;$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1.lib;mfcs140u.lib</AdditionalDependencies>
+      <AdditionalDependencies>mfcs140u.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
@@ -127,10 +127,12 @@
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
       <Command>xcopy /y /d .\Schema\Barlist.xsd  $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+xcopy /y /d "$(XSDDIR)\bin\xerces-c-3.2.dll" $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d "$(ARPDIR)\WBFL\Apache\XALANCPKG-112-324-X64-VC143\bin\Xalan-C_1_12.dll" $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d "$(ARPDIR)\WBFL\Apache\XALANCPKG-112-324-X64-VC143\bin\XalanMessages_1_12.dll" $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1.dll</Outputs>
+      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c-3.2.dll;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Xalan-C_1_12.dll;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\XalanMessages_1_12.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -142,7 +144,7 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\Include;$(ARPDIR)\WBFL\Apache\XERCESCPKG-11-31-X64-VC100\Include;%(AdditionalIncludeDirectories);$(ARPDIR)\BridgeLink\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\;.\Schema;$(ARPDIR)\WBFL\Include;$(ARPDIR)\WBFL\Include\$(Platform);%(AdditionalIncludeDirectories);$(ARPDIR)\BridgeLink\Include</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -171,7 +173,7 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
       <ShowProgress>NotSet</ShowProgress>
-      <AdditionalDependencies>$(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\lib\xerces-c_3D.lib;$(ARPDIR)\WBFL\Apache\XALANCPKG-11-31-X64-VC100\lib\Xalan-C_1D.lib;mfcs140ud.lib</AdditionalDependencies>
+      <AdditionalDependencies>mfcs140ud.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
@@ -191,10 +193,12 @@ xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1.dll $
     </CXX_Tree_Mapping_Rule>
     <CustomBuildStep>
       <Command>xcopy /y /d .\Schema\Barlist.xsd  $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
-xcopy /y /d $(ARPDIR)\WBFL\Apache\XERCESCPKG-31-X64-VC100\bin\xerces-c_3_1D.dll $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
+xcopy /y /d "$(XSDDIR)\bin\xerces-c-3.2d.dll" $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d "$(ARPDIR)\WBFL\Apache\XALANCPKG-112-324-X64-VC143\bin\Xalan-C_1_12D.dll" $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\
+xcopy /y /d "$(ARPDIR)\WBFL\Apache\XALANCPKG-112-324-X64-VC143\bin\XalanMessages_1_12D.dll" $(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\</Command>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c_3_1D.dll</Outputs>
+      <Outputs>$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Barlist.xsd;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\xerces-c-3.2d.dll;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\Xalan-C_1_12D.dll;$(ARPDIR)\BridgeLink\RegFreeCOM\$(PlatformName)\$(ConfigurationName)\XalanMessages_1_12D.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
