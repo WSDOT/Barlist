@@ -44,7 +44,7 @@ BEGIN
             VALUE "FileDescription", "Barlist SDK Example Add-in"
             VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "ExampleAddin"
-            VALUE "LegalCopyright", "Copyright ï¿½ 1999-2026, Washington State Department of Transportation, All Rights Reserved"
+            VALUE "LegalCopyright", "Copyright © 1999-2026, Washington State Department of Transportation, All Rights Reserved"
             VALUE "OriginalFilename", "ExampleAddin.DLL"
             VALUE "ProductName", "Barlist SDK Example Add-in"
             VALUE "ProductVersion", "1.0.0.0"
