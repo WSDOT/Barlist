@@ -15,7 +15,9 @@ type doc\searchdata.xml >> %SEARCH_HTML%
 echo ^</script^> >> %SEARCH_HTML%
 
 %ARPDIR%\BridgeLink\RegFreeCOM\x64\Release\MakeDocMap Barlist
-rmdir /S /Q %ARPDIR%\BridgeLink\Docs\Barlist\%1\
-mkdir %ARPDIR%\BridgeLink\Docs\Barlist\%1\
-xcopy /s /y /d %ARPDIR%\Barlist\Documentation\doc\html\* %ARPDIR%\BridgeLink\Docs\Barlist\%1\
-copy %ARPDIR%\Barlist\Documentation\Barlist.dm %ARPDIR%\BridgeLink\Docs\Barlist\%1\
+rem ** Make the BridgeLink copy the same as the build, copying only changed files so unchanged files keep
+rem    their timestamps (PublishDocumentation.bat then sends only what changed to the server)
+powershell -NoProfile -ExecutionPolicy Bypass -File %ARPDIR%\BridgeLink\SyncFolder.ps1 -Source %ARPDIR%\Barlist\Documentation\doc\html -Target %ARPDIR%\BridgeLink\Docs\Barlist\%1 -Keep *.dm
+if errorlevel 1 exit /B 1
+powershell -NoProfile -ExecutionPolicy Bypass -File %ARPDIR%\BridgeLink\SyncFolder.ps1 -Source %ARPDIR%\Barlist\Documentation\Barlist.dm -Target %ARPDIR%\BridgeLink\Docs\Barlist\%1\Barlist.dm
+if errorlevel 1 exit /B 1
